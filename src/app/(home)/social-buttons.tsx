@@ -55,7 +55,7 @@ export default function SocialButtons() {
 						</motion.a>
 					)}
 
-					{secondaryShow && (
+//					{secondaryShow && (
 //						<motion.a
 //							href='https://juejin.cn/user/2427311675422382'
 //							target='_blank'
@@ -67,7 +67,7 @@ export default function SocialButtons() {
 //							<JuejinSVG className='h-6 w-6' />
 //							稀土掘金
 //						</motion.a> 
-					)}
+//					)}
 
 //					<motion.button
 //						onClick={() => {
