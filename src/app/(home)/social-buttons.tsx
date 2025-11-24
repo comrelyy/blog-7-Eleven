@@ -66,7 +66,7 @@ export default function SocialButtons() {
 //							className='card relative flex items-center gap-2 rounded-xl px-3 py-2.5 font-medium whitespace-nowrap'>
 //							<JuejinSVG className='h-6 w-6' />
 //							稀土掘金
-						</motion.a> 
+//						</motion.a> 
 					)}
 
 //					<motion.button
