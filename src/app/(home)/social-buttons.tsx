@@ -33,9 +33,8 @@ export default function SocialButtons() {
 		setTimeout(() => setTertiaryShow(true), styles.order * ANIMATION_DELAY * 1000 + 2 * delay)
 	}, [])
 
-	if (show)
-		return (
-			<motion.div
+/**	if (fales)
+/**		return (		<motion.div
 				className='absolute max-sm:static'
 				animate={{ left: center.x + hiCardStyles.width / 2, top: center.y + hiCardStyles.height / 2 + CARD_SPACING }}
 				initial={{ left: center.x + hiCardStyles.width / 2, top: center.y + hiCardStyles.height / 2 + CARD_SPACING }}>
@@ -84,6 +83,6 @@ export default function SocialButtons() {
 //					</motion.button>
 				</div>
 			</motion.div>
-		)
+		) */
 	return null
 }
