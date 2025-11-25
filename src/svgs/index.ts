@@ -3,42 +3,48 @@
 
 import Svg0 from './about-filled.svg'
 import Svg1 from './about-outline.svg'
-import Svg2 from './email.svg'
-import Svg3 from './github.svg'
-import Svg4 from './juejin.svg'
-import Svg5 from './music.svg'
-import Svg6 from './pen.svg'
-import Svg7 from './play.svg'
-import Svg8 from './projects-filled.svg'
-import Svg9 from './projects-outline.svg'
-import Svg10 from './scroll-filled.svg'
-import Svg11 from './scroll-outline.svg'
-import Svg12 from './share-filled.svg'
-import Svg13 from './share-outline.svg'
-import Svg14 from './short-line.svg'
-import Svg15 from './top.svg'
-import Svg16 from './website-filled.svg'
-import Svg17 from './website-outline.svg'
+import Svg2 from './checkin-filled.svg'
+import Svg3 from './checkin-outline.svg'
+import Svg4 from './dots.svg'
+import Svg5 from './email.svg'
+import Svg6 from './github.svg'
+import Svg7 from './juejin.svg'
+import Svg8 from './music.svg'
+import Svg9 from './pen.svg'
+import Svg10 from './play.svg'
+import Svg11 from './projects-filled.svg'
+import Svg12 from './projects-outline.svg'
+import Svg13 from './scroll-filled.svg'
+import Svg14 from './scroll-outline.svg'
+import Svg15 from './share-filled.svg'
+import Svg16 from './share-outline.svg'
+import Svg17 from './short-line.svg'
+import Svg18 from './top.svg'
+import Svg19 from './website-filled.svg'
+import Svg20 from './website-outline.svg'
 
 export type SvgComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>
 
 export const svgItems: { key: string; Component: SvgComponent }[] = [
-	{ key: './about-filled.svg', Component: Svg0 },
-	{ key: './about-outline.svg', Component: Svg1 },
-	{ key: './email.svg', Component: Svg2 },
-	{ key: './github.svg', Component: Svg3 },
-	{ key: './juejin.svg', Component: Svg4 },
-	{ key: './music.svg', Component: Svg5 },
-	{ key: './pen.svg', Component: Svg6 },
-	{ key: './play.svg', Component: Svg7 },
-	{ key: './projects-filled.svg', Component: Svg8 },
-	{ key: './projects-outline.svg', Component: Svg9 },
-	{ key: './scroll-filled.svg', Component: Svg10 },
-	{ key: './scroll-outline.svg', Component: Svg11 },
-	{ key: './share-filled.svg', Component: Svg12 },
-	{ key: './share-outline.svg', Component: Svg13 },
-	{ key: './short-line.svg', Component: Svg14 },
-	{ key: './top.svg', Component: Svg15 },
-	{ key: './website-filled.svg', Component: Svg16 },
-	{ key: './website-outline.svg', Component: Svg17 }
+	{ key: 'about-filled.svg', Component: Svg0 },
+	{ key: 'about-outline.svg', Component: Svg1 },
+	{ key: 'checkin-filled.svg', Component: Svg2 },
+	{ key: 'checkin-outline.svg', Component: Svg3 },
+	{ key: 'dots.svg', Component: Svg4 },
+	{ key: 'email.svg', Component: Svg5 },
+	{ key: 'github.svg', Component: Svg6 },
+	{ key: 'juejin.svg', Component: Svg7 },
+	{ key: 'music.svg', Component: Svg8 },
+	{ key: 'pen.svg', Component: Svg9 },
+	{ key: 'play.svg', Component: Svg10 },
+	{ key: 'projects-filled.svg', Component: Svg11 },
+	{ key: 'projects-outline.svg', Component: Svg12 },
+	{ key: 'scroll-filled.svg', Component: Svg13 },
+	{ key: 'scroll-outline.svg', Component: Svg14 },
+	{ key: 'share-filled.svg', Component: Svg15 },
+	{ key: 'share-outline.svg', Component: Svg16 },
+	{ key: 'short-line.svg', Component: Svg17 },
+	{ key: 'top.svg', Component: Svg18 },
+	{ key: 'website-filled.svg', Component: Svg19 },
+	{ key: 'website-outline.svg', Component: Svg20 }
 ]
