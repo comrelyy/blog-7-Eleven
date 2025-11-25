@@ -165,6 +165,18 @@
 		"stars": 5
 	},
 	{
+		"name": "酷壳-CoolShell",
+		"logo": "https://coolshell.cn/favicon.png",
+		"url": "https://coolshell.cn/",
+		"description": "享受编程和技术所带来的快乐 - Coding your ambition----纪念",
+		"tags": [
+			"个人博客",
+			"编程",
+			"开拓眼界"
+		],
+		"stars": 5
+	},
+	{
 		"name": "阮一峰的网络日志",
 		"logo": "/images/blogger/fe25259da8e3609b.png",
 		"url": "https://www.ruanyifeng.com/blog/archives.html",
@@ -329,5 +341,27 @@
 			"UI设计"
 		],
 		"stars": 3
+	},
+	{
+		"name": "kenney.nl",
+		"logo": "https://kenney.nl/favicon.ico",
+		"url": "https://kenney.nl/",
+		"description": "Kenney.nl 就像游戏开发世界的一座灯塔，为无数怀揣梦想的开发者指明了方向。它不仅提供了高质量的免费素材，更体现了开源和共享的精神，极大地推动了独立游戏社区的发展。无论您是经验丰富的开发者，还是刚刚入门的新手，Kenney.nl 都是您不容错过的宝藏网站",
+		"tags": [
+			"游戏素材",
+			"UI设计"
+		],
+		"stars": 4
+	},
+	{
+		"name": "opengameart.org",
+		"logo": "https://opengameart.org/sites/default/files/archive/sara-logo.png",
+		"url": "https://opengameart.org/",
+		"description": "一个致力于提供免费、开源游戏素材的宝藏网站",
+		"tags": [
+			"游戏素材",
+			"UI设计"
+		],
+		"stars": 4
 	}
 ]

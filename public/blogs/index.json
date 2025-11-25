@@ -3,26 +3,28 @@
     "slug": "Zelda-catalog",
     "title": "《海拉鲁演义》--目录及大纲",
     "tags": [
+      "海拉鲁演义",
       "AI",
       "游戏",
       "同人小说",
       "塞尔达",
-      "海拉鲁",
       "林克"
     ],
     "date": "2025-11-24",
-    "summary": "AI同人小说《海拉鲁演义》小说目录及章节"
+    "summary": "AI同人小说《海拉鲁演义》小说目录及章节",
+    "theme": "海拉鲁演义"
   },
   {
     "slug": "Zelda-begining",
     "title": "《海拉鲁演义》--楔子",
     "tags": [
+      "海拉鲁演义",
       "塞尔达",
-      "海拉鲁",
       "AI"
     ],
     "date": "2025-11-24",
     "summary": "海拉鲁演义--冒险故事的开始",
-    "cover": "/blogs/Zelda-begining/012b88b8365aa427.jpg"
+    "cover": "/blogs/Zelda-begining/012b88b8365aa427.jpg",
+    "theme": "海拉鲁演义"
   }
 ]
