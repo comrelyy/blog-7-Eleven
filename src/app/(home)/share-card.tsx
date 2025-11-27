@@ -37,19 +37,19 @@ export default function ShareCard() {
 
 	useEffect(() => {
 		// 随机决定展示分享项目还是诗词
-		const showPoetry = Math.random() > 0.5
+		//const showPoetry = Math.random() > 0.5
 		
-		if (showPoetry) {
+		//if (showPoetry) {
 			// 随机选择一个诗词
 			const randomIndex = Math.floor(Math.random() * poetryData.length)
 			setRandomPoetry(poetryData[randomIndex])
-			setRandomItem(null)
-		} else {
-			// 随机选择一个分享项目
-			const randomIndex = Math.floor(Math.random() * shareList.length)
-			setRandomItem(shareList[randomIndex])
-			setRandomPoetry(null)
-		}
+		//	setRandomItem(null)
+		// } else {
+		// 	// 随机选择一个分享项目
+		// 	const randomIndex = Math.floor(Math.random() * shareList.length)
+		// 	setRandomItem(shareList[randomIndex])
+		// 	setRandomPoetry(null)
+		// }
 	}, [])
 
 	if (!randomItem && !randomPoetry) {
