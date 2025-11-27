@@ -8,18 +8,34 @@ import { DialogModal } from "@/components/dialog-modal"
 import { useAuthStore } from '@/hooks/use-auth'
 import { readFileAsText } from '@/lib/file-utils'
 import { toast } from 'sonner'
+import { loadCheckinData, saveCheckinData, migrateLocalDataIfNeeded, type CheckinEvent, type CheckinRecord, type CheckinPosition } from '../services/checkin-data-service'
 
-type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
-type CheckinRecord = { date: string; eventId: string }
+// type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
+// type CheckinRecord = { date: string; eventId: string }
 
 function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinEvent[]; onCreate: (e: CheckinEvent) => void; onDelete: (id: string) => void; inline?: boolean }) {
   const { isAuth, setPrivateKey } = useAuthStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
+  const [formExpanded, setFormExpanded] = useState(true) // 新增：用于控制表单区域展开/收起
   const [name, setName] = useState("")
   const [color, setColor] = useState("#EF4444")
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
+  const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({}) // 新增：用于跟踪事件展开状态
+
+  // 新增：切换事件展开/收起状态
+  const toggleEventExpand = (id: string) => {
+    setExpandedEvents(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }))
+  }
+
+  // 新增：切换表单区域展开/收起状态
+  const toggleFormExpand = () => {
+    setFormExpanded(!formExpanded)
+  }
 
   const handlePrivateKeySelection = async (file: File) => {
     try {
@@ -36,9 +52,28 @@ function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinE
     fileInputRef.current?.click()
   }
 
-  const create = () => {
+  const create = async () => {
     if (!name) return
-    onCreate({ id: String(Date.now()), name, color, start: start || undefined, end: end || undefined })
+    
+    // 检查是否已导入密钥
+    if (!isAuth) {
+      toast.error('请先导入密钥再创建事件')
+      return
+    }
+    
+    const newEvent: CheckinEvent = { id: String(Date.now()), name, color, start: start || undefined, end: end || undefined }
+    onCreate(newEvent)
+    
+    // 直接保存到GitHub
+    try {
+      // 这里需要获取当前的events和records状态来保存完整数据
+      // 但由于我们只能访问这个组件的props，我们需要在父组件中处理保存
+      toast.info('事件创建成功，正在保存到GitHub...')
+    } catch (error) {
+      console.error('保存事件到GitHub失败:', error)
+      toast.error('事件保存到GitHub失败')
+    }
+    
     setName("")
     setColor("#EF4444")
     setStart("")
@@ -69,46 +104,98 @@ function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinE
       )}
       {(open || inline) && (
         <div className={`${containerClass} mt-2 relative`}> 
-          <h4 className="text-sm font-semibold text-primary mb-4">新增事件</h4>
-          {!isAuth && (
-            <button 
-              onClick={handleImportKey}
-              className="absolute top-2 right-2 rounded-lg border border-white/30 bg-white/40 px-2 py-1 text-xs font-medium text-primary hover:bg-white/60 transition-colors shadow-sm"
-            >
-              导入密钥
-            </button>
+          <div className="flex justify-between items-center mb-4">
+            <h4 className="text-sm font-semibold text-primary">新增事件</h4>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={toggleFormExpand}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+                title={formExpanded ? '收起' : '展开'}
+              >
+                {formExpanded ? (
+                  // 向上的箭头图标表示收起
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  // 向下的箭头图标表示展开
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+              {!isAuth && (
+                <button 
+                  onClick={handleImportKey}
+                  className="rounded-lg border border-white/30 bg-white/40 px-2 py-1 text-xs font-medium text-primary hover:bg-white/60 transition-colors shadow-sm"
+                >
+                  导入密钥
+                </button>
+              )}
+            </div>
+          </div>
+          {formExpanded && (
+            <>
+              <div className="mb-3 flex flex-col gap-2">
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="事件名称" className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary placeholder-secondary/60 focus:ring-2 focus:ring-brand/30 transition" />
+              </div>
+              <div className="mb-3 flex items-center gap-3">
+                <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-12 h-10 rounded-lg border border-white/30 cursor-pointer" />
+                <div className="text-xs font-mono text-secondary">{color}</div>
+              </div>
+              <div className="mb-3 flex gap-2 flex-col text-xs text-secondary">
+                <label>开始日期</label>
+                <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary appearance-none cursor-pointer" />
+              </div>
+              <div className="mb-4 flex gap-2 flex-col text-xs text-secondary">
+                <label>结束日期</label>
+                <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary appearance-none cursor-pointer" />
+              </div>
+              <div className="flex gap-2 mb-3">
+                <button onClick={create} className="flex-1 brand-btn text-xs justify-center">新增</button>
+                {!inline && <button onClick={() => setOpen(false)} className="flex-1 rounded-xl border border-white/30 bg-white/30 px-3 py-2 text-xs font-medium text-primary hover:bg-white/50 transition">关闭</button>}
+              </div>
+            </>
           )}
-          <div className="mb-3 flex flex-col gap-2">
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="事件名称" className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary placeholder-secondary/60 focus:ring-2 focus:ring-brand/30 transition" />
-          </div>
-          <div className="mb-3 flex items-center gap-3">
-            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-12 h-10 rounded-lg border border-white/30 cursor-pointer" />
-            <div className="text-xs font-mono text-secondary">{color}</div>
-          </div>
-          <div className="mb-3 flex gap-2 flex-col text-xs text-secondary">
-            <label>开始日期</label>
-            <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary appearance-none cursor-pointer" />
-          </div>
-          <div className="mb-4 flex gap-2 flex-col text-xs text-secondary">
-            <label>结束日期</label>
-            <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary appearance-none cursor-pointer" />
-          </div>
-          <div className="flex gap-2 mb-3">
-            <button onClick={create} className="flex-1 brand-btn text-xs justify-center">新增</button>
-            {!inline && <button onClick={() => setOpen(false)} className="flex-1 rounded-xl border border-white/30 bg-white/30 px-3 py-2 text-xs font-medium text-primary hover:bg-white/50 transition">关闭</button>}
-          </div>
           {events.length > 0 && (
             <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
               {events.map((ev) => (
-                <div key={ev.id} className="flex items-center justify-between p-2 bg-white/30 rounded-lg border border-white/20 hover:bg-white/40 transition">
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="h-4 w-4 rounded-full shadow-sm" style={{ background: ev.color }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-primary truncate">{ev.name}</div>
-                      <div className="text-[10px] text-secondary">{ev.start || ev.end ? `${ev.start || '—'} ~ ${ev.end || '—'}` : '长期'}</div>
+                <div key={ev.id} className="flex flex-col bg-white/30 rounded-lg border border-white/20 hover:bg-white/40 transition">
+                  <div className="flex items-center justify-between p-2">
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className="h-4 w-4 rounded-full shadow-sm" style={{ background: ev.color }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-primary truncate">{ev.name}</div>
+                        <div className="text-[10px] text-secondary">
+                          {expandedEvents[ev.id] 
+                            ? (ev.start || ev.end ? `${ev.start || '—'} ~ ${ev.end || '—'}` : '长期') 
+                            : (ev.start || ev.end ? `${ev.start || '—'} ~ ${ev.end || '—'}` : '长期')}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => toggleEventExpand(ev.id)} 
+                        className="text-xs text-blue-500 hover:text-blue-600 font-medium"
+                      >
+                        {expandedEvents[ev.id] ? '收起' : '展开'}
+                      </button>
+                      <button onClick={() => onDelete(ev.id)} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">删除</button>
                     </div>
                   </div>
-                  <button onClick={() => onDelete(ev.id)} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">删除</button>
+                  {expandedEvents[ev.id] && (
+                    <div className="px-2 pb-2 text-[10px] text-secondary border-t border-white/20">
+                      <div className="mt-1">
+                        <strong>开始日期:</strong> {ev.start || '未设置'}
+                      </div>
+                      <div className="mt-1">
+                        <strong>结束日期:</strong> {ev.end || '未设置'}
+                      </div>
+                      <div className="mt-1">
+                        <strong>ID:</strong> {ev.id}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -124,29 +211,77 @@ export default function CheckinClient() {
   const [records, setRecords] = useState<CheckinRecord[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<CheckinEvent | null>(null)
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({}) // 新增：用于跟踪卡片展开状态
+  const [isSaving, setIsSaving] = useState(false) // 新增：用于跟踪保存状态
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
 
+  // 新增：切换卡片展开/收起状态
+  const toggleCardExpand = (id: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }))
+  }
+
   useEffect(() => {
-    const stored = localStorage.getItem("checkin-events")
-    if (stored) {
-      try { setEvents(JSON.parse(stored)) } catch (e) { console.error(e) }
+    const init = async () => {
+      try {
+        // 尝试从GitHub加载数据
+        const migrated = await migrateLocalDataIfNeeded()
+        
+        if (migrated) {
+          // 如果进行了数据迁移，重新加载数据
+          const data = await loadCheckinData()
+          if (data) {
+            setEvents(data.events)
+            setRecords(data.records)
+            setPositions(data.positions)
+          }
+        } else {
+          // 尝试从GitHub加载数据
+          const data = await loadCheckinData()
+          if (data) {
+            setEvents(data.events)
+            setRecords(data.records)
+            setPositions(data.positions)
+          }
+        }
+      } catch (error) {
+        console.error('初始化打卡数据失败:', error)
+        toast.error('初始化打卡数据失败')
+      }
     }
-    const storedRecords = localStorage.getItem("checkin-records")
-    if (storedRecords) {
-      try { setRecords(JSON.parse(storedRecords)) } catch (e) { console.error(e) }
-    }
-    const storedPos = localStorage.getItem('checkin-positions')
-    if (storedPos) {
-      try { setPositions(JSON.parse(storedPos)) } catch (e) { console.error(e) }
-    }
+    
+    init()
   }, [])
 
-  useEffect(() => { localStorage.setItem("checkin-events", JSON.stringify(events)) }, [events])
-  useEffect(() => { localStorage.setItem("checkin-records", JSON.stringify(records)) }, [records])
-  useEffect(() => { localStorage.setItem('checkin-positions', JSON.stringify(positions)) }, [positions])
+  // 修改：保存数据到GitHub而不是localStorage
+  useEffect(() => {
+    const saveData = async () => {
+      // 只有在有数据需要保存时才执行
+      if (events.length === 0 && records.length === 0) return;
+      
+      setIsSaving(true)
+      try {
+        // 直接保存到GitHub，不使用localStorage作为后备
+        await saveCheckinData({ events, records, positions })
+        console.log('打卡数据已保存到GitHub')
+      } catch (error) {
+        // 如果保存到GitHub失败，显示错误但不回退到localStorage
+        console.error('保存到GitHub失败:', error)
+        toast.error('打卡数据保存到GitHub失败')
+      } finally {
+        setIsSaving(false)
+      }
+    }
+    
+    // 使用防抖避免频繁保存
+    const timer = setTimeout(saveData, 1000)
+    return () => clearTimeout(timer)
+  }, [events, records, positions])
 
   // apply stored positions to card elements when refs are available
   useEffect(() => {
@@ -321,7 +456,36 @@ export default function CheckinClient() {
         <div className="fixed right-6 top-1/4 z-50">
           <LiquidGrass inline width={300} height={220} className="rounded-lg">
             <div className="p-2">
-              <EventManager inline events={events} onCreate={(ev) => setEvents((prev) => [ev, ...prev])} onDelete={(id) => setEvents((prev) => prev.filter((e) => e.id !== id))} />
+              <EventManager 
+                inline 
+                events={events} 
+                onCreate={async (ev) => {
+                  const newEvents = [ev, ...events]
+                  setEvents(newEvents)
+                  // 立即保存到GitHub
+                  try {
+                    await saveCheckinData({ events: newEvents, records, positions })
+                    toast.success('事件创建成功并已保存到GitHub')
+                  } catch (error) {
+                    console.error('保存事件到GitHub失败:', error)
+                    toast.error('事件保存到GitHub失败')
+                  }
+                }} 
+                onDelete={async (id) => {
+                  const newEvents = events.filter((e) => e.id !== id)
+                  const newRecords = records.filter(r => r.eventId !== id)
+                  setEvents(newEvents)
+                  setRecords(newRecords)
+                  // 立即保存到GitHub
+                  try {
+                    await saveCheckinData({ events: newEvents, records: newRecords, positions })
+                    toast.success('事件删除成功并已保存到GitHub')
+                  } catch (error) {
+                    console.error('保存事件到GitHub失败:', error)
+                    toast.error('事件保存到GitHub失败')
+                  }
+                }} 
+              />
             </div>
           </LiquidGrass>
         </div>

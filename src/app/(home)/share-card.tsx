@@ -60,7 +60,7 @@ export default function ShareCard() {
 		<Card
 			order={styles.order}
 			width={styles.width}
-			x={center.x + hiCardStyles.width / 2 - socialButtonsStyles.width}
+			x={center.x + hiCardStyles.width / 2 + CARD_SPACING * 2}
 			y={center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING}>
 			<h2 className='text-secondary text-sm'>随机推荐</h2>
 

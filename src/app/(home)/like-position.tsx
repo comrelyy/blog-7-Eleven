@@ -13,8 +13,8 @@ export const styles = {
 
 export default function LikePosition() {
 	const center = useCenterStore()
-	const left = center.x + hiCardStyles.width / 2 - socialButtonsStyles.width + shareCardStyles.width + CARD_SPACING
-	const top = center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING + musicCardStyles.height + CARD_SPACING
+	const left = center.x + hiCardStyles.width / 2 - socialButtonsStyles.width + shareCardStyles.width
+	const top = center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height  + musicCardStyles.height
 
 	return (
 		<motion.div className='absolute max-sm:static' initial={{ left, top }} animate={{ left, top }}>

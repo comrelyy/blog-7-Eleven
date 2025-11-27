@@ -16,11 +16,14 @@ export default function ArticleCard() {
 	const center = useCenterStore()
 	const { blog, loading } = useLatestBlog()
 
+	// 向左移动一些位置
+	const adjustedX = center.x + hiCardStyles.width / 2 - socialButtonsStyles.width - CARD_SPACING - styles.width - 30
+
 	return (
 		<Card
 			order={styles.order}
 			width={styles.width}
-			x={center.x + hiCardStyles.width / 2 - socialButtonsStyles.width - CARD_SPACING - styles.width}
+			x={adjustedX}
 			y={center.y + hiCardStyles.height / 2 + CARD_SPACING}
 			className='space-y-2 max-sm:static'>
 			<h2 className='text-secondary text-sm'>最新文章</h2>
