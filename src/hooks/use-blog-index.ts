@@ -4,6 +4,7 @@ export type BlogIndexItem = {
 	slug: string
 	title: string
 	tags: string[]
+	theme?: string
 	date: string
 	summary?: string
 	cover?: string

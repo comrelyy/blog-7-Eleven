@@ -18,6 +18,8 @@ import ShareFilledSVG from '@/svgs/share-filled.svg'
 import ShareOutlineSVG from '@/svgs/share-outline.svg'
 import WebsiteFilledSVG from '@/svgs/website-filled.svg'
 import WebsiteOutlineSVG from '@/svgs/website-outline.svg'
+import CheckinFilledSVG from '@/svgs/checkin-filled.svg'
+import CheckinOutlineSVG from '@/svgs/checkin-outline.svg'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { cn } from '@/lib/utils'
@@ -39,8 +41,27 @@ const list = [
 	{
 		icon: ProjectsOutlineSVG,
 		iconActive: ProjectsFilledSVG,
-		label: '我的项目',
-		href: '/projects'
+		label: '我的博客',
+		href: '/articles'
+	},
+	// {
+	// 	icon: ProjectsOutlineSVG,
+	// 	iconActive: ProjectsFilledSVG,
+	// 	label: '我的项目',
+	// 	href: '/projects'
+	// },
+	{
+		icon: CheckinOutlineSVG,
+		iconActive: CheckinFilledSVG,
+		label: '我的打卡',
+		href: '/checkin'
+	},
+	
+	{
+		icon: ShareOutlineSVG,
+		iconActive: ShareFilledSVG,
+		label: '我的收藏',
+		href: '/share'
 	},
 	{
 		icon: AboutOutlineSVG,
@@ -48,18 +69,6 @@ const list = [
 		label: '关于网站',
 		href: '/about'
 	},
-	{
-		icon: ShareOutlineSVG,
-		iconActive: ShareFilledSVG,
-		label: '推荐分享',
-		href: '/share'
-	},
-	{
-		icon: WebsiteOutlineSVG,
-		iconActive: WebsiteFilledSVG,
-		label: '优秀博客',
-		href: '/bloggers'
-	}
 ]
 
 const extraSize = 8
