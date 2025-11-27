@@ -5,16 +5,36 @@ import { motion } from "motion/react"
 import { INIT_DELAY, ANIMATION_DELAY } from "@/consts"
 import LiquidGrass from "@/components/liquid-grass"
 import { DialogModal } from "@/components/dialog-modal"
+import { useAuthStore } from '@/hooks/use-auth'
+import { readFileAsText } from '@/lib/file-utils'
+import { toast } from 'sonner'
 
 type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
 type CheckinRecord = { date: string; eventId: string }
 
 function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinEvent[]; onCreate: (e: CheckinEvent) => void; onDelete: (id: string) => void; inline?: boolean }) {
+  const { isAuth, setPrivateKey } = useAuthStore()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [color, setColor] = useState("#EF4444")
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
+
+  const handlePrivateKeySelection = async (file: File) => {
+    try {
+      const pem = await readFileAsText(file)
+      setPrivateKey(pem)
+      toast.success('密钥导入成功')
+    } catch (error) {
+      console.error(error)
+      toast.error('读取密钥失败')
+    }
+  }
+
+  const handleImportKey = () => {
+    fileInputRef.current?.click()
+  }
 
   const create = () => {
     if (!name) return
@@ -33,12 +53,31 @@ function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinE
 
   return (
     <div>
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='.pem'
+        className='hidden'
+        onChange={async e => {
+          const f = e.target.files?.[0]
+          if (f) await handlePrivateKeySelection(f)
+          if (e.currentTarget) e.currentTarget.value = ''
+        }}
+      />
       {!inline && (
         <button onClick={() => setOpen((v) => !v)} className="rounded-xl border border-white/30 bg-white/40 px-4 py-2 text-sm font-medium text-primary hover:bg-white/60 transition-colors shadow-sm">📋 管理事件</button>
       )}
       {(open || inline) && (
-        <div className={`${containerClass} mt-2`}> 
+        <div className={`${containerClass} mt-2 relative`}> 
           <h4 className="text-sm font-semibold text-primary mb-4">新增事件</h4>
+          {!isAuth && (
+            <button 
+              onClick={handleImportKey}
+              className="absolute top-2 right-2 rounded-lg border border-white/30 bg-white/40 px-2 py-1 text-xs font-medium text-primary hover:bg-white/60 transition-colors shadow-sm"
+            >
+              导入密钥
+            </button>
+          )}
           <div className="mb-3 flex flex-col gap-2">
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="事件名称" className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary placeholder-secondary/60 focus:ring-2 focus:ring-brand/30 transition" />
           </div>
@@ -391,4 +430,3 @@ export default function CheckinClient() {
     </div>
   )
 }
-

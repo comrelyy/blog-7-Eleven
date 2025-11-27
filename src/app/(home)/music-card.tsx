@@ -10,7 +10,6 @@ import PlaySVG from '@/svgs/play.svg'
 export const styles = {
 	width: 293,
 	height: 66,
-	offset: 120,
 	order: 6
 }
 
@@ -22,7 +21,7 @@ export default function MusicCard() {
 			order={styles.order}
 			width={styles.width}
 			height={styles.height}
-			x={center.x + CARD_SPACING + hiCardStyles.width / 2 - styles.offset}
+			x={center.x + CARD_SPACING + hiCardStyles.width / 2}
 			y={center.y - clockCardStyles.offset + CARD_SPACING + calendarCardStyles.height + CARD_SPACING}
 			className='flex items-center gap-3'>
 			<MusicSVG className='h-8 w-8' />
