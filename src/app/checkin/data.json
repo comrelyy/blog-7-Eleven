@@ -6,6 +6,11 @@
       "color": "#EF4444"
     }
   ],
-  "records": [],
+  "records": [
+    {
+      "eventId": "1764325097736",
+      "date": "2025-11-28"
+    }
+  ],
   "positions": {}
 }
