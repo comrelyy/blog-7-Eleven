@@ -33,19 +33,7 @@ function formatDateTime(timestamp: number): { date: string; time: string } {
 // 获取新的认证令牌（不使用缓存）
 async function getFreshAuthToken(): Promise<string> {
   // 获取私钥（从缓存）
-  const privateKey = useAuthStore.getState().privateKey
-  if (!privateKey) {
-    throw new Error('需要先设置私钥。请使用 useAuth().setPrivateKey()')
-  }
-
-  toast.info('正在签发 JWT...')
-  const jwt = signAppJwt(GITHUB_CONFIG.APP_ID, privateKey)
-
-  toast.info('正在获取安装信息...')
-  const installationId = await getInstallationId(jwt, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO)
-
-  toast.info('正在创建安装令牌...')
-  const token = await createInstallationToken(jwt, installationId)
+  const token = await getAuthToken()
 
   return token
 }
