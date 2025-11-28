@@ -1,5 +1,11 @@
 {
-  "events": [],
+  "events": [
+    {
+      "id": "1764325097736",
+      "name": "每天10个俯卧撑",
+      "color": "#EF4444"
+    }
+  ],
   "records": [],
   "positions": {}
 }
