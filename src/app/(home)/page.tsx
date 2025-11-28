@@ -12,6 +12,7 @@ import WriteButtons from '@/app/(home)/write-buttons'
 import LikePosition from './like-position'
 import { useSize } from '@/hooks/use-size'
 import ThoughtsCard from '@/app/(home)/thoughts-card'
+import WeatherCard from '@/app/(home)/weather-card'
 
 export default function Home() {
 	const { maxSM } = useSize()
@@ -23,8 +24,10 @@ export default function Home() {
 			{!maxSM && <ClockCard />}
 			{!maxSM && <CalendarCard />}
 			{!maxSM && <MusicCard />}
-			<ThoughtsCard />
+			{!maxSM && <ThoughtsCard />}
 			{!maxSM && <ShareCard />}
+			{!maxSM && <ShareCard />}
+			{/* {!maxSM && <WeatherCard />} */}
 			<AritcleCard />
 			{!maxSM && <WriteButtons />}
 			<LikePosition />
