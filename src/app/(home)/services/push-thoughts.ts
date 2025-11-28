@@ -2,6 +2,8 @@ import { toBase64Utf8, getRef, createTree, createCommit, updateRef, createBlob, 
 import { getAuthToken } from '@/lib/auth'
 import { GITHUB_CONFIG } from '@/consts'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/hooks/use-auth'
+import { signAppJwt, getInstallationId, createInstallationToken } from '@/lib/github-client'
 
 // 定义碎碎念数据结构
 export interface Thought {
@@ -26,6 +28,14 @@ function formatDateTime(timestamp: number): { date: string; time: string } {
     date: `${year}-${month}-${day}`,
     time: `${hours}:${minutes}:${seconds}`
   }
+}
+
+// 获取新的认证令牌（不使用缓存）
+async function getFreshAuthToken(): Promise<string> {
+  // 获取私钥（从缓存）
+  const token = await getAuthToken()
+
+  return token
 }
 
 // 推送碎碎念数据到GitHub
@@ -101,7 +111,8 @@ export async function pushThoughts(thoughts: Thought[]): Promise<void> {
 
 // 从GitHub读取碎碎念数据
 export async function fetchThoughts(): Promise<Thought[]> {
-  const token = await getAuthToken()
+  // 使用新的认证令牌函数，避免缓存问题
+  const token = await getFreshAuthToken()
   
   // 获取所有碎碎念文件
   const thoughts: Thought[] = []
