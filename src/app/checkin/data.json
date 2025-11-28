@@ -1,11 +1,5 @@
 {
-  "events": [
-    {
-      "id": "1764241208446",
-      "name": "打卡事件",
-      "color": "#EF4444"
-    }
-  ],
+  "events": [],
   "records": [],
   "positions": {}
 }
