@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# data
+/src/app/checkin/data.json
+/src/app/share/list.json
+/src/data/thoughts/*.json
+/src/public/*
+
