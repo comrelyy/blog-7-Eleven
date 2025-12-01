@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { CARD_SPACING } from '@/consts'
-import { styles as hiCardStyles } from './hi-card'
-import { styles as clockCardStyles } from './clock-card'
+import { useConfigStore } from './stores/config-store'
 import WeatherSVG from '@/svgs/weather.svg'
 
 export const styles = {
@@ -24,6 +23,9 @@ export default function WeatherCard() {
   const center = useCenterStore()
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const { cardStyles } = useConfigStore()
+  const hiCardStyles = cardStyles.hiCard
+  const clockCardStyles = cardStyles.clockCard
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {

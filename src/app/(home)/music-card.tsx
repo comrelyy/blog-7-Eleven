@@ -10,12 +10,11 @@ export default function MusicCard() {
 	const center = useCenterStore()
 	const { cardStyles } = useConfigStore()
 	const styles = cardStyles.musicCard
+	const artCardStyles = cardStyles.artCard
 	const hiCardStyles = cardStyles.hiCard
-	const clockCardStyles = cardStyles.clockCard
-	const calendarCardStyles = cardStyles.calendarCard
 
-	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + hiCardStyles.width / 2 - styles.offset
-	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y - clockCardStyles.offset + CARD_SPACING + calendarCardStyles.height + CARD_SPACING
+	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + artCardStyles.width / 2
+	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y - hiCardStyles.height / 2 - CARD_SPACING - artCardStyles.height / 2 - styles.height - CARD_SPACING / 2
 
 	return (
 		<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='flex items-center gap-3'>

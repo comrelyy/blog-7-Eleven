@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
+import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
-import { styles as hiCardStyles } from './hi-card'
 import { pushThoughts, fetchThoughts, type Thought } from './services/push-thoughts'
 import { useAuthStore } from '@/hooks/use-auth'
 import { toast } from 'sonner'
@@ -16,12 +16,15 @@ export const styles = {
 
 export default function ThoughtsCard() {
 	const center = useCenterStore()
+	const { cardStyles } = useConfigStore()
 	const { isAuth } = useAuthStore()
 	const  initAuth  = hasAuth()
 	const [thoughts, setThoughts] = useState<Thought[]>([])
 	const [inputValue, setInputValue] = useState('')
 	const [isLoading, setIsLoading] = useState(true)
 	const [latestThought, setLatestThought] = useState<Thought | null>(null)
+
+	const hiCardStyles = cardStyles.hiCard
 
 	// 从 GitHub 加载数据（如果已认证）或从 localStorage 加载数据（如果未认证）
 	useEffect(() => {
