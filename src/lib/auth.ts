@@ -49,7 +49,7 @@ export async function getAuthToken(): Promise<string> {
 	// 1. 先尝试从缓存获取 token
 	const cachedToken = getTokenFromCache()
 	if (cachedToken) {
-		//toast.info('使用缓存的令牌...')
+		toast.info('使用缓存的令牌...')
 		return cachedToken
 	}
 
@@ -59,7 +59,7 @@ export async function getAuthToken(): Promise<string> {
 		throw new Error('需要先设置私钥。请使用 useAuth().setPrivateKey()')
 	}
 
-	//toast.info('正在签发 JWT...')
+	toast.info('正在签发 JWT...')
 	const jwt = signAppJwt(GITHUB_CONFIG.APP_ID, privateKey)
 
 	//toast.info('正在获取安装信息...')

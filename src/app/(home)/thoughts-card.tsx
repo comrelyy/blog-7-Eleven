@@ -6,6 +6,7 @@ import { styles as hiCardStyles } from './hi-card'
 import { pushThoughts, fetchThoughts, type Thought } from './services/push-thoughts'
 import { useAuthStore } from '@/hooks/use-auth'
 import { toast } from 'sonner'
+import { hasAuth } from '@/lib/auth'
 
 export const styles = {
 	width: 360,
@@ -16,6 +17,7 @@ export const styles = {
 export default function ThoughtsCard() {
 	const center = useCenterStore()
 	const { isAuth } = useAuthStore()
+	const  initAuth  = hasAuth()
 	const [thoughts, setThoughts] = useState<Thought[]>([])
 	const [inputValue, setInputValue] = useState('')
 	const [isLoading, setIsLoading] = useState(true)
@@ -24,7 +26,8 @@ export default function ThoughtsCard() {
 	// 从 GitHub 加载数据（如果已认证）或从 localStorage 加载数据（如果未认证）
 	useEffect(() => {
 		const loadData = async () => {
-			if (isAuth) {
+			toast.info('正在加载碎碎念...'+initAuth)
+			if(initAuth){
 				try {
 					const fetchedThoughts = await fetchThoughts()
 					setThoughts(fetchedThoughts)
@@ -34,15 +37,13 @@ export default function ThoughtsCard() {
 					}
 				} catch (error) {
 					console.error('Failed to fetch thoughts from GitHub', error)
-					toast.error('加载碎碎念失败，使用本地缓存')
-					loadFromLocalStorage()
 				}
 			} else {
-				loadFromLocalStorage()
+				toast.warning('未认证，无法加载碎碎念数据')
 			}
+			
 			setIsLoading(false)
 		}
-
 		loadData()
 	}, [isAuth])
 
@@ -72,16 +73,17 @@ export default function ThoughtsCard() {
 
 	// 保存数据到 GitHub（如果已认证）或 localStorage（如果未认证）
 	const saveThoughts = async (newThoughts: Thought[]) => {
-		if (isAuth) {
+		if (initAuth) {
 			try {
 				await pushThoughts(newThoughts)
 			} catch (error) {
 				console.error('Failed to push thoughts to GitHub', error)
-				toast.error('保存到 GitHub 失败，使用本地缓存')
-				localStorage.setItem('thoughts', JSON.stringify(newThoughts))
+				//toast.error('保存到 GitHub 失败，使用本地缓存')
+				//localStorage.setItem('thoughts', JSON.stringify(newThoughts))
 			}
-		} else {
-			localStorage.setItem('thoughts', JSON.stringify(newThoughts))
+		 } else {
+		// 	localStorage.setItem('thoughts', JSON.stringify(newThoughts))
+			toast.info('上传密钥进行认证') 
 		}
 	}
 
