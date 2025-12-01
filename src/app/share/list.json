@@ -363,5 +363,35 @@
 			"UI设计"
 		],
 		"stars": 4
+	},
+	{
+		"name": "Ease 函数参考",
+		"logo": "https://easings.net/96.8aa68ac4.png",
+		"url": "https://easings.net/",
+		"description": "当你在调整动画节奏时，这个 ease 表能帮助直观感受 ease 表现出的效果",
+		"tags": [
+			"Github"
+		],
+		"stars": 3
+	},
+	{
+		"name": "Isocons",
+		"logo": "blob:https://www.yysuni.com/6e6e7339-d34d-40ef-b3e5-1f12ad5f6b1d",
+		"url": "https://www.isocons.app/",
+		"description": "3D icons 网站，酷酷的，免费。",
+		"tags": [
+			"Icons"
+		],
+		"stars": 3
+	},
+	{
+		"name": "Webp 转换压缩",
+		"logo": "https://www.yysuni.com/images/avatar.png",
+		"url": "https://www.yysuni.com/image-toolbox",
+		"description": "无限压缩，快且方便，可以直接对比效果",
+		"tags": [
+			"图片"
+		],
+		"stars": 3
 	}
 ]

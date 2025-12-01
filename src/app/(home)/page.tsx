@@ -26,7 +26,6 @@ export default function Home() {
 			{!maxSM && <MusicCard />}
 			{!maxSM && <ThoughtsCard />}
 			{!maxSM && <ShareCard />}
-			{!maxSM && <ShareCard />}
 			{/* {!maxSM && <WeatherCard />} */}
 			<AritcleCard />
 			{!maxSM && <WriteButtons />}
