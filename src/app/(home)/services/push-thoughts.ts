@@ -2,40 +2,17 @@ import { toBase64Utf8, getRef, createTree, createCommit, updateRef, createBlob, 
 import { getAuthToken } from '@/lib/auth'
 import { GITHUB_CONFIG } from '@/consts'
 import { toast } from 'sonner'
-import { useAuthStore } from '@/hooks/use-auth'
-import { signAppJwt, getInstallationId, createInstallationToken } from '@/lib/github-client'
 
-// 定义碎碎念数据结构
+export type ThoughtJsonArray = {
+  thoughts: Thought[]
+}
+
 export interface Thought {
   id: string
   text: string
   timestamp: number
   date: string // YYYY-MM-DD
   time: string // HH:mm:ss
-}
-
-// 将时间戳转换为日期和时间字符串
-function formatDateTime(timestamp: number): { date: string; time: string } {
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  const seconds = String(date.getSeconds()).padStart(2, '0')
-  
-  return {
-    date: `${year}-${month}-${day}`,
-    time: `${hours}:${minutes}:${seconds}`
-  }
-}
-
-// 获取新的认证令牌（不使用缓存）
-async function getFreshAuthToken(): Promise<string> {
-  // 获取私钥（从缓存）
-  const token = await getAuthToken()
-
-  return token
 }
 
 // 推送碎碎念数据到GitHub
@@ -50,13 +27,6 @@ export async function pushThoughts(thoughts: Thought[]): Promise<void> {
   // 按月份分组碎碎念数据
   const thoughtsByMonth: Record<string, Thought[]> = {}
   thoughts.forEach(thought => {
-    // 确保每个thought都有date和time字段
-    if (!thought.date || !thought.time) {
-      const { date, time } = formatDateTime(thought.timestamp)
-      thought.date = date
-      thought.time = time
-    }
-    
     const monthKey = thought.date.substring(0, 7) // 提取 yyyy-mm 部分
     if (!thoughtsByMonth[monthKey]) {
       thoughtsByMonth[monthKey] = []
@@ -68,13 +38,13 @@ export async function pushThoughts(thoughts: Thought[]): Promise<void> {
 
   const treeItems: TreeItem[] = []
 
-  // 为每个月份创建JSON文件
+  // 为每个月份创建JSON文件，保存到 /public/thoughts 目录
   for (const [month, monthlyThoughts] of Object.entries(thoughtsByMonth)) {
     const thoughtsJson = JSON.stringify(monthlyThoughts, null, '\t')
     const thoughtsBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(thoughtsJson), 'base64')
     
-    // 文件路径：src/data/thoughts/xxxx-xx.json
-    const filePath = `src/data/thoughts/${month}.json`
+    // 文件路径：public/thoughts/xxxx-xx.json
+    const filePath = `public/thoughts/${month}.json`
     
     treeItems.push({
       path: filePath,
@@ -88,7 +58,7 @@ export async function pushThoughts(thoughts: Thought[]): Promise<void> {
   if (Object.keys(thoughtsByMonth).length === 0) {
     const emptyBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(''), 'base64')
     treeItems.push({
-      path: 'src/data/thoughts/.gitkeep',
+      path: 'public/thoughts/.gitkeep',
       mode: '100644',
       type: 'blob',
       sha: emptyBlob.sha
@@ -109,72 +79,65 @@ export async function pushThoughts(thoughts: Thought[]): Promise<void> {
   toast.success('碎碎念保存成功！')
 }
 
-// 从GitHub读取碎碎念数据
-export async function fetchThoughts(): Promise<Thought[]> {
-  // 使用新的认证令牌函数，避免缓存问题
-  const token = await getFreshAuthToken()
+export async function useThoughtsIndex() :Promise<ThoughtJsonArray | null>{
+  // 定义可能的文件列表（您可以根据实际情况调整）
+  const possibleFiles = getAllPossibleThoughtFiles()
   
-  // 获取所有碎碎念文件
-  const thoughts: Thought[] = []
+  // 创建多个 SWR 请求来加载所有可能的文件
   
-  // 获取最近几个月的年月（最近12个月）
+  // 合并所有数据
+  const allThoughts: Thought[] = []
+  let loading = 0
+  let error = null
+  
+  // 检查所有请求的状态
+  for (const file of possibleFiles) {
+  if (loading > 1) {
+    break
+  }
+    const res = await fetch(`/thoughts/${file}`, { 
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  })
+  if (res.status === 404) {
+    loading++
+    continue
+  }
+  
+  if (!res.ok) {
+    throw new Error(`Failed to load ${file}`)
+  }
+  
+  
+  const data = await res.json()
+  
+
+  allThoughts.push(...(Array.isArray(data) ? data : []))
+
+  }
+  
+  // 按时间戳排序，最新的在前
+  const sortedThoughts = allThoughts.sort((a, b) => b.timestamp - a.timestamp)
+
+  return { thoughts: sortedThoughts }
+}
+
+// 获取所有可能的碎碎念文件列表
+function getAllPossibleThoughtFiles(): string[] {
+  const files = []
   const today = new Date()
-  const months = []
   
+  // 生成从当前日期往前推24个月的文件名
   for (let i = 0; i < 12; i++) {
     const date = new Date(today.getFullYear(), today.getMonth() - i, 1)
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
-    months.push(`${year}-${month}`)
+    files.push(`${year}-${month}.json`)
   }
   
-  // 读取每个月份的碎碎念数据
-  for (const month of months) {
-    try {
-      const path = `src/data/thoughts/${month}.json`
-      const fileContent = await readTextFileFromRepo(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, path)
-      
-      if (fileContent) {
-        const monthlyThoughts: Thought[] = JSON.parse(fileContent)
-        thoughts.push(...monthlyThoughts)
-      }
-    } catch (error) {
-      // 文件不存在或其他错误，跳过
-      console.debug(`未能读取 ${month} 的碎碎念数据:`, error)
-    }
-  }
-  
-  // 按时间戳排序，最新的在前
-  return thoughts.sort((a, b) => b.timestamp - a.timestamp)
-}
-
-// 辅助函数：从仓库读取文本文件
-async function readTextFileFromRepo(token: string, owner: string, repo: string, path: string): Promise<string | null> {
-  try {
-    // 先获取ref
-    const refData = await getRef(token, owner, repo, `heads/${GITHUB_CONFIG.BRANCH}`)
-    
-    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(refData.sha)}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      }
-    })
-    
-    if (res.status === 404) return null
-    if (!res.ok) throw new Error(`read file failed: ${res.status}`)
-    
-    const data: any = await res.json()
-    if (Array.isArray(data) || !data.content) return null
-    
-    try {
-      return decodeURIComponent(escape(atob(data.content)))
-    } catch {
-      return atob(data.content)
-    }
-  } catch (error) {
-    console.error(`Error reading file from repo: ${path}`, error)
-    return null
-  }
+  return files
 }
