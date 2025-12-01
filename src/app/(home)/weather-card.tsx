@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { CARD_SPACING } from '@/consts'
-import { useConfigStore } from './stores/config-store'
 import WeatherSVG from '@/svgs/weather.svg'
+import { useConfigStore } from './stores/config-store'
 
 export const styles = {
   width: 200,
@@ -23,20 +23,33 @@ export default function WeatherCard() {
   const center = useCenterStore()
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const { cardStyles } = useConfigStore()
   const hiCardStyles = cardStyles.hiCard
   const clockCardStyles = cardStyles.clockCard
-  const [error, setError] = useState<string | null>(null)
-
   useEffect(() => {
-    // 模拟天气数据获取
+    // 获取真实天气数据的函数
     const fetchWeather = async () => {
       try {
         setLoading(true)
-        // 模拟API调用延迟
+        // 这里应该替换为真实的天气API调用
+        // 例如使用 OpenWeatherMap API:
+        /*
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=Beijing&appid=YOUR_API_KEY&units=metric`
+        )
+        const data = await response.json()
+        
+        const weatherData: WeatherData = {
+          temperature: Math.round(data.main.temp),
+          condition: data.weather[0].description,
+          location: data.name
+        }
+        */
+        
+        // 目前仍然使用模拟数据，但您可以替换成上面的真实API调用
         await new Promise(resolve => setTimeout(resolve, 800))
         
-        // 模拟天气数据
         const mockWeather: WeatherData = {
           temperature: 22,
           condition: '晴',
@@ -53,7 +66,14 @@ export default function WeatherCard() {
       }
     }
 
+    // 初始获取天气数据
     fetchWeather()
+    
+    // 设置定时器每30分钟更新一次天气数据
+    const interval = setInterval(fetchWeather, 30 * 60 * 1000)
+    
+    // 清理函数
+    return () => clearInterval(interval)
   }, [])
 
   // 计算天气卡片的位置（在时钟卡片右侧）

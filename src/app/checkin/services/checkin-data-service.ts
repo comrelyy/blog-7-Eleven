@@ -20,20 +20,30 @@ export type CheckinData = {
  */
 export async function loadCheckinData(): Promise<CheckinData | null> {
   try {
-    const token = await getAuthToken()
+    // const token = await getAuthToken()
     
-    // 读取打卡数据文件
-    const dataStr = await readTextFileFromRepo(
-      token, 
-      GITHUB_CONFIG.OWNER, 
-      GITHUB_CONFIG.REPO, 
-      'src/app/checkin/data.json', 
-      GITHUB_CONFIG.BRANCH
-    )
-    
-    if (!dataStr) return null
-    
-    const data: CheckinData = JSON.parse(dataStr)
+    // // 读取打卡数据文件
+    // const dataStr = await readTextFileFromRepo(
+    //   token, 
+    //   GITHUB_CONFIG.OWNER, 
+    //   GITHUB_CONFIG.REPO, 
+    //   'src/app/checkin/data.json', 
+    //   GITHUB_CONFIG.BRANCH
+    // )
+
+    const res = await fetch(`/checkin/data.json`, { 
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  })
+  
+  if (!res.ok) {
+    throw new Error(`Failed to load checkin data.json`)
+  }
+    const data: CheckinData = await res.json()
     return data
   } catch (error) {
     console.error('加载打卡数据失败:', error)
@@ -58,7 +68,7 @@ export async function saveCheckinData(data: CheckinData): Promise<void> {
     
     // 创建文件树
     const treeItems: TreeItem[] = [{
-      path: 'src/app/checkin/data.json',
+      path: '/checkin/data.json',
       mode: '100644',
       type: 'blob',
       sha: dataBlob.sha
