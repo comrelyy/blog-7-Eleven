@@ -41,8 +41,3 @@ yarn-error.log*
 next-env.d.ts
 
 # data
-/src/app/checkin/data.json
-/src/app/share/list.json
-/src/data/*
-/public/*
-
