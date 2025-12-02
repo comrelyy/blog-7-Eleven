@@ -213,6 +213,7 @@ export default function CheckinClient() {
   const [selectedEvent, setSelectedEvent] = useState<CheckinEvent | null>(null)
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({}) // 新增：用于跟踪卡片展开状态
   const [isSaving, setIsSaving] = useState(false) // 新增：用于跟踪保存状态
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false) // 新增：跟踪是否有未保存的更改
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -258,17 +259,18 @@ export default function CheckinClient() {
     init()
   }, [])
 
-  // 修改：保存数据到GitHub而不是localStorage
+  // 修改：只在有未保存更改时才保存数据
   useEffect(() => {
+    // 如果没有未保存的更改，则不执行保存操作
+    if (!hasUnsavedChanges) return;
+
     const saveData = async () => {
-      // 只有在有数据需要保存时才执行
-      if (events.length === 0 && records.length === 0) return;
-      
       setIsSaving(true)
       try {
         // 直接保存到GitHub，不使用localStorage作为后备
         await saveCheckinData({ events, records, positions })
         console.log('打卡数据已保存到GitHub')
+        setHasUnsavedChanges(false) // 保存成功后清除未保存标记
       } catch (error) {
         // 如果保存到GitHub失败，显示错误但不回退到localStorage
         console.error('保存到GitHub失败:', error)
@@ -281,7 +283,7 @@ export default function CheckinClient() {
     // 使用防抖避免频繁保存
     const timer = setTimeout(saveData, 1000)
     return () => clearTimeout(timer)
-  }, [events, records, positions])
+  }, [hasUnsavedChanges, events, records, positions])
 
   // apply stored positions to card elements when refs are available
   useEffect(() => {
@@ -304,6 +306,7 @@ export default function CheckinClient() {
     const exists = records.some(r => r.eventId === ev.id && r.date === todayStr)
     if (!exists) {
       setRecords(prev => [...prev, { eventId: ev.id, date: todayStr }])
+      setHasUnsavedChanges(true) // 标记有未保存的更改
       // trigger confetti animation near the card
       const el = cardRefs.current[ev.id]
       triggerConfetti(ev.color, el)
@@ -361,11 +364,13 @@ export default function CheckinClient() {
       const el = cardRefs.current[ev.id]
       triggerConfetti(ev.color, el)
     }
+    setHasUnsavedChanges(true) // 标记有未保存的更改
   }
 
   const handleCardDelete = (id: string) => {
     setEvents(prev => prev.filter(e => e.id !== id))
     setRecords(prev => prev.filter(r => r.eventId !== id))
+    setHasUnsavedChanges(true) // 标记有未保存的更改
   }
 
   const openDetailModal = (ev: CheckinEvent) => {
@@ -439,6 +444,7 @@ export default function CheckinClient() {
       newPos[key] = { x, y }
     })
     setPositions(newPos)
+    setHasUnsavedChanges(true) // 标记有未保存的更改
   }
 
   function rectsOverlap(a: DOMRect, b: DOMRect) {
@@ -462,6 +468,7 @@ export default function CheckinClient() {
                 onCreate={async (ev) => {
                   const newEvents = [ev, ...events]
                   setEvents(newEvents)
+                  setHasUnsavedChanges(true) // 标记有未保存的更改
                   // 立即保存到GitHub
                   try {
                     await saveCheckinData({ events: newEvents, records, positions })
@@ -476,6 +483,7 @@ export default function CheckinClient() {
                   const newRecords = records.filter(r => r.eventId !== id)
                   setEvents(newEvents)
                   setRecords(newRecords)
+                  setHasUnsavedChanges(true) // 标记有未保存的更改
                   // 立即保存到GitHub
                   try {
                     await saveCheckinData({ events: newEvents, records: newRecords, positions })
