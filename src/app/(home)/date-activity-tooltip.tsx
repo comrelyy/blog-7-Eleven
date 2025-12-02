@@ -132,10 +132,16 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 								<div key={event.id} className='flex items-center gap-2'>
 									<span 
 										className='h-2 w-2 rounded-full' 
-										style={{ backgroundColor: event.color }}
+										style={{ 
+											backgroundColor: isChecked ? '#10b981' : event.color 
+										}}
 									/>
 									<span className='flex-1 truncate'>{event.name}</span>
-									<span>{isChecked ? '✓' : '○'}</span>
+									<span style={{ 
+										color: isChecked ? '#10b981' : undefined 
+									}}>
+										{isChecked ? '✓' : '○'}
+									</span>
 								</div>
 							)
 						})}

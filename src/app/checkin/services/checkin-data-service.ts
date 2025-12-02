@@ -68,7 +68,7 @@ export async function saveCheckinData(data: CheckinData): Promise<void> {
     
     // 创建文件树
     const treeItems: TreeItem[] = [{
-      path: '/checkin/data.json',
+      path: 'public/checkin/data.json',
       mode: '100644',
       type: 'blob',
       sha: dataBlob.sha

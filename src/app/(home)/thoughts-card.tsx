@@ -20,7 +20,7 @@ export default function ThoughtsCard() {
 	const { isAuth } = useAuthStore()
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
-	const [latestThought, setLatestThought] = useState<Thought | null>(null)
+	const [latestThoughts, setLatestThoughts] = useState<Thought[]>([]) // 修改为数组
 	const [thoughts, setThoughts] = useState<Thought[]>([])
 	const isMounted = useRef(true)
 
@@ -33,8 +33,9 @@ export default function ThoughtsCard() {
 				// 确保组件仍然挂载
 				if (isMounted.current && data) {
 					setThoughts(data.thoughts)
+					// 获取最新的三条碎碎念
 					if (data.thoughts.length > 0) {
-						setLatestThought(data.thoughts[0])
+						setLatestThoughts(data.thoughts.slice(0, 3))
 					}
 				}
 			} catch (error) {
@@ -83,7 +84,8 @@ export default function ThoughtsCard() {
 				// 更新本地状态
 				setInputValue('')
 				setThoughts(updatedThoughts)
-				setLatestThought(newThought)
+				// 更新最新三条碎碎念
+				setLatestThoughts(updatedThoughts.slice(0, 3))
 				toast.success('碎碎念保存成功！')
 			} catch (error) {
 				console.error('Failed to save thoughts', error)
@@ -128,14 +130,24 @@ export default function ThoughtsCard() {
 				</div>
 			</form>
 			
-			{/* 显示最近的一条碎碎念 */}
-			{latestThought && (
+			{/* 显示最新的三条碎碎念 */}
+			{latestThoughts.length > 0 && (
 				<div className='mt-3 pt-3 border-t border-white/20'>
-					<div className='text-xs text-secondary'>
-						最新碎碎念 · {formatTime(latestThought.timestamp)}
+					<div className='text-xs text-secondary mb-1'>
+						最新碎碎念
 					</div>
-					<div className='text-sm mt-1 truncate'>
-						{latestThought.text}
+					<div className='space-y-1'>
+						{latestThoughts.map((thought, index) => (
+							<div key={thought.id} className='text-sm truncate flex items-start'>
+								<span className='mr-2 text-secondary'>•</span>
+								<div className='flex-1'>
+									<span className='text-secondary text-xs mr-2'>
+										{formatTime(thought.timestamp)}
+									</span>
+									<span>{thought.text}</span>
+								</div>
+							</div>
+						))}
 					</div>
 				</div>
 			)}
