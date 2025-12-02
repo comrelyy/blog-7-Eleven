@@ -112,7 +112,7 @@ export default function NavCard() {
 		if (form === 'mini') return { width: 64, height: 64 }
 		else if (form === 'icons') return { width: 340, height: 64 }
 		else return { width: styles.width, height: styles.height }
-	}, [form])
+	}, [form, styles])
 
 	useEffect(() => {
 		if (form === 'icons' && activeIndex !== undefined && hoveredIndex !== activeIndex) {
@@ -164,7 +164,7 @@ export default function NavCard() {
 									stiffness: 400,
 									damping: 30
 								}}
-								style={{ backgroundImage: 'linear-gradient(to right bottom, #FFFFFF 0%, #fafafa 80%)' }}
+								style={{ backgroundImage: 'linear-gradient(to right bottom, var(--color-border) 60%, var(--color-card) 100%)' }}
 							/>
 
 							{list.map((item, index) => (
