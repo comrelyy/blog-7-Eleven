@@ -1,5 +1,15 @@
 [
   {
+    "slug": "mind-1",
+    "title": "最近想做的事",
+    "tags": [
+      "杂记"
+    ],
+    "date": "2025-12-03",
+    "summary": "最近想做的事",
+    "cover": "/blogs/mind-1/9d9dd69e26f3712a.jpg"
+  },
+  {
     "slug": "zelda-1",
     "title": "《海拉鲁演义》--第一章 复苏祠寒侵肌骨 希卡石暖透心魂",
     "tags": [
