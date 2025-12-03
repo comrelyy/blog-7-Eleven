@@ -4,32 +4,74 @@ import { motion } from 'motion/react'
 import { ColorPicker } from '@/components/color-picker'
 import { XIcon } from 'lucide-react'
 import type { SiteContent } from '../stores/config-store'
+import siteContent from '@/config/site-content.json'
 
 interface ColorConfigProps {
 	formData: SiteContent
 	setFormData: React.Dispatch<React.SetStateAction<SiteContent>>
 }
 
-interface ColorPreset {
+const DEFAULT_THEME_COLORS = siteContent.theme
+
+type ColorPreset = {
 	name: string
-	colorBrand: string
+	theme: Partial<SiteContent['theme']>
 	backgroundColors: string[]
 }
 
 const COLOR_PRESETS: ColorPreset[] = [
 	{
-		name: '默认配色',
-		colorBrand: '#35bfab',
+		name: '春暖',
+		theme: {
+			colorBrand: '#35bfab',
+			colorBrandSecondary: '#1fc9e7',
+			colorPrimary: '#334f52',
+			colorSecondary: '#7b888e',
+			colorBg: '#eeeeee',
+			colorBorder: '#ffffff',
+			colorCard: '#ffffff66',
+			colorArticle: '#ffffffcc'
+		},
 		backgroundColors: ['#EDDD62', '#9EE7D1', '#84D68A', '#EDDD62', '#88E6E5', '#a7f3d0']
 	},
 	{
-		name: '测试',
-		colorBrand: '#3b82f6',
-		backgroundColors: ['#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb']
+		name: '秋实',
+		theme: {
+			colorPrimary: '#4E3F42',
+			colorBrand: '#de4331',
+			colorBrandSecondary: '#FCC841'
+		},
+		backgroundColors: ['#FCC841', '#DFEFFC', '#DEDE92', '#DE4331', '#FE9750', '#FCC841']
+	},
+	{
+		name: '深夜',
+		theme: {
+			colorBrand: '#2a48f3',
+			colorPrimary: '#e6e8e8',
+			colorSecondary: '#acadae',
+			colorBrandSecondary: '#51d0b9',
+			colorBg: '#0a051f',
+			colorBorder: '#8a8a8a5e',
+			colorCard: '#ffffff0e',
+			colorArticle: '#6f6f6f33'
+		},
+		backgroundColors: ['#16007b']
 	}
 ]
 
 export function ColorConfig({ formData, setFormData }: ColorConfigProps) {
+	const theme = formData.theme ?? {}
+
+	const handleThemeColorChange = (key: keyof typeof DEFAULT_THEME_COLORS, value: string) => {
+		setFormData(prev => ({
+			...prev,
+			theme: {
+				...prev.theme,
+				[key]: value
+			}
+		}))
+	}
+
 	const handleBrandColorChange = (value: string) => {
 		setFormData(prev => ({
 			...prev,
@@ -89,7 +131,7 @@ export function ColorConfig({ formData, setFormData }: ColorConfigProps) {
 			backgroundColors: [...preset.backgroundColors],
 			theme: {
 				...prev.theme,
-				colorBrand: preset.colorBrand
+				...preset.theme
 			}
 		}))
 	}
@@ -97,9 +139,46 @@ export function ColorConfig({ formData, setFormData }: ColorConfigProps) {
 	return (
 		<div className='space-y-6'>
 			<div>
-				<label className='mb-2 block text-sm font-medium'>主题色</label>
-				<div className='flex items-center gap-3'>
-					<ColorPicker value={formData.theme?.colorBrand ?? '#35bfab'} onChange={handleBrandColorChange} />
+				<label className='mb-2 block text-sm font-medium'>基础颜色</label>
+				<div className='grid grid-cols-2 gap-4'>
+					<div className='flex items-center gap-3'>
+						<ColorPicker value={formData.theme?.colorBrand ?? '#35bfab'} onChange={handleBrandColorChange} />
+						<span className='text-xs'>主题色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker
+							value={theme.colorBrandSecondary ?? DEFAULT_THEME_COLORS.colorBrandSecondary}
+							onChange={value => handleThemeColorChange('colorBrandSecondary', value)}
+						/>
+						<span className='text-xs'>次级主题色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker value={theme.colorPrimary ?? DEFAULT_THEME_COLORS.colorPrimary} onChange={value => handleThemeColorChange('colorPrimary', value)} />
+						<span className='text-xs'>主色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker
+							value={theme.colorSecondary ?? DEFAULT_THEME_COLORS.colorSecondary}
+							onChange={value => handleThemeColorChange('colorSecondary', value)}
+						/>
+						<span className='text-xs'>次色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker value={theme.colorBg ?? DEFAULT_THEME_COLORS.colorBg} onChange={value => handleThemeColorChange('colorBg', value)} />
+						<span className='text-xs'>背景色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker value={theme.colorBorder ?? DEFAULT_THEME_COLORS.colorBorder} onChange={value => handleThemeColorChange('colorBorder', value)} />
+						<span className='text-xs'>边框色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker value={theme.colorCard ?? DEFAULT_THEME_COLORS.colorCard} onChange={value => handleThemeColorChange('colorCard', value)} />
+						<span className='text-xs'>卡片色</span>
+					</div>
+					<div className='flex items-center gap-3'>
+						<ColorPicker value={theme.colorArticle ?? DEFAULT_THEME_COLORS.colorArticle} onChange={value => handleThemeColorChange('colorArticle', value)} />
+						<span className='text-xs'>文章背景</span>
+					</div>
 				</div>
 			</div>
 
@@ -148,7 +227,10 @@ export function ColorConfig({ formData, setFormData }: ColorConfigProps) {
 						onClick={() => handlePresetChange(preset)}
 						className='flex items-center gap-3 rounded-lg border bg-white/60 p-3 transition-colors hover:bg-white/80'>
 						<div className='flex items-center gap-2'>
-							<div className='h-10 w-10 rounded-lg border-2 border-white/20 shadow-sm' style={{ backgroundColor: preset.colorBrand }} />
+							<div
+								className='h-10 w-10 rounded-lg border-2 border-white/20 shadow-sm'
+								style={{ backgroundColor: preset.theme.colorBrand ?? DEFAULT_THEME_COLORS.colorBrand }}
+							/>
 							{preset.backgroundColors.map((color, index) => (
 								<div key={index} className='h-10 w-10 rounded-lg border-2 border-white/20 shadow-sm' style={{ backgroundColor: color }} />
 							))}

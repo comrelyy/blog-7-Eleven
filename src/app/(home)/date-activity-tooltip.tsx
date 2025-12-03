@@ -10,6 +10,7 @@ import { useBlogIndex } from '@/hooks/use-blog-index'
 import type { BlogIndexItem } from '@/hooks/use-blog-index'
 import { loadCheckinData } from '@/app/checkin/services/checkin-data-service'
 import type { CheckinData, CheckinRecord, CheckinEvent } from '@/app/checkin/services/checkin-data-service'
+import { getThoughtsByDate, type Thought } from './services/push-thoughts'
 
 dayjs.locale('zh-cn')
 dayjs.extend(isSameOrAfter)
@@ -28,6 +29,7 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 	const [hasCheckin, setHasCheckin] = useState(false)
 	const [postsOnDate, setPostsOnDate] = useState<BlogIndexItem[]>([])
 	const [eventsOnDate, setEventsOnDate] = useState<CheckinEvent[]>([])
+	const [thoughtsCount, setThoughtsCount] = useState<number>(0) // 添加碎碎念条数状态
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -66,6 +68,10 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 					
 					setEventsOnDate(activeEvents)
 				}
+				
+				// 获取当天的碎碎念条数
+				const thoughts = await getThoughtsByDate(date)
+				setThoughtsCount(thoughts.length)
 			} catch (err) {
 				console.error('Failed to load checkin data from GitHub:', err)
 				setError(err instanceof Error ? err.message : '未知错误')
@@ -146,6 +152,13 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 							)
 						})}
 					</div>
+				</div>
+			)}
+			
+			{/* Thoughts count */}
+			{(thoughtsCount > 0) && (
+				<div className='mb-2'>
+					<p className='text-gray-600 font-medium'>碎碎念: {thoughtsCount} 条</p>
 				</div>
 			)}
 			

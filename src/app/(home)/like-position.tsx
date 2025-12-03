@@ -14,7 +14,6 @@ export default function LikePosition() {
 
 	const left = center.x + hiCardStyles.width / 2 - CARD_SPACING 
 	const top = center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING + musicCardStyles.height
-
 	return (
 		<motion.div className='absolute max-sm:static' initial={{ left, top }} animate={{ left, top }}>
 			<LikeButton delay={cardStyles.shareCard.order * ANIMATION_DELAY * 1000} />

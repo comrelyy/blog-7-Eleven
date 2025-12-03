@@ -4,12 +4,20 @@ import { useState, useRef } from 'react'
 import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import initialList from './list.json'
-import { PictureCard, type Picture } from './components/picture-card'
+import { RandomLayout } from './components/random-layout'
 import UploadDialog from './components/upload-dialog'
 import { pushPictures } from './services/push-pictures'
 import { useAuthStore } from '@/hooks/use-auth'
 import type { ImageItem } from '../projects/components/image-upload-dialog'
 import { useRouter } from 'next/navigation'
+
+export interface Picture {
+	id: string
+	uploadedAt: string
+	description?: string
+	image?: string
+	images?: string[]
+}
 
 export default function Page() {
 	const [pictures, setPictures] = useState<Picture[]>(initialList as Picture[])
@@ -56,7 +64,80 @@ export default function Page() {
 		setIsUploadDialogOpen(false)
 	}
 
-	const handleDelete = (picture: Picture) => {
+	const handleDeleteSingleImage = (pictureId: string, imageIndex: number | 'single') => {
+		setPictures(prev => {
+			return prev
+				.map(picture => {
+					if (picture.id !== pictureId) return picture
+
+					// 如果是 single image，删除整个 Picture
+					if (imageIndex === 'single') {
+						return null
+					}
+
+					// 如果是 images 数组中的图片
+					if (picture.images && picture.images.length > 0) {
+						const newImages = picture.images.filter((_, idx) => idx !== imageIndex)
+						// 如果删除后数组为空，删除整个 Picture
+						if (newImages.length === 0) {
+							return null
+						}
+						return {
+							...picture,
+							images: newImages
+						}
+					}
+
+					return picture
+				})
+				.filter((p): p is Picture => p !== null)
+		})
+
+		// 更新 imageItems Map
+		setImageItems(prev => {
+			const next = new Map(prev)
+			if (imageIndex === 'single') {
+				// 删除所有相关的文件项
+				for (const key of next.keys()) {
+					if (key.startsWith(`${pictureId}::`)) {
+						next.delete(key)
+					}
+				}
+			} else {
+				// 删除特定索引的文件项
+				next.delete(`${pictureId}::${imageIndex}`)
+				
+				// 重新索引：删除索引 imageIndex 后，后面的索引需要前移
+				// 例如：删除索引 1，原来的索引 2 变成 1，索引 3 变成 2
+				const keysToUpdate: Array<{ oldKey: string; newKey: string }> = []
+				for (const key of next.keys()) {
+					if (key.startsWith(`${pictureId}::`)) {
+						const [, indexStr] = key.split('::')
+						const oldIndex = Number(indexStr)
+						if (!isNaN(oldIndex) && oldIndex > imageIndex) {
+							const newIndex = oldIndex - 1
+							keysToUpdate.push({
+								oldKey: key,
+								newKey: `${pictureId}::${newIndex}`
+							})
+						}
+					}
+				}
+				
+				// 执行重新索引
+				for (const { oldKey, newKey } of keysToUpdate) {
+					const value = next.get(oldKey)
+					if (value) {
+						next.set(newKey, value)
+						next.delete(oldKey)
+					}
+				}
+			}
+			return next
+		})
+	}
+
+	const handleDeleteGroup = (picture: Picture) => {
 		if (!confirm('确定要删除这一组图片吗？')) return
 
 		setPictures(prev => prev.filter(p => p.id !== picture.id))
@@ -133,15 +214,13 @@ export default function Page() {
 				}}
 			/>
 
-			<div className='flex flex-col items-center justify-center px-6 pt-32 pb-12'>
-				<div className='grid w-full max-w-[1200px] grid-cols-3 gap-6 max-lg:grid-cols-2 max-sm:grid-cols-1'>
-					{pictures.map(picture => (
-						<PictureCard key={picture.id} picture={picture} isEditMode={isEditMode} onDelete={() => handleDelete(picture)} />
-					))}
-				</div>
 
-				{pictures.length === 0 && <div className='mt-16 text-center text-sm text-gray-500'>还没有上传图片，点击右上角「编辑」后即可开始上传。</div>}
-			</div>
+			<RandomLayout pictures={pictures} isEditMode={isEditMode} onDeleteSingle={handleDeleteSingleImage} onDeleteGroup={handleDeleteGroup} />
+			{pictures.length === 0 && (
+				<div className='text-secondary flex min-h-screen items-center justify-center text-center text-sm'>
+					还没有上传图片，点击右上角「编辑」后即可开始上传。
+				</div>
+			)}
 
 			<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='absolute top-4 right-6 flex gap-3 max-sm:hidden'>
 				{isEditMode ? (

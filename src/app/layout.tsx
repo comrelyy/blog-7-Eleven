@@ -1,13 +1,13 @@
 import '@/styles/globals.css'
 
 import type { Metadata } from 'next'
-import type { CSSProperties } from 'react'
 import Layout from '@/layout'
 import Head from '@/layout/head'
 import siteContent from '@/config/site-content.json'
 
 const {
-	meta: { title, description }
+	meta: { title, description },
+	theme
 } = siteContent
 
 export const metadata: Metadata = {
@@ -23,24 +23,31 @@ export const metadata: Metadata = {
 	}
 }
 
-const bodyStyle: CSSProperties & { '--color-brand'?: string } = {
+const htmlStyle = {
 	cursor: 'url(/images/cursor.svg) 2 1, auto',
-	'--color-brand': siteContent.theme?.colorBrand
+	'--color-brand': theme.colorBrand,
+	'--color-primary': theme.colorPrimary,
+	'--color-secondary': theme.colorSecondary,
+	'--color-brand-secondary': theme.colorBrandSecondary,
+	'--color-bg': theme.colorBg,
+	'--color-border': theme.colorBorder,
+	'--color-card': theme.colorCard,
+	'--color-article': theme.colorArticle
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<html lang='en' suppressHydrationWarning>
+		<html lang='en' suppressHydrationWarning style={htmlStyle}>
 			<Head />
 
-			<body style={bodyStyle}>
+			<body>
 				<script
 					dangerouslySetInnerHTML={{
 						__html: `
-						if (window && /windows|win32/i.test(navigator.userAgent)) {
-							setTimeout(() => document.documentElement.classList.add('windows'), 0)			
-						}
-			      `
+					if (/windows|win32/i.test(navigator.userAgent)) {
+						document.documentElement.classList.add('windows');
+					}
+		      `
 					}}
 				/>
 

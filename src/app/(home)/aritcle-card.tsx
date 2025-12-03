@@ -18,7 +18,6 @@ export default function ArticleCard() {
 	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y + hiCardStyles.height / 2 + CARD_SPACING
 
 	return (
-
 		<Card order={styles.order} width={styles.width} x={x} y={y} className='space-y-2 max-sm:static'>
 			<h2 className='text-secondary text-sm'>最新文章</h2>
 

@@ -94,9 +94,13 @@ export default function ThoughtsCard() {
 		}
 	}
 
-	const formatTime = (timestamp: number) => {
+	const formatDateTime = (timestamp: number) => {
 		const date = new Date(timestamp)
-		return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+		const month = (date.getMonth() + 1).toString().padStart(2, '0')
+		const day = date.getDate().toString().padStart(2, '0')
+		const hours = date.getHours().toString().padStart(2, '0')
+		const minutes = date.getMinutes().toString().padStart(2, '0')
+		return `${month}-${day} ${hours}:${minutes}`
 	}
 
 	// 计算与 hi-card 左对齐的 x 坐标
@@ -142,7 +146,7 @@ export default function ThoughtsCard() {
 								<span className='mr-2 text-secondary'>•</span>
 								<div className='flex-1'>
 									<span className='text-secondary text-xs mr-2'>
-										{formatTime(thought.timestamp)}
+										{formatDateTime(thought.timestamp)}
 									</span>
 									<span>{thought.text}</span>
 								</div>

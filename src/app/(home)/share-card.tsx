@@ -7,6 +7,7 @@ import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import shareList from '@/app/share/list.json'
 import { poetryData } from './poetry-data'
+import Link from 'next/link'
 
 type ShareItem = {
 	name: string
@@ -28,9 +29,7 @@ export default function ShareCard() {
 	const center = useCenterStore()
 	const { cardStyles } = useConfigStore()
 	const [randomItem, setRandomItem] = useState<ShareItem | null>(null)
-
 	const [randomPoetry, setRandomPoetry] = useState<PoetryItem | null>(null)
-
 	const styles = cardStyles.shareCard
 	const hiCardStyles = cardStyles.hiCard
 	const socialButtonsStyles = cardStyles.socialButtons

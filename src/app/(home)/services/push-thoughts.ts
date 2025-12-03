@@ -126,6 +126,47 @@ export async function useThoughtsIndex() :Promise<ThoughtJsonArray | null>{
   return { thoughts: sortedThoughts }
 }
 
+// 获取指定日期的碎碎念数据
+export async function getThoughtsByDate(date: string): Promise<Thought[]> {
+  // 从日期提取年月
+  const yearMonth = date.substring(0, 7); // YYYY-MM
+  const fileName = `${yearMonth}.json`;
+  
+  try {
+    // 尝试获取该月份的碎碎念数据
+    const res = await fetch(`/thoughts/${fileName}`, { 
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+    
+    if (res.status === 404) {
+      // 文件不存在，返回空数组
+      return [];
+    }
+    
+    if (!res.ok) {
+      throw new Error(`Failed to load ${fileName}`);
+    }
+    
+    const data = await res.json();
+    
+    // 筛选出指定日期的碎碎念
+    const thoughtsForDate = Array.isArray(data) 
+      ? data.filter(thought => thought.date === date)
+      : [];
+    
+    // 按时间戳排序，最新的在前
+    return thoughtsForDate.sort((a, b) => b.timestamp - a.timestamp);
+  } catch (error) {
+    console.error(`Error fetching thoughts for date ${date}:`, error);
+    return [];
+  }
+}
+
 // 获取所有可能的碎碎念文件列表
 function getAllPossibleThoughtFiles(): string[] {
   const files = []

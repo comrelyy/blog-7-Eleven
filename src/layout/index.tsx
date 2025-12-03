@@ -1,35 +1,25 @@
 'use client'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 import { useCenterInit } from '@/hooks/use-center'
 import BlurredBubblesBackground from './backgrounds/blurred-bubbles'
 import NavCard from '@/components/nav-card'
 import { Toaster } from 'sonner'
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from 'lucide-react'
-import { useSizeInit } from '@/hooks/use-size'
+import { useSize, useSizeInit } from '@/hooks/use-size'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
+import { ScrollTopButton } from '@/components/scroll-top-button'
 
 export default function Layout({ children }: PropsWithChildren) {
 	useCenterInit()
 	useSizeInit()
 	const { siteContent, regenerateKey } = useConfigStore()
-
-	useEffect(() => {
-		if (typeof document === 'undefined') return
-		const color = siteContent.theme?.colorBrand
-		if (color) {
-			document.documentElement.style.setProperty('--color-brand', color)
-			if (document.body) {
-				document.body.style.setProperty('--color-brand', color)
-			}
-		}
-	}, [siteContent.theme?.colorBrand])
+	const { maxSM, init } = useSize()
 
 	return (
 		<>
 			<Toaster
 				position='bottom-right'
 				richColors
-				// closeButton
 				icons={{
 					success: <CircleCheckIcon className='size-4' />,
 					info: <InfoIcon className='size-4' />,
@@ -48,6 +38,8 @@ export default function Layout({ children }: PropsWithChildren) {
 				{children}
 				<NavCard />
 			</main>
+
+			{maxSM && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-8 z-50 shadow-md' />}
 		</>
 	)
 }

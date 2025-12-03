@@ -1,6 +1,5 @@
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
-
 import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import MusicSVG from '@/svgs/music.svg'
