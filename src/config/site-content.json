@@ -4,16 +4,21 @@
 		"description": "77&&Eleven的个人博客，工作，生活以及中年人挣扎中的碎碎念"
 	},
 	"theme": {
-		"colorBrand": "#de4331",
-		"colorPrimary": "#4E3F42",
+		"colorBrand": "#F35833",
+		"colorPrimary": "#334f52",
 		"colorSecondary": "#7b888e",
-		"colorBrandSecondary": "#FCC841",
+		"colorBrandSecondary": "#1fc9e7",
 		"colorBg": "#eeeeee",
 		"colorBorder": "#ffffff",
 		"colorCard": "#ffffff66",
 		"colorArticle": "#ffffffcc"
 	},
-	"backgroundColors": ["#FCC841", "#DFEFFC", "#DEDE92", "#DE4331", "#FE9750", "#FCC841"],
+	"backgroundColors": [
+		"#36F277",
+		"#7D9F80",
+		"#0F2212",
+		"#5AAD8E"
+	],
 	"artImages": [
 		{
 			"id": "cat",
@@ -22,7 +27,11 @@
 		{
 			"id": "a46372ff45bc5524",
 			"url": "/images/art/a46372ff45bc5524.jpg"
+		},
+		{
+			"id": "5b6203557fd1ecc3",
+			"url": "/images/art/5b6203557fd1ecc3.webp"
 		}
 	],
-	"currentArtImageId": "a46372ff45bc5524"
+	"currentArtImageId": "5b6203557fd1ecc3"
 }
