@@ -217,12 +217,12 @@ export default function DateActivityModal({ date, onClose }: DateActivityModalPr
 							return (
 								<div key={event.id} className='flex items-center gap-2 text-sm'>
 									<span 
-										className='h-2 w-2 rounded-full' 
+										className='h-2 w-2 rounded-full flex-shrink-0' 
 										style={{ 
 											backgroundColor: isChecked ? '#10b981' : event.color 
 										}}
 									/>
-									<span className='flex-1 truncate'>{event.name}</span>
+									<span className='flex-1 break-words'>{event.name}</span>
 									<span style={{ 
 										color: isChecked ? '#10b981' : undefined 
 									}}>
@@ -250,13 +250,13 @@ export default function DateActivityModal({ date, onClose }: DateActivityModalPr
 								initial={{ opacity: 0, x: -8 }}
 								animate={{ opacity: 1, x: 0 }}
 								transition={{ delay: INIT_DELAY + ANIMATION_DELAY * (2 + idx) }}
-								className='text-sm truncate flex items-start bg-[var(--color-card)] p-2 rounded-lg'>
-								<span className='mr-2 text-secondary'>•</span>
-								<div className='flex-1'>
-									<span className='text-secondary text-xs mr-2'>
+								className='text-sm flex items-start bg-[var(--color-card)] p-2 rounded-lg'>
+								<span className='mr-2 text-secondary flex-shrink-0'>•</span>
+								<div className='flex-1 min-w-0'>
+									<span className='text-secondary text-xs mr-2 whitespace-nowrap'>
 										{formatTime(thought.timestamp)}
 									</span>
-									<span>{thought.text}</span>
+									<span className='break-words'>{thought.text}</span>
 								</div>
 							</motion.div>
 						))}
@@ -283,8 +283,8 @@ export default function DateActivityModal({ date, onClose }: DateActivityModalPr
 								transition={{ delay: INIT_DELAY + ANIMATION_DELAY * (4 + idx) }}
 								className='rounded-lg border border-gray-200 p-2 hover:bg-gray-50 transition-colors bg-[var(--color-article)]'>
 								<a href={`/blog/${post.slug}`} className='block'>
-									<p className='text-sm font-medium text-gray-900 hover:text-brand'>{post.title || post.slug}</p>
-									{post.summary && <p className='text-xs text-gray-500 mt-1 line-clamp-2'>{post.summary}</p>}
+									<p className='text-sm font-medium text-gray-900 hover:text-brand break-words'>{post.title || post.slug}</p>
+									{post.summary && <p className='text-xs text-gray-500 mt-1 break-words'>{post.summary}</p>}
 								</a>
 							</motion.li>
 						))}

@@ -142,13 +142,13 @@ export default function ThoughtsCard() {
 					</div>
 					<div className='space-y-1'>
 						{latestThoughts.map((thought, index) => (
-							<div key={thought.id} className='text-sm truncate flex items-start'>
-								<span className='mr-2 text-secondary'>•</span>
-								<div className='flex-1'>
-									<span className='text-secondary text-xs mr-2'>
+							<div key={thought.id} className='text-sm flex items-start'>
+								<span className='mr-2 text-secondary flex-shrink-0'>•</span>
+								<div className='flex-1 min-w-0'>
+									<span className='text-secondary text-xs mr-2 whitespace-nowrap'>
 										{formatDateTime(thought.timestamp)}
 									</span>
-									<span>{thought.text}</span>
+									<span className='break-words'>{thought.text}</span>
 								</div>
 							</div>
 						))}
