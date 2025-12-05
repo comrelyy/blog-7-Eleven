@@ -8,6 +8,7 @@ import { CARD_SPACING } from '@/consts'
 import shareList from '@/app/share/list.json'
 import { poetryData } from './poetry-data'
 import Link from 'next/link'
+import { HomeDraggableLayer } from './home-draggable-layer'
 
 type ShareItem = {
 	name: string
@@ -60,6 +61,7 @@ export default function ShareCard() {
 	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING / 2	
 
 	return (
+		<HomeDraggableLayer cardKey='shareCard' x={x} y={y} width={styles.width} height={styles.height}>
 		<Card order={styles.order} width={styles.width} x={x} y={y}>
 			{/* <h2 className='text-secondary text-sm'>随机推荐</h2> */}
 
@@ -85,5 +87,6 @@ export default function ShareCard() {
 				</a>
 			) : null}
 		</Card>
+		</HomeDraggableLayer>
 	)
 }
