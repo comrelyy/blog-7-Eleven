@@ -18,11 +18,13 @@ import { motion } from 'motion/react'
 import { useLayoutEditStore } from './stores/layout-edit-store'
 import { useConfigStore } from './stores/config-store'
 import { toast } from 'sonner'
+import ConfigDialog from './config-dialog/index'
+import { useEffect } from 'react'
 
 
 export default function Home() {
 	const { maxSM } = useSize()
-	const { cardStyles } = useConfigStore()
+	const { cardStyles, configDialogOpen, setConfigDialogOpen } = useConfigStore()
 	const editing = useLayoutEditStore(state => state.editing)
 	const saveEditing = useLayoutEditStore(state => state.saveEditing)
 	const cancelEditing = useLayoutEditStore(state => state.cancelEditing)
@@ -36,6 +38,20 @@ export default function Home() {
 		cancelEditing()
 		toast.info('已取消此次拖拽布局修改')
 	}
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+				e.preventDefault()
+				setConfigDialogOpen(true)
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [setConfigDialogOpen])
 
 	return (
 // <<<<<<< HEAD
@@ -87,6 +103,7 @@ export default function Home() {
 				{!maxSM && cardStyles.writeButtons?.enabled !== false && <WriteButtons />}
 				{cardStyles.likePosition?.enabled !== false && <LikePosition />}
 			</div>
+			<ConfigDialog open={configDialogOpen} onClose={() => setConfigDialogOpen(false)} />
 		</>
 	)
 }
