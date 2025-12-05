@@ -12,16 +12,12 @@ export default function LikePosition() {
 	const hiCardStyles = cardStyles.hiCard
 	const socialButtonsStyles = cardStyles.socialButtons
 	const musicCardStyles = cardStyles.musicCard
-	const shareCardStyles = cardStyles.shareCard
-
-	const left = center.x + hiCardStyles.width / 2 - CARD_SPACING 
-	const top = center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING + musicCardStyles.height
 	const x =
-		styles.offsetX !== null ? center.x + styles.offsetX : center.x + hiCardStyles.width / 2 - socialButtonsStyles.width + shareCardStyles.width + CARD_SPACING
+		styles.offsetX !== null ? center.x + styles.offsetX : center.x + hiCardStyles.width / 2 - CARD_SPACING 
 	const y =
 		styles.offsetY !== null
 			? center.y + styles.offsetY
-			: center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING + musicCardStyles.height + CARD_SPACING
+			: center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING + musicCardStyles.height
 
 	return (
 		<HomeDraggableLayer cardKey='likePosition' x={x} y={y} width={styles.width} height={styles.height}>
