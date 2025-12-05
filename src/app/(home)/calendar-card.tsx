@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils'
 import { DialogModal } from '@/components/dialog-modal'
 import DateActivityModal from './date-activity-modal'
 import DateActivityTooltip from './date-activity-tooltip'
+import { HomeDraggableLayer } from './home-draggable-layer'
+
 
 dayjs.locale('zh-cn')
 
@@ -73,7 +75,7 @@ export default function CalendarCard() {
 	}
 
 	return (
-		<>
+		<HomeDraggableLayer cardKey='calendarCard' x={x} y={y} width={styles.width} height={styles.height}>
 			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y}>
 				<div className="flex items-center justify-between">
 					<button 
@@ -128,10 +130,13 @@ export default function CalendarCard() {
 				</ul>
 			</Card>
 
+
+
+
 			<DialogModal open={showModal} onClose={handleCloseModal}>
 				{selectedDate && <DateActivityModal date={selectedDate} onClose={handleCloseModal} />}
 			</DialogModal>
-		</>
+		</HomeDraggableLayer>
 	)
 }
 
