@@ -1,7 +1,8 @@
 {
 	"meta": {
 		"title": "77&&Eleven",
-		"description": "77&&Eleven的个人博客，工作，生活以及中年人挣扎中的碎碎念"
+		"description": "77&&Eleven的个人博客，工作，生活以及中年人挣扎中的碎碎念",
+		"username": "77&&Eleven"
 	},
 	"theme": {
 		"colorBrand": "#F35833",
@@ -69,5 +70,8 @@
 			"label": "",
 			"order": 1
 		}
-	]
+	],
+	"clockShowSeconds": false,
+	"summaryInContent": false,
+	"hideEditButton": false
 }
