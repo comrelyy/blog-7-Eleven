@@ -1,7 +1,8 @@
 {
 	"meta": {
 		"title": "77&&Eleven",
-		"description": "77&&Eleven的个人博客，工作，生活以及中年人挣扎中的碎碎念"
+		"description": "77&&Eleven 的个人博客。",
+		"username": "77&&Eleven"
 	},
 	"theme": {
 		"colorBrand": "#F35833",
@@ -51,5 +52,23 @@
 		}
 	],
 	"currentBackgroundImageId": "b4a326042a5f0bf6",
-	"socialButtons": []
+	"socialButtons": [
+		{
+			"id": "github",
+			"type": "github",
+			"value": "https://github.com/comrelyy",
+			"label": "Github",
+			"order": 3
+		},
+		{
+			"id": "email",
+			"type": "email",
+			"value": "relyy2014@163.com",
+			"label": "",
+			"order": 1
+		}
+	],
+	"clockShowSeconds": false,
+	"summaryInContent": false,
+	"hideEditButton": false
 }

@@ -2,7 +2,10 @@
 
 import Link from 'next/link'
 import dayjs from 'dayjs'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { motion } from 'motion/react'
+
+dayjs.extend(weekOfYear)
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ANIMATION_DELAY, INIT_DELAY } from '@/consts'
@@ -11,21 +14,27 @@ import { useBlogIndex, type BlogIndexItem } from '@/hooks/use-blog-index'
 import { useReadArticles } from '@/hooks/use-read-articles'
 import JuejinSVG from '@/svgs/juejin.svg'
 import { useAuthStore } from '@/hooks/use-auth'
+import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { readFileAsText } from '@/lib/file-utils'
 import { cn } from '@/lib/utils'
 import { batchDeleteBlogs } from './services/batch-delete-blogs'
 import { Check } from 'lucide-react'
 
+type DisplayMode = 'day' | 'week' | 'month' | 'year'
+
 export default function BlogPage() {
 	const { items, loading } = useBlogIndex()
 	const { isRead } = useReadArticles()
 	const { isAuth, setPrivateKey } = useAuthStore()
+	const { siteContent } = useConfigStore()
+	const hideEditButton = siteContent.hideEditButton ?? false
 
 	const keyInputRef = useRef<HTMLInputElement>(null)
 	const [editMode, setEditMode] = useState(false)
 	const [editableItems, setEditableItems] = useState<BlogIndexItem[]>([])
 	const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
 	const [saving, setSaving] = useState(false)
+	const [displayMode, setDisplayMode] = useState<DisplayMode>('year')
 
 	useEffect(() => {
 		if (!editMode) {
@@ -35,22 +44,63 @@ export default function BlogPage() {
 
 	const displayItems = editMode ? editableItems : items
 
-	const { groupedItems, years } = useMemo(() => {
+	const { groupedItems, groupKeys, getGroupLabel } = useMemo(() => {
 		const sorted = [...displayItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
 		const grouped = sorted.reduce(
 			(acc, item) => {
-				const year = dayjs(item.date).format('YYYY')
-				if (!acc[year]) {
-					acc[year] = []
+				let key: string
+				let label: string
+				const date = dayjs(item.date)
+
+				switch (displayMode) {
+					case 'day':
+						key = date.format('YYYY-MM-DD')
+						label = date.format('YYYY年MM月DD日')
+						break
+					case 'week':
+						const week = date.week()
+						key = `${date.format('YYYY')}-W${week.toString().padStart(2, '0')}`
+						label = `${date.format('YYYY')}年第${week}周`
+						break
+					case 'month':
+						key = date.format('YYYY-MM')
+						label = date.format('YYYY年MM月')
+						break
+					case 'year':
+					default:
+						key = date.format('YYYY')
+						label = date.format('YYYY年')
+						break
 				}
-				acc[year].push(item)
+
+				if (!acc[key]) {
+					acc[key] = { items: [], label }
+				}
+				acc[key].items.push(item)
 				return acc
 			},
-			{} as Record<string, BlogIndexItem[]>
+			{} as Record<string, { items: BlogIndexItem[]; label: string }>
 		)
-		const yearKeys = Object.keys(grouped).sort((a, b) => Number(b) - Number(a))
-		return { groupedItems: grouped, years: yearKeys }
-	}, [displayItems])
+
+		const keys = Object.keys(grouped).sort((a, b) => {
+			// 按时间倒序排序
+			if (displayMode === 'week') {
+				// 周格式：YYYY-WW
+				const [yearA, weekA] = a.split('-W').map(Number)
+				const [yearB, weekB] = b.split('-W').map(Number)
+				if (yearA !== yearB) return yearB - yearA
+				return weekB - weekA
+			}
+			return b.localeCompare(a)
+		})
+
+		return {
+			groupedItems: grouped,
+			groupKeys: keys,
+			getGroupLabel: (key: string) => grouped[key]?.label || key
+		}
+	}, [displayItems, displayMode])
 
 	const selectedCount = selectedSlugs.size
 	const buttonText = isAuth ? '保存' : '导入密钥'
@@ -76,6 +126,44 @@ export default function BlogPage() {
 			}
 			return next
 		})
+	}, [])
+
+	// 全选所有文章
+	const handleSelectAll = useCallback(() => {
+		setSelectedSlugs(new Set(editableItems.map(item => item.slug)))
+	}, [editableItems])
+
+	// 全选/取消全选某个时间维度分组
+	const handleSelectGroup = useCallback(
+		(groupKey: string) => {
+			const group = groupedItems[groupKey]
+			if (!group) return
+
+			// 检查该分组是否所有文章都已选中
+			const allSelected = group.items.every(item => selectedSlugs.has(item.slug))
+
+			setSelectedSlugs(prev => {
+				const next = new Set(prev)
+				if (allSelected) {
+					// 如果已全选，则取消该分组的选择
+					group.items.forEach(item => {
+						next.delete(item.slug)
+					})
+				} else {
+					// 如果未全选，则全选该分组
+					group.items.forEach(item => {
+						next.add(item.slug)
+					})
+				}
+				return next
+			})
+		},
+		[groupedItems, selectedSlugs]
+	)
+
+	// 取消全选
+	const handleDeselectAll = useCallback(() => {
+		setSelectedSlugs(new Set())
 	}, [])
 
 	const handleItemClick = useCallback(
@@ -146,6 +234,20 @@ export default function BlogPage() {
 		[setPrivateKey]
 	)
 
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (!editMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
+				e.preventDefault()
+				toggleEditMode()
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [editMode, toggleEditMode])
+
 	return (
 		<>
 			<input
@@ -160,24 +262,66 @@ export default function BlogPage() {
 				}}
 			/>
 
-			<div className='flex flex-col items-center justify-center gap-6 px-6 pt-32 pb-12 max-sm:pt-28'>
-				<>
-					{years.map((year, index) => (
+			<div className='flex flex-col items-center justify-center gap-6 px-6 pt-24 max-sm:pt-24'>
+				{items.length > 0 && (
+					<motion.div
+						initial={{ opacity: 0, scale: 0.6 }}
+						animate={{ opacity: 1, scale: 1 }}
+						className='card relative mx-auto flex items-center gap-1 rounded-xl p-1 max-sm:hidden'>
+						{(['day', 'week', 'month', 'year'] as DisplayMode[]).map(mode => (
+							<motion.button
+								key={mode}
+								whileHover={{ scale: 1.05 }}
+								whileTap={{ scale: 0.95 }}
+								onClick={() => setDisplayMode(mode)}
+								className={cn(
+									'rounded-lg px-3 py-1.5 text-xs font-medium transition-all',
+									displayMode === mode ? 'bg-brand text-white shadow-sm' : 'text-secondary hover:text-brand hover:bg-white/60'
+								)}>
+								{mode === 'day' ? '日' : mode === 'week' ? '周' : mode === 'month' ? '月' : '年'}
+							</motion.button>
+						))}
+					</motion.div>
+				)}
+
+				{groupKeys.map((groupKey, index) => {
+					const group = groupedItems[groupKey]
+					if (!group) return null
+
+					return (
 						<motion.div
-							key={year}
-							initial={{ opacity: 0, scale: 0.9 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: INIT_DELAY + ANIMATION_DELAY * index }}
+							key={groupKey}
+							initial={{ opacity: 0, scale: 0.95 }}
+							whileInView={{ opacity: 1, scale: 1 }}
+							transition={{ delay: INIT_DELAY / 2 }}
 							className='card relative w-full max-w-[840px] space-y-6'>
-							<div className='mb-3 flex items-center gap-3 text-base'>
-								<div className='w-[44px] font-medium'>{year}</div>
-
-								<div className='h-2 w-2 rounded-full bg-[#D9D9D9]'></div>
-
-								<div className='text-secondary text-sm'>{groupedItems[year].length} 篇文章</div>
+							<div className='mb-3 flex items-center justify-between gap-3 text-base'>
+								<div className='flex items-center gap-3'>
+									<div className='font-medium'>{getGroupLabel(groupKey)}</div>
+									<div className='h-2 w-2 rounded-full bg-[#D9D9D9]'></div>
+									<div className='text-secondary text-sm'>{group.items.length} 篇文章</div>
+								</div>
+								{editMode &&
+									(() => {
+										const groupAllSelected = group.items.every(item => selectedSlugs.has(item.slug))
+										return (
+											<motion.button
+												whileHover={{ scale: 1.05 }}
+												whileTap={{ scale: 0.95 }}
+												onClick={() => handleSelectGroup(groupKey)}
+												className={cn(
+													'rounded-lg border px-3 py-1 text-xs transition-colors',
+													groupAllSelected
+														? 'border-brand/40 bg-brand/10 text-brand hover:bg-brand/20'
+														: 'text-secondary hover:border-brand/40 hover:text-brand border-transparent bg-white/60 hover:bg-white/80'
+												)}>
+												{groupAllSelected ? '取消全选' : '全选该分组'}
+											</motion.button>
+										)
+									})()}
 							</div>
 							<div>
-								{groupedItems[year].map(it => {
+								{group.items.map(it => {
 									const hasRead = isRead(it.slug)
 									const isSelected = selectedSlugs.has(it.slug)
 									return (
@@ -229,8 +373,16 @@ export default function BlogPage() {
 								})}
 							</div>
 						</motion.div>
-					))}
+						)
+					})}
 					{/* {items.length > 0 && (
+
+									})}
+								</div>
+							</motion.div>
+						)
+					})}
+					{items.length > 0 && (
 						<div className='text-center'>
 							<motion.a
 								initial={{ opacity: 0, scale: 0.6 }}
@@ -247,10 +399,12 @@ export default function BlogPage() {
 					)} */}
 					{!loading && items.length === 0 && <div className='text-secondary py-6 text-center text-sm'>暂无文章</div>}
 					{loading && <div className='text-secondary py-6 text-center text-sm'>加载中...</div>}
-				</>
 			</div>
 
-			<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='absolute top-4 right-6 flex gap-3 max-sm:hidden'>
+			<motion.div
+				initial={{ opacity: 0, scale: 0.6 }}
+				animate={{ opacity: 1, scale: 1 }}
+				className='absolute top-4 right-6 flex items-center gap-3 max-sm:hidden'>
 				{editMode ? (
 					<>
 						<motion.button
@@ -260,6 +414,13 @@ export default function BlogPage() {
 							disabled={saving}
 							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
 							取消
+						</motion.button>
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={selectedCount === editableItems.length ? handleDeselectAll : handleSelectAll}
+							className='rounded-xl border bg-white/60 px-4 py-2 text-sm transition-colors hover:bg-white/80'>
+							{selectedCount === editableItems.length ? '取消全选' : '全选'}
 						</motion.button>
 						<motion.button
 							whileHover={{ scale: 1.05 }}
@@ -274,13 +435,15 @@ export default function BlogPage() {
 						</motion.button>
 					</>
 				) : (
-					<motion.button
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						onClick={toggleEditMode}
-						className='rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
-						编辑
-					</motion.button>
+					!hideEditButton && (
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={toggleEditMode}
+							className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
+							编辑
+						</motion.button>
+					)
 				)}
 			</motion.div>
 		</>
