@@ -68,7 +68,7 @@ export const poetryData = [
     content: "杨柳青青江水平，闻郎江上唱歌声，\n 东边日出西边雨，道是无晴却有晴。"
   },
   {
-    title: "关雎",d
+    title: "关雎",
     chapter: "诗经",
     content: "关关雎鸠，在河之洲。窈窕淑女，君子好逑。"
   },
