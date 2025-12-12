@@ -29,7 +29,7 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 	const [hasCheckin, setHasCheckin] = useState(false)
 	const [postsOnDate, setPostsOnDate] = useState<BlogIndexItem[]>([])
 	const [eventsOnDate, setEventsOnDate] = useState<CheckinEvent[]>([])
-	const [thoughtsCount, setThoughtsCount] = useState<number>(0) // 添加碎碎念条数状态
+	const [thoughtsOnDate, setThoughtsOnDate] = useState<Thought[]>([]) // 存储当天的碎碎念数据
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -69,9 +69,9 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 					setEventsOnDate(activeEvents)
 				}
 				
-				// 获取当天的碎碎念条数
+				// 获取当天的碎碎念数据
 				const thoughts = await getThoughtsByDate(date)
-				setThoughtsCount(thoughts.length)
+				setThoughtsOnDate(thoughts)
 			} catch (err) {
 				console.error('Failed to load checkin data from GitHub:', err)
 				setError(err instanceof Error ? err.message : '未知错误')
@@ -122,6 +122,9 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 		)
 	}
 
+	// 过滤出以"*今日待办*"开头的碎碎念
+	const todoThoughts = thoughtsOnDate.filter(thought => thought.text.startsWith('##'))
+
 	return (
 		<div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 rounded-lg bg-white border border-gray-200 shadow-lg p-3 text-xs pointer-events-none text-gray-800'>
 			{/* Checkin events */}
@@ -155,10 +158,24 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 				</div>
 			)}
 			
-			{/* Thoughts count */}
-			{(thoughtsCount > 0) && (
+			{/* Todo thoughts */}
+			{todoThoughts.length > 0 && (
 				<div className='mb-2'>
-					<p className='text-gray-600 font-medium'>碎碎念: {thoughtsCount} 条</p>
+					<p className='text-gray-600 font-medium mb-1'>今日待办:</p>
+					<div className='space-y-1'>
+						{todoThoughts.map(thought => (
+							<p key={thought.id} className='text-gray-700 break-words'>
+								{thought.text.replace('##', '').trim()}
+							</p>
+						))}
+					</div>
+				</div>
+			)}
+			
+			{/* Other thoughts count */}
+			{(thoughtsOnDate.length - todoThoughts.length) > 0 && (
+				<div className='mb-2'>
+					<p className='text-gray-600 font-medium'>碎碎念: {thoughtsOnDate.length - todoThoughts.length} 条</p>
 				</div>
 			)}
 			
