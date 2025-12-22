@@ -70,5 +70,13 @@
 	],
 	"clockShowSeconds": false,
 	"summaryInContent": false,
-	"hideEditButton": false
+	"hideEditButton": false,
+	"isCachePem": false,
+	"enableCategories": true,
+	"currentHatIndex": 3,
+	"hatFlipped": false,
+	"beian": {
+		"text": "",
+		"link": ""
+	}
 }
