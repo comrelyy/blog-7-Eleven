@@ -128,20 +128,45 @@ export default function NavCard() {
 
 	if (show)
 		return (
-<HomeDraggableLayer cardKey='navCard' x={position.x} y={position.y} width={styles.width} height={styles.height}>
-			<Card
-				order={styles.order}
-				width={size.width}
-				height={size.height}
-				x={position.x}
-				y={position.y}
-				className={clsx('overflow-hidden', form === 'mini' && 'p-3', form === 'icons' && 'flex items-center gap-6 p-3')}>
-				<Link className='flex items-center gap-3' href='/'>
-					<Image src='/images/avatar.png' alt='avatar' width={40} height={40} style={{ boxShadow: ' 0 12px 20px -5px #E2D9CE' }} className='rounded-full' />
-					{form === 'full' && <span className='font-averia mt-1 text-2xl leading-none font-medium'>{siteContent.meta.title}</span>}
-					{form === 'full' && <span className='text-brand mt-2 text-xs font-medium'></span>}
-				</Link>
+// <<<<<<< HEAD
+// <HomeDraggableLayer cardKey='navCard' x={position.x} y={position.y} width={styles.width} height={styles.height}>
+// 			<Card
+// 				order={styles.order}
+// 				width={size.width}
+// 				height={size.height}
+// 				x={position.x}
+// 				y={position.y}
+// 				className={clsx('overflow-hidden', form === 'mini' && 'p-3', form === 'icons' && 'flex items-center gap-6 p-3')}>
+// 				<Link className='flex items-center gap-3' href='/'>
+// 					<Image src='/images/avatar.png' alt='avatar' width={40} height={40} style={{ boxShadow: ' 0 12px 20px -5px #E2D9CE' }} className='rounded-full' />
+// 					{form === 'full' && <span className='font-averia mt-1 text-2xl leading-none font-medium'>{siteContent.meta.title}</span>}
+// 					{form === 'full' && <span className='text-brand mt-2 text-xs font-medium'></span>}
+// 				</Link>
+// =======
+			<HomeDraggableLayer cardKey='navCard' x={position.x} y={position.y} width={styles.width} height={styles.height}>
+				<Card
+					order={styles.order}
+					width={size.width}
+					height={size.height}
+					x={position.x}
+					y={position.y}
+					className={clsx(form != 'full' && 'overflow-hidden', form === 'mini' && 'p-3', form === 'icons' && 'flex items-center gap-6 p-3')}>
+					{form === 'full' && siteContent.enableChristmas && (
+						<>
+							<img
+								src='/images/christmas/snow-4.webp'
+								alt='Christmas decoration'
+								className='pointer-events-none absolute'
+								style={{ width: 160, left: -18, top: -20, opacity: 0.9 }}
+							/>
+						</>
+					)}
 
+					<Link className='flex items-center gap-3' href='/'>
+						<Image src='/images/avatar.png' alt='avatar' width={40} height={40} style={{ boxShadow: ' 0 12px 20px -5px #E2D9CE' }} className='rounded-full' />
+						{form === 'full' && <span className='font-averia mt-1 text-2xl leading-none font-medium'>{siteContent.meta.title}</span>}
+						{form === 'full' && <span className='text-brand mt-2 text-xs font-medium'></span>}
+					</Link>
 					{(form === 'full' || form === 'icons') && (
 						<>
 							{form !== 'icons' && <div className='text-secondary mt-6 text-sm uppercase'>General</div>}

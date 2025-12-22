@@ -18,10 +18,12 @@ dayjs.locale('zh-cn')
 
 export default function CalendarCard() {
 	const center = useCenterStore()
-	const { cardStyles } = useConfigStore()
+
+	//const { cardStyles } = useConfigStore()
 	
 	// 使用 useState 来管理当前显示的月份
 	const [currentMonth, setCurrentMonth] = useState(dayjs())
+	const { cardStyles, siteContent } = useConfigStore()
 	const now = dayjs()
 	const currentDate = now.date()
 	const firstDayOfMonth = currentMonth.startOf('month')
@@ -76,6 +78,7 @@ export default function CalendarCard() {
 
 	return (
 		<HomeDraggableLayer cardKey='calendarCard' x={x} y={y} width={styles.width} height={styles.height}>
+{/* <<<<<<< HEAD
 			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y}>
 				<div className="flex items-center justify-between">
 					<button 
@@ -95,6 +98,37 @@ export default function CalendarCard() {
 					</button>
 				</div>
 				<ul className='text-secondary mt-3 grid h-[206px] grid-cols-7 gap-2 text-sm'>
+======= */}
+			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='flex flex-col'>
+				{siteContent.enableChristmas && (
+					<>
+						<img
+							src='/images/christmas/snow-7.webp'
+							alt='Christmas decoration'
+							className='pointer-events-none absolute'
+							style={{ width: 150, right: -12, top: -12, opacity: 0.8 }}
+						/>
+					</>
+				)}
+
+				<div className="flex items-center justify-between">
+					<button 
+						onClick={handlePrevMonth}
+						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
+					>
+						&lt;
+					</button>
+					<h3 className='text-secondary text-sm'>
+						{currentMonth.format('YYYY/M/D')} {currentMonth.format('ddd')}
+					</h3>
+					<button 
+						onClick={handleNextMonth}
+						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
+					>
+						&gt;
+					</button>
+				</div>
+				<ul className={cn('text-secondary mt-3 grid h-[206px] flex-1 grid-cols-7 gap-2 text-sm', (styles.height < 240 || styles.width < 240) && 'text-xs')}>
 					{new Array(7).fill(0).map((_, index) => {
 						const isCurrentWeekday = index === currentWeekday
 						return (
