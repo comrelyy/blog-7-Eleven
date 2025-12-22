@@ -16,7 +16,7 @@ export const styles = {
 
 export default function ThoughtsCard() {
 	const center = useCenterStore()
-	const { cardStyles } = useConfigStore()
+	const { cardStyles, siteContent } = useConfigStore()
 	const { isAuth } = useAuthStore()
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
@@ -114,6 +114,16 @@ export default function ThoughtsCard() {
 			x={alignedX}
 			y={center.y + (cardStyles.hiCard?.height || 0) / 2 + CARD_SPACING}
 			className='p-4'>
+			{siteContent.enableChristmas && (
+					<>
+						<img
+							src='/images/christmas/snow-7.webp'
+							alt='Christmas decoration'
+							className='pointer-events-none absolute'
+							style={{ width: 150, right: -12, top: -12, opacity: 0.8 }}
+						/>
+					</>
+				)}
 			<form onSubmit={handleSubmit} className='flex flex-col h-full'>
 				<textarea
 					value={inputValue}
