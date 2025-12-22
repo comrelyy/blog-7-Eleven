@@ -267,7 +267,8 @@ export default function BlogPage() {
 					<motion.div
 						initial={{ opacity: 0, scale: 0.6 }}
 						animate={{ opacity: 1, scale: 1 }}
-						className='card relative mx-auto flex items-center gap-1 rounded-xl p-1 max-sm:hidden'>
+
+						className='card btn-rounded relative mx-auto flex items-center gap-1 p-1 max-sm:hidden'>
 						{(['day', 'week', 'month', 'year'] as DisplayMode[]).map(mode => (
 							<motion.button
 								key={mode}
