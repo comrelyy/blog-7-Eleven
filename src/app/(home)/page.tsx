@@ -12,6 +12,7 @@ import WriteButtons from '@/app/(home)/write-buttons'
 import LikePosition from './like-position'
 ///import HatCard from './hat-card'
 import BeianCard from './beian-card'
+import YearProgressCard from '@/app/(home)/year-progress-card'
 import { useSize } from '@/hooks/use-size'
 import ThoughtsCard from '@/app/(home)/thoughts-card'
 import WeatherCard from '@/app/(home)/weather-card'
@@ -106,7 +107,8 @@ export default function Home() {
 				{!maxSM && cardStyles.shareCard?.enabled !== false && <ShareCard />}
 				{cardStyles.articleCard?.enabled !== false && <AritcleCard />}
 				{!maxSM && cardStyles.writeButtons?.enabled !== false && <WriteButtons />}
-				{cardStyles.likePosition?.enabled !== false && <LikePosition />}
+				{/* {cardStyles.likePosition?.enabled !== false && <LikePosition />} */}
+				{!maxSM && cardStyles.yearProgressCard?.enabled !== false && <YearProgressCard />}
 				{/* {cardStyles.hatCard?.enabled !== false && <HatCard />} */}
 				{cardStyles.beianCard?.enabled !== false && <BeianCard />}
 			</div>

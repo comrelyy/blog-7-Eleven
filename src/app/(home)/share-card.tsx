@@ -34,7 +34,8 @@ export default function ShareCard() {
 	const styles = cardStyles.shareCard
 	const hiCardStyles = cardStyles.hiCard
 	const socialButtonsStyles = cardStyles.socialButtons
-
+	const [isAnimating, setIsAnimating] = useState(false)
+    const [currentIndex, setCurrentIndex] = useState(0)
 
 	useEffect(() => {
 		// 随机决定展示分享项目还是诗词
@@ -53,20 +54,37 @@ export default function ShareCard() {
 		// }
 	}, [])
 
+	
+
 	if (!randomItem && !randomPoetry) {
 		return null
+	}
+
+	const handleNextItem = () => {
+		if (poetryData.length === 0) return
+		
+		if (isAnimating) return // 防止重复点击
+		
+		setIsAnimating(true)
+		
+		// 切换效果
+		setTimeout(() => {
+			setCurrentIndex((prevIndex) => (prevIndex + 1) % poetryData.length)
+			setIsAnimating(false)
+		}, 300) // 动画持续时间
 	}
 
 	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + hiCardStyles.width / 2 + CARD_SPACING
 	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING / 2	
 
+	const currentItem = poetryData[currentIndex]
 	return (
-		<HomeDraggableLayer cardKey='shareCard' x={x} y={y} width={styles.width} height={styles.height}>
+		<HomeDraggableLayer cardKey='shareCard' x={x} y={y} width={styles.width} height={styles.height} >
 {/* <<<<<<< HEAD
 		<Card order={styles.order} width={styles.width} x={x} y={y}>
 			{/* <h2 className='text-secondary text-sm'>随机推荐</h2> */}
 
-			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y}>
+			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} >
 				{siteContent.enableChristmas && (
 					<>
 						<img
@@ -78,17 +96,20 @@ export default function ShareCard() {
 					</>
 				)}
 
-				<h2 className='text-secondary text-sm'>随机推荐</h2>
-
-			{randomPoetry ? (
+				<h2 className='text-secondary text-sm' onClick={handleNextItem}>随机推荐</h2>
+{/* <div 
+					className='mt-2 cursor-pointer bg-white/10 p-2 rounded border border-white/20 relative'
+					onClick={handleNextItem}
+				> */}
+			{currentItem ? (
 				<div className='mt-2 space-y-2'>
 					<div className='flex items-center justify-between'>
-						<h3 className='text-sm font-medium'>{randomPoetry.title}</h3>
+						<h3 className='text-sm font-medium'>{currentItem.title}</h3>
 						<span className='text-xs text-secondary'>
-							{randomPoetry.author ? `作者：${randomPoetry.author}` : `${randomPoetry.chapter}`}
+							{currentItem.author ? `作者：${currentItem.author}` : `${currentItem.chapter}`}
 						</span>
 					</div>
-					<p className='text-secondary text-xs leading-relaxed'>{randomPoetry.content}</p>
+					<p className='text-secondary text-xs leading-relaxed'>{currentItem.content}</p>
 				</div>
 			) : randomItem ? (
 				<a href={randomItem.url} target="_blank" rel="noopener noreferrer" className='mt-2 block space-y-2'>
@@ -101,6 +122,7 @@ export default function ShareCard() {
 					<p className='text-secondary line-clamp-3 text-xs'>{randomItem.description}</p>
 				</a>
 			) : null}
+			{/* </div> */}
 		</Card>
 		</HomeDraggableLayer>
 	)

@@ -20,11 +20,12 @@ export default function ThoughtsCard() {
 	const { isAuth } = useAuthStore()
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
-	const [latestThoughts, setLatestThoughts] = useState<Thought[]>([]) // 修改为数组
-	const [thoughts, setThoughts] = useState<Thought[]>([])
+	const [allThoughts, setAllThoughts] = useState<Thought[]>([])
+	const [currentIndex, setCurrentIndex] = useState(0)
+	const [isAnimating, setIsAnimating] = useState(false)
 	const isMounted = useRef(true)
 
-	// 设置最新碎碎念
+	// 设置所有碎碎念
 	useEffect(() => {
 		isMounted.current = true
 		const init = async () => {
@@ -32,11 +33,9 @@ export default function ThoughtsCard() {
 				const data = await useThoughtsIndex()
 				// 确保组件仍然挂载
 				if (isMounted.current && data) {
-					setThoughts(data.thoughts)
-					// 获取最新的三条碎碎念
-					if (data.thoughts.length > 0) {
-						setLatestThoughts(data.thoughts.slice(0, 3))
-					}
+					// 获取最新的10条碎碎念
+					const latestThoughts = data.thoughts.slice(0, 10)
+					setAllThoughts(latestThoughts)
 				}
 			} catch (error) {
 				console.error('Failed to load thoughts', error)
@@ -76,16 +75,15 @@ export default function ThoughtsCard() {
 				time: `${hours}:${minutes}:${seconds}`
 			}
 			
-			const updatedThoughts = [newThought, ...thoughts]
+			const updatedThoughts = [newThought, ...allThoughts]
 			
 			// 保存数据
 			try {
 				await pushThoughts(updatedThoughts)
 				// 更新本地状态
 				setInputValue('')
-				setThoughts(updatedThoughts)
-				// 更新最新三条碎碎念
-				setLatestThoughts(updatedThoughts.slice(0, 3))
+				setAllThoughts(updatedThoughts.slice(0, 10)) // 保持最多10条
+				setCurrentIndex(0) // 重置到第一条
 				toast.success('碎碎念保存成功！')
 			} catch (error) {
 				console.error('Failed to save thoughts', error)
@@ -101,6 +99,21 @@ export default function ThoughtsCard() {
 		const hours = date.getHours().toString().padStart(2, '0')
 		const minutes = date.getMinutes().toString().padStart(2, '0')
 		return `${month}-${day} ${hours}:${minutes}`
+	}
+
+	// 点击下一条碎碎念
+	const handleNextThought = () => {
+		if (allThoughts.length === 0) return
+		
+		if (isAnimating) return // 防止重复点击
+		
+		setIsAnimating(true)
+		
+		// 撕日历效果
+		setTimeout(() => {
+			setCurrentIndex((prevIndex) => (prevIndex + 1) % allThoughts.length)
+			setIsAnimating(false)
+		}, 300) // 动画持续时间
 	}
 
 	// 计算与 hi-card 左对齐的 x 坐标
@@ -144,24 +157,67 @@ export default function ThoughtsCard() {
 				</div>
 			</form>
 			
-			{/* 显示最新的三条碎碎念 */}
-			{latestThoughts.length > 0 && (
+			{/* 显示碎碎念卡片堆叠效果 */}
+			{allThoughts.length > 0 && (
+				<div className='mt-3 pt-3 border-t border-white/20'>
+					<div className='flex items-center justify-between'>
+						<div className='text-xs text-secondary mb-1'>
+							最新碎碎念
+						</div>
+						<div className='text-xs text-secondary'>
+							{currentIndex + 1}/{allThoughts.length}
+						</div>
+					</div>
+					<div 
+						className='relative h-16 cursor-pointer bg-white/10 p-2 rounded border border-white/20'
+						onClick={handleNextThought}
+					>
+						{allThoughts.slice(currentIndex, Math.min(currentIndex + 3, allThoughts.length)).map((thought, index) => {
+							const zIndex = allThoughts.length - (currentIndex + index)
+							const offset = index * 6 // 增加每张卡片的偏移量
+							const opacity = index === 0 ? 1 : 0.4 // 当前卡片完全不透明，其他卡片更低透明度
+							
+							return (
+								<div
+									key={`${thought.id}-${currentIndex + index}`}
+									className={`absolute w-full text-sm rounded transition-all duration-300 ${
+										index === 0 ? 'bg-white/10' : 'bg-white/5'
+									}`}
+									style={{
+										top: `${offset}px`,
+										left: 0,
+										zIndex,
+										opacity,
+										transform: isAnimating && index === 0 ? 'translateY(-20px) rotate(-5deg)' : 'none',
+										transition: 'transform 0.3s ease, opacity 0.3s ease'
+									}}
+								>
+									<div className='flex items-start'>
+										<span className='mr-2 text-secondary flex-shrink-0'>•</span>
+										<div className='flex-1 min-w-0'>
+											<span className='text-secondary text-xs mr-2 whitespace-nowrap'>
+												{formatDateTime(thought.timestamp)}
+											</span>
+											<span className='break-words'>{thought.text}</span>
+										</div>
+									</div>
+								</div>
+							)
+						})}
+					</div>
+					<div className='text-xs text-secondary mt-1 text-center'>
+						点击切换下一条
+					</div>
+				</div>
+			)}
+			
+			{allThoughts.length === 0 && (
 				<div className='mt-3 pt-3 border-t border-white/20'>
 					<div className='text-xs text-secondary mb-1'>
 						最新碎碎念
 					</div>
-					<div className='space-y-1'>
-						{latestThoughts.map((thought, index) => (
-							<div key={thought.id} className='text-sm flex items-start'>
-								<span className='mr-2 text-secondary flex-shrink-0'>•</span>
-								<div className='flex-1 min-w-0'>
-									<span className='text-secondary text-xs mr-2 whitespace-nowrap'>
-										{formatDateTime(thought.timestamp)}
-									</span>
-									<span className='break-words'>{thought.text}</span>
-								</div>
-							</div>
-						))}
+					<div className='text-sm text-secondary italic bg-white/10 p-2 rounded border border-white/20'>
+						暂无碎碎念
 					</div>
 				</div>
 			)}
