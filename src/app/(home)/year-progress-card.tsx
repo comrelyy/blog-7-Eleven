@@ -34,7 +34,7 @@ export default function YearProgressCard() {
 			const totalDuration = endOfYear.diff(startOfYear)
 			const elapsedDuration = now.diff(startOfYear)
 			const progress = (elapsedDuration / totalDuration) * 100
-			setYearProgress(progress)
+			setYearProgress(Number(progress.toFixed(2))) // 保留2位小数
 		}
 
 		calculateYearProgress()
@@ -59,7 +59,7 @@ export default function YearProgressCard() {
 							style={{ height: `${yearProgress}%` }}
 						/>
 					</div>
-					<div className="text-xs text-secondary mt-1">{Math.round(remainingProgress)}%</div>
+					<div className="text-xs text-secondary mt-1">{Number(remainingProgress.toFixed(2))}%</div> {/* 显示剩余进度也保留2位小数 */}
 				</div>
 			</Card>
 		</HomeDraggableLayer>
