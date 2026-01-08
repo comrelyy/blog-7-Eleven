@@ -36,7 +36,7 @@ const combinedFetcher = async () => {
 	const thoughtItems = thoughtData.status === 'fulfilled' ? thoughtData.value : []
 	
 	// 合并并按日期排序
-	const allItems = [...blogItems, ...thoughtItems]
+	const allItems = [...blogItems]
 		.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 	
 	return allItems
