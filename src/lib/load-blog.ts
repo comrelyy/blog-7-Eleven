@@ -23,9 +23,10 @@ export async function loadBlog(slug: string): Promise<LoadedBlog> {
 	}
 
 	// 检查是否是thoughts的slug (格式为 YYYY-MM)
-	const isThought = /^\d{4}-\d{2}$/.test(slug)
+	const isThought = false
 	
 	if (isThought) {
+		console.log('Loading thought for slug:', slug)
 		// 加载thought数据
 		const res = await fetch(`/thoughts/${slug}.json`)
 		if (!res.ok) {
