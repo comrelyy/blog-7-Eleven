@@ -33,7 +33,7 @@
 		"enabled": true
 	},
 	"musicCard": {
-		"width": 293,
+		"width": 260,
 		"height": 66,
 		"offset": 120,
 		"order": 6,
@@ -85,6 +85,29 @@
 		"width": 54,
 		"height": 54,
 		"order": 8,
+		"offsetX": null,
+		"offsetY": null,
+		"enabled": true
+	},
+	"hatCard": {
+		"width": 99,
+		"height": 105,
+		"order": 10,
+		"offsetX": -48,
+		"offsetY": -168
+	},
+	"beianCard": {
+		"width": 200,
+		"height": 60,
+		"order": 11,
+		"offsetX": null,
+		"offsetY": null,
+		"enabled": false
+	},
+	"yearProgressCard": {
+		"width": 66,
+		"height": 280,
+		"order": 9,
 		"offsetX": null,
 		"offsetY": null,
 		"enabled": true
