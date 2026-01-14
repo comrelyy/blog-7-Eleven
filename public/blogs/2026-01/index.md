@@ -1,3 +1,19 @@
+### 2026-01-14
+写作核心能力
+	
+	写作能力的核心 不等于 遣词造句，而是深层思考的结果
+
+- 输入能力. 
+输入强度，输入质量，输入效果
+- 训练思考能力. 
+追问本质，建立知识链接，应用所学
+
+>The opposite view involves some effort of thought, and most people would die sooner than think—in fact, they do so. -- 罗素
+
+- 输出能力. 
+持续输出，兼顾故事与观点，写作流程，反馈机制
+---
+
 ### 2026-01-12
 - 核心条件 ，次要条件，禁忌条件
 - 每日核心三件事
