@@ -232,5 +232,15 @@
 			"3D"
 		],
 		"stars": 3
+	},
+	{
+		"name": "Limboy's Digital Garden",
+		"logo": "https://limboy.me/logo.png",
+		"url": "https://limboy.me/",
+		"description": "80 后，现居杭州，曾就职于知乎、蘑菇街、字节跳动等公司，热衷创作，正在努力成为一个合格的独立创作者。这些是我中意的影音书，和我使用的工具和服务。",
+		"tags": [
+			"个人开发者"
+		],
+		"stars": 3
 	}
 ]
