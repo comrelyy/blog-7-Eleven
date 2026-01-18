@@ -7,6 +7,7 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import { hasAuth } from '@/lib/auth'
 import { pushThoughts, useThoughtsIndex, type Thought, type ThoughtJsonArray } from './services/push-thoughts'
+import { readFileAsText } from '@/lib/file-utils'
 
 // export const styles = {
 // 	width: 360,
@@ -18,13 +19,29 @@ export default function ThoughtsCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
 	const styles = cardStyles.thoughtsCard
-	const { isAuth } = useAuthStore()
+	const { isAuth, setPrivateKey } = useAuthStore()
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
 	const [allThoughts, setAllThoughts] = useState<Thought[]>([])
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [isAnimating, setIsAnimating] = useState(false)
 	const isMounted = useRef(true)
+	const fileInputRef = useRef<HTMLInputElement>(null)
+
+	const handlePrivateKeySelection = async (file: File) => {
+		try {
+			const pem = await readFileAsText(file)
+			setPrivateKey(pem)
+			toast.success('密钥导入成功')
+		} catch (error) {
+			console.error(error)
+			toast.error('读取密钥失败')
+		}
+	}
+
+	const handleImportKey = () => {
+		fileInputRef.current?.click()
+	}
 
 	// 设置所有碎碎念
 	useEffect(() => {
@@ -121,13 +138,25 @@ export default function ThoughtsCard() {
 	const alignedX = center.x - (cardStyles.hiCard?.width || 0) / 2
 
 	return (
-		<Card
-			order={styles.order}
-			width={styles.width}
-			height={styles.height}
-			x={alignedX}
-			y={center.y + (cardStyles.hiCard?.height || 0) / 2 + CARD_SPACING}
-			className='space-y-2 max-sm:static'>
+		<>
+			<input
+				ref={fileInputRef}
+				type='file'
+				accept='.pem'
+				className='hidden'
+				onChange={async e => {
+					const f = e.target.files?.[0]
+					if (f) await handlePrivateKeySelection(f)
+					if (e.currentTarget) e.currentTarget.value = ''
+				}}
+			/>
+			<Card
+				order={styles.order}
+				width={styles.width}
+				height={styles.height}
+				x={alignedX}
+				y={center.y + (cardStyles.hiCard?.height || 0) / 2 + CARD_SPACING}
+				className='space-y-2 max-sm:static'>
 			{siteContent.enableChristmas && (
 					<>
 						<img
@@ -150,10 +179,11 @@ export default function ThoughtsCard() {
 						{/* 按回车保存 */}
 					</span>
 					<button 
-						type='submit' 
+						type={isAuth ? 'submit' : 'button'}
+						onClick={!isAuth ? handleImportKey : undefined}
 						className='text-xs bg-brand text-white px-2 py-1 rounded hover:bg-brand/80 transition-colors'
 					>
-						保存
+						{isAuth ? '保存' : '导入密钥'}
 					</button>
 				</div>
 			</form>
@@ -223,5 +253,6 @@ export default function ThoughtsCard() {
 				</div>
 			)}
 		</Card>
+		</>
 	)
 }
