@@ -7,6 +7,7 @@ import { HomeDraggableLayer } from './home-draggable-layer'
 import { useAuthStore } from '@/hooks/use-auth'
 import { readFileAsText } from '@/lib/file-utils'
 import { toast } from 'sonner'
+import { generateAndCacheToken } from '@/lib/auth'
 import { useRef } from 'react'
 
 function getGreeting() {
@@ -39,6 +40,7 @@ export default function HiCard() {
 		try {
 			const pem = await readFileAsText(file)
 			setPrivateKey(pem)
+			await generateAndCacheToken()
 			toast.success('密钥导入成功')
 		} catch (error) {
 			console.error(error)

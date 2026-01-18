@@ -36,6 +36,20 @@ export function clearAllAuthCache(): void {
 	clearTokenCache()
 }
 
+export async function generateAndCacheToken(): Promise<void> {
+	const privateKey = useAuthStore.getState().privateKey
+	if (!privateKey) return
+
+	try {
+		const jwt = signAppJwt(GITHUB_CONFIG.APP_ID, privateKey)
+		const installationId = await getInstallationId(jwt, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO)
+		const token = await createInstallationToken(jwt, installationId)
+		saveTokenToCache(token)
+	} catch (error) {
+		console.error('Failed to generate and cache token:', error)
+	}
+}
+
 export function hasAuth(): boolean {
 	return !!getTokenFromCache()
 }

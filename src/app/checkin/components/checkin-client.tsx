@@ -9,6 +9,7 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { readFileAsText } from '@/lib/file-utils'
 import { toast } from 'sonner'
 import { loadCheckinData, saveCheckinData, migrateLocalDataIfNeeded, type CheckinEvent, type CheckinRecord, type CheckinPosition } from '../services/checkin-data-service'
+import { generateAndCacheToken } from '@/lib/auth'
 
 // type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
 // type CheckinRecord = { date: string; eventId: string }
@@ -41,6 +42,7 @@ function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { event
     try {
       const pem = await readFileAsText(file)
       setPrivateKey(pem)
+      await generateAndCacheToken()
       toast.success('密钥导入成功')
     } catch (error) {
       console.error(error)

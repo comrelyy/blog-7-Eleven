@@ -5,7 +5,7 @@ import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import { useAuthStore } from '@/hooks/use-auth'
 import { toast } from 'sonner'
-import { hasAuth } from '@/lib/auth'
+import { hasAuth, generateAndCacheToken } from '@/lib/auth'
 import { pushThoughts, useThoughtsIndex, type Thought, type ThoughtJsonArray } from './services/push-thoughts'
 import { readFileAsText } from '@/lib/file-utils'
 
@@ -32,6 +32,7 @@ export default function ThoughtsCard() {
 		try {
 			const pem = await readFileAsText(file)
 			setPrivateKey(pem)
+			await generateAndCacheToken()
 			toast.success('密钥导入成功')
 		} catch (error) {
 			console.error(error)
