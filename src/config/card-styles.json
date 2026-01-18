@@ -115,8 +115,8 @@
 	,
 	"thoughtsCard": {
 		"width": 360,
-		"height": 120,
-		"order": 2,
+		"height": 160,
+		"order": 8,
 		"offsetX": null,
 		"offsetY": null,
 		"enabled": true

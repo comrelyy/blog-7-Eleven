@@ -13,7 +13,7 @@ import { loadCheckinData, saveCheckinData, migrateLocalDataIfNeeded, type Checki
 // type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
 // type CheckinRecord = { date: string; eventId: string }
 
-function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinEvent[]; onCreate: (e: CheckinEvent) => void; onDelete: (id: string) => void; inline?: boolean }) {
+function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { events: CheckinEvent[]; onCreate: (e: CheckinEvent) => void; onDelete: (id: string) => void; onCheckin?: (ev: CheckinEvent) => void; inline?: boolean }) {
   const { isAuth, setPrivateKey } = useAuthStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
@@ -160,7 +160,7 @@ function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinE
           {events.length > 0 && (
             <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
               {events.map((ev) => (
-                <div key={ev.id} className="flex flex-col bg-white/30 rounded-lg border border-white/20 hover:bg-white/40 transition">
+                <div key={ev.id} className="flex flex-col bg-white/30 rounded-lg border border-white/20 hover:bg-white/40 transition cursor-pointer" onClick={() => onCheckin?.(ev)}>
                   <div className="flex items-center justify-between p-2">
                     <div className="flex items-center gap-2 flex-1">
                       <span className="h-4 w-4 rounded-full shadow-sm" style={{ background: ev.color }} />
@@ -175,12 +175,12 @@ function EventManager({ events, onCreate, onDelete, inline }: { events: CheckinE
                     </div>
                     <div className="flex items-center gap-1">
                       <button 
-                        onClick={() => toggleEventExpand(ev.id)} 
+                        onClick={(e) => { e.stopPropagation(); toggleEventExpand(ev.id) }} 
                         className="text-xs text-blue-500 hover:text-blue-600 font-medium"
                       >
                         {expandedEvents[ev.id] ? '收起' : '展开'}
                       </button>
-                      <button onClick={() => onDelete(ev.id)} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">删除</button>
+                      <button onClick={(e) => { e.stopPropagation(); onDelete(ev.id) }} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">删除</button>
                     </div>
                   </div>
                   {expandedEvents[ev.id] && (
@@ -492,7 +492,8 @@ export default function CheckinClient() {
                     console.error('保存事件到GitHub失败:', error)
                     toast.error('事件保存到GitHub失败')
                   }
-                }} 
+                }}
+                onCheckin={toggleTodayCheck}
               />
             </div>
           </LiquidGrass>

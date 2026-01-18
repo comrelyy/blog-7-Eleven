@@ -8,15 +8,16 @@ import { toast } from 'sonner'
 import { hasAuth } from '@/lib/auth'
 import { pushThoughts, useThoughtsIndex, type Thought, type ThoughtJsonArray } from './services/push-thoughts'
 
-export const styles = {
-	width: 360,
-	height: 120,
-	order: 2
-}
+// export const styles = {
+// 	width: 360,
+// 	height: 120,
+// 	order: 2
+// }
 
 export default function ThoughtsCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
+	const styles = cardStyles.thoughtsCard
 	const { isAuth } = useAuthStore()
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
@@ -126,7 +127,7 @@ export default function ThoughtsCard() {
 			height={styles.height}
 			x={alignedX}
 			y={center.y + (cardStyles.hiCard?.height || 0) / 2 + CARD_SPACING}
-			className='p-4'>
+			className='space-y-2 max-sm:static'>
 			{siteContent.enableChristmas && (
 					<>
 						<img
