@@ -103,9 +103,9 @@ export default function Home() {
 				{!maxSM && cardStyles.clockCard?.enabled !== false && <ClockCard />}
 				{!maxSM && cardStyles.calendarCard?.enabled !== false && <CalendarCard />}
 				{!maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
-			 	{!maxSM && <ThoughtsCard />}
+			 	{cardStyles.thoughtsCard?.enabled !== false && <ThoughtsCard />}
 				{!maxSM && cardStyles.shareCard?.enabled !== false && <ShareCard />}
-				{cardStyles.articleCard?.enabled !== false && <AritcleCard />}
+				{!maxSM && cardStyles.articleCard?.enabled !== false && <AritcleCard />}
 				{!maxSM && cardStyles.writeButtons?.enabled !== false && <WriteButtons />}
 				{/* {cardStyles.likePosition?.enabled !== false && <LikePosition />} */}
 				{!maxSM && cardStyles.yearProgressCard?.enabled !== false && <YearProgressCard />}

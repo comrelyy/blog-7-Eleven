@@ -112,4 +112,13 @@
 		"offsetY": null,
 		"enabled": true
 	}
+	,
+	"thoughtsCard": {
+		"width": 360,
+		"height": 120,
+		"order": 2,
+		"offsetX": null,
+		"offsetY": null,
+		"enabled": true
+	}
 }
