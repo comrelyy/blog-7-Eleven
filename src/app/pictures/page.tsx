@@ -239,32 +239,50 @@ export default function Page() {
 				</div>
 			)}
 
-			<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='absolute top-4 right-6 flex gap-3 max-sm:hidden'>
+			<motion.div 
+				initial={{ opacity: 0, scale: 0.6 }} 
+				animate={{ opacity: 1, scale: 1 }} 
+				className='absolute top-1/2 right-6 transform -translate-y-1/2 flex flex-col gap-3 items-end'
+			>
 				{isEditMode ? (
 					<>
+						{/* 移动端始终显示的上传按钮 */}
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={() => setIsUploadDialogOpen(true)}
+							className='rounded-xl border bg-white/60 px-6 py-2 text-sm max-sm:w-full max-sm:mr-0'
+						>
+							上传
+						</motion.button>
+						
+						{/* 移动端始终显示的压缩工具按钮 */}
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							onClick={() => router.push('/image-toolbox')}
-							className='rounded-xl border bg-blue-50 px-4 py-2 text-sm text-blue-700'>
+							className='rounded-xl border bg-blue-50 px-4 py-2 text-sm text-blue-700 max-sm:w-full max-sm:mr-0'>
 							压缩工具
 						</motion.button>
+						
+						{/* 移动端始终显示的取消按钮 */}
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							onClick={handleCancel}
 							disabled={isSaving}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
+							className='rounded-xl border bg-white/60 px-6 py-2 text-sm max-sm:w-full max-sm:mr-0'>
 							取消
 						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={() => setIsUploadDialogOpen(true)}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
-							上传
-						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={isSaving} className='brand-btn px-6'>
+						
+						{/* 移动端始终显示的保存按钮 */}
+						<motion.button 
+							whileHover={{ scale: 1.05 }} 
+							whileTap={{ scale: 0.95 }} 
+							onClick={handleSaveClick} 
+							disabled={isSaving} 
+							className='brand-btn px-6 max-sm:w-full max-sm:mr-0'
+						>
 							{isSaving ? '保存中...' : buttonText}
 						</motion.button>
 					</>
@@ -274,7 +292,7 @@ export default function Page() {
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							onClick={() => setIsEditMode(true)}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
+							className='rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80 max-sm:w-full max-sm:mr-0'>
 							编辑
 						</motion.button>
 					)
