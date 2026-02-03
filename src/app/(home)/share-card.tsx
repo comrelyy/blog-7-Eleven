@@ -45,6 +45,7 @@ export default function ShareCard() {
 			// 随机选择一个诗词
 			const randomIndex = Math.floor(Math.random() * poetryData.length)
 			setRandomPoetry(poetryData[randomIndex])
+			setCurrentIndex(randomIndex)
 		//	setRandomItem(null)
 		// } else {
 		// 	// 随机选择一个分享项目
