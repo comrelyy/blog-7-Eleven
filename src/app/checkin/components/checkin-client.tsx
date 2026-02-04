@@ -262,6 +262,11 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
                       <div className="mt-1">
                         <strong>ID:</strong> {ev.id}
                       </div>
+                      {ev.description && (
+                        <div className="mt-1">
+                          <strong>说明:</strong> {ev.description}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -676,7 +681,7 @@ export default function CheckinClient() {
                   dragElastic={0.6}
                   onDragEnd={(e, info) => onDragEnd(ev.id, info)}
                   className="cursor-grab group">
-                  <LiquidGrass inline width={260} height={140} className="rounded-lg overflow-hidden">
+                  <LiquidGrass inline width={260} height={160} className="rounded-lg overflow-hidden">
                     <div className={`h-full w-full flex flex-col justify-center items-start gap-2 p-4 transition-all relative ${
                       checkedToday
                         ? `bg-[${ev.color}30] shadow-lg`
@@ -691,6 +696,7 @@ export default function CheckinClient() {
                         ✓
                       </button>
 
+
                       <div className="flex items-center gap-3 w-full justify-between">
                         <div className="flex items-center gap-3">
                           <span className="inline-block h-6 w-6 rounded-full" style={{ background: ev.color }} />
@@ -698,9 +704,9 @@ export default function CheckinClient() {
                         </div>
                       </div>
 
-                      {/* Event description */}
+                      {/* Description - moved below the name and displayed as a separate line */}
                       {ev.description && (
-                        <div className="text-sm text-gray-600 line-clamp-2 mt-1">{ev.description}</div>
+                        <div className="text-sm text-gray-600 w-full mt-1 whitespace-pre-line break-words">{ev.description}</div>
                       )}
 
                       {/* Stats on its own line */}
