@@ -14,7 +14,14 @@ import { generateAndCacheToken } from '@/lib/auth'
 // type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
 // type CheckinRecord = { date: string; eventId: string }
 
-function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { events: CheckinEvent[]; onCreate: (e: CheckinEvent) => void; onDelete: (id: string) => void; onCheckin?: (ev: CheckinEvent) => void; inline?: boolean }) {
+function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }: { 
+  events: CheckinEvent[]; 
+  onCreate: (e: CheckinEvent) => void; 
+  onDelete: (id: string) => void; 
+  onCheckin?: (ev: CheckinEvent) => void; 
+  onEdit?: (e: CheckinEvent) => void;
+  inline?: boolean 
+}) {
   const { isAuth, setPrivateKey } = useAuthStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
@@ -24,6 +31,8 @@ function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { event
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
   const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({}) // 新增：用于跟踪事件展开状态
+  const [editingEvent, setEditingEvent] = useState<CheckinEvent | null>(null) // 新增：用于跟踪正在编辑的事件
+  const [editModalOpen, setEditModalOpen] = useState(false) // 新增：用于控制编辑模态框的显示
 
   // 新增：切换事件展开/收起状态
   const toggleEventExpand = (id: string) => {
@@ -36,6 +45,48 @@ function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { event
   // 新增：切换表单区域展开/收起状态
   const toggleFormExpand = () => {
     setFormExpanded(!formExpanded)
+  }
+
+  // 新增：打开编辑模态框
+  const openEditModal = (event: CheckinEvent) => {
+    setEditingEvent(event)
+    setName(event.name)
+    setColor(event.color)
+    setStart(event.start || "")
+    setEnd(event.end || "")
+    setEditModalOpen(true)
+  }
+
+  // 新增：关闭编辑模态框
+  const closeEditModal = () => {
+    setEditingEvent(null)
+    setName("")
+    setColor("#EF4444")
+    setStart("")
+    setEnd("")
+    setEditModalOpen(false)
+  }
+
+  // 新增：保存编辑
+  const saveEdit = () => {
+    if (!editingEvent || !name) return
+    
+    // 检查是否已导入密钥
+    if (!isAuth) {
+      toast.error('请先导入密钥再编辑事件')
+      return
+    }
+    
+    const updatedEvent: CheckinEvent = {
+      ...editingEvent,
+      name,
+      color,
+      start: start || undefined,
+      end: end || undefined
+    }
+    
+    onEdit?.(updatedEvent)
+    closeEditModal()
   }
 
   const handlePrivateKeySelection = async (file: File) => {
@@ -182,6 +233,12 @@ function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { event
                       >
                         {expandedEvents[ev.id] ? '收起' : '展开'}
                       </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); openEditModal(ev) }} 
+                        className="text-xs text-green-500 hover:text-green-600 font-medium ml-2"
+                      >
+                        编辑
+                      </button>
                       <button onClick={(e) => { e.stopPropagation(); onDelete(ev.id) }} className="text-xs text-red-500 hover:text-red-600 font-medium ml-2">删除</button>
                     </div>
                   </div>
@@ -204,6 +261,70 @@ function EventManager({ events, onCreate, onDelete, onCheckin, inline }: { event
           )}
         </div>
       )}
+
+      {/* 编辑模态框 */}
+      <DialogModal open={editModalOpen} onClose={closeEditModal}>
+        {editingEvent && (
+          <div className="w-full max-w-md bg-white rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="inline-block h-6 w-6 rounded-full" style={{ background: editingEvent.color }} />
+              <h3 className="text-lg font-semibold">编辑事件</h3>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">事件名称</label>
+              <input 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">颜色</label>
+              <div className="flex items-center gap-3">
+                <input 
+                  type="color" 
+                  value={color} 
+                  onChange={(e) => setColor(e.target.value)} 
+                  className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer" 
+                />
+                <div className="text-xs font-mono text-gray-500">{color}</div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+              <input 
+                type="date" 
+                value={start} 
+                onChange={(e) => setStart(e.target.value)} 
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm appearance-none cursor-pointer" 
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+              <input 
+                type="date" 
+                value={end} 
+                onChange={(e) => setEnd(e.target.value)} 
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm appearance-none cursor-pointer" 
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button 
+                onClick={closeEditModal} 
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                取消
+              </button>
+              <button 
+                onClick={saveEdit} 
+                className="rounded-lg bg-blue-500 text-white px-4 py-2 text-sm font-medium hover:bg-blue-600 transition-colors"
+              >
+                保存
+              </button>
+            </div>
+          </div>
+        )}
+      </DialogModal>
     </div>
   )
 }
@@ -220,6 +341,22 @@ export default function CheckinClient() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({})
+
+  // 新增：处理事件编辑
+  const handleEditEvent = async (updatedEvent: CheckinEvent) => {
+    const newEvents = events.map(e => e.id === updatedEvent.id ? updatedEvent : e)
+    setEvents(newEvents)
+    setHasUnsavedChanges(true) // 标记有未保存的更改
+    
+    // 立即保存到GitHub
+    try {
+      await saveCheckinData({ events: newEvents, records, positions })
+      toast.success('事件编辑成功并已保存到GitHub')
+    } catch (error) {
+      console.error('保存事件到GitHub失败:', error)
+      toast.error('事件保存到GitHub失败')
+    }
+  }
 
   // 新增：切换卡片展开/收起状态
   const toggleCardExpand = (id: string) => {
@@ -495,6 +632,7 @@ export default function CheckinClient() {
                     toast.error('事件保存到GitHub失败')
                   }
                 }}
+                onEdit={handleEditEvent}
                 onCheckin={toggleTodayCheck}
               />
             </div>
@@ -504,7 +642,7 @@ export default function CheckinClient() {
 
       <div ref={containerRef} className="relative min-h-[360px]">
         {events.length === 0 ? (
-          <div className="text-center text-gray-500">暂无事件。使用右上角的“管理事件”新增。</div>
+          <div className="text-center text-gray-500">暂无事件。使用右上角的"管理事件"新增。</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {events.map((ev) => {
