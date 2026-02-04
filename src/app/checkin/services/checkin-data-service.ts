@@ -4,7 +4,7 @@ import { readTextFileFromRepo, createBlob, getRef, createTree, createCommit, upd
 import { toast } from 'sonner'
 
 // 打卡事件和记录的数据结构
-export type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string }
+export type CheckinEvent = { id: string; name: string; color: string; start?: string; end?: string; description?: string }
 export type CheckinRecord = { date: string; eventId: string }
 export type CheckinPosition = { x: number; y: number }
 
