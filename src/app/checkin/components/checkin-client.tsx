@@ -30,6 +30,7 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
   const [color, setColor] = useState("#EF4444")
   const [start, setStart] = useState("")
   const [end, setEnd] = useState("")
+  const [description, setDescription] = useState("")
   const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({}) // 新增：用于跟踪事件展开状态
   const [editingEvent, setEditingEvent] = useState<CheckinEvent | null>(null) // 新增：用于跟踪正在编辑的事件
   const [editModalOpen, setEditModalOpen] = useState(false) // 新增：用于控制编辑模态框的显示
@@ -48,12 +49,13 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
   }
 
   // 新增：打开编辑模态框
-  const openEditModal = (event: CheckinEvent) => {
+ const openEditModal = (event: CheckinEvent) => {
     setEditingEvent(event)
     setName(event.name)
     setColor(event.color)
     setStart(event.start || "")
     setEnd(event.end || "")
+    setDescription(event.description || "")
     setEditModalOpen(true)
   }
 
@@ -64,10 +66,12 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
     setColor("#EF4444")
     setStart("")
     setEnd("")
+    setDescription("")
     setEditModalOpen(false)
   }
 
   // 新增：保存编辑
+    // 新增：保存编辑
   const saveEdit = () => {
     if (!editingEvent || !name) return
     
@@ -82,7 +86,8 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
       name,
       color,
       start: start || undefined,
-      end: end || undefined
+      end: end || undefined,
+      description: description || undefined
     }
     
     onEdit?.(updatedEvent)
@@ -105,7 +110,7 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
     fileInputRef.current?.click()
   }
 
-  const create = async () => {
+    const create = async () => {
     if (!name) return
     
     // 检查是否已导入密钥
@@ -114,7 +119,7 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
       return
     }
     
-    const newEvent: CheckinEvent = { id: String(Date.now()), name, color, start: start || undefined, end: end || undefined }
+    const newEvent: CheckinEvent = { id: String(Date.now()), name, color, start: start || undefined, end: end || undefined, description: description || undefined }
     onCreate(newEvent)
     
     // 直接保存到GitHub
@@ -131,6 +136,7 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
     setColor("#EF4444")
     setStart("")
     setEnd("")
+    setDescription("")
     setOpen(false)
   }
 
@@ -189,8 +195,11 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
           </div>
           {formExpanded && (
             <>
-              <div className="mb-3 flex flex-col gap-2">
+               <div className="mb-3 flex flex-col gap-2">
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="事件名称" className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary placeholder-secondary/60 focus:ring-2 focus:ring-brand/30 transition" />
+              </div>
+              <div className="mb-3 flex flex-col gap-2">
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="事件说明（可选）" rows={2} className="rounded-xl border border-white/30 bg-white/50 px-3 py-2 text-sm text-primary placeholder-secondary/60 focus:ring-2 focus:ring-brand/30 transition resize-none" />
               </div>
               <div className="mb-3 flex items-center gap-3">
                 <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-12 h-10 rounded-lg border border-white/30 cursor-pointer" />
@@ -270,12 +279,21 @@ function EventManager({ events, onCreate, onDelete, onCheckin, onEdit, inline }:
               <span className="inline-block h-6 w-6 rounded-full" style={{ background: editingEvent.color }} />
               <h3 className="text-lg font-semibold">编辑事件</h3>
             </div>
-            <div className="mb-4">
+                       <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">事件名称</label>
               <input 
                 value={name} 
                 onChange={(e) => setName(e.target.value)} 
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">事件说明</label>
+              <textarea 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                rows={2}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
               />
             </div>
             <div className="mb-4">
@@ -680,6 +698,11 @@ export default function CheckinClient() {
                         </div>
                       </div>
 
+                      {/* Event description */}
+                      {ev.description && (
+                        <div className="text-sm text-gray-600 line-clamp-2 mt-1">{ev.description}</div>
+                      )}
+
                       {/* Stats on its own line */}
                       <div className="w-full mt-2 text-sm text-gray-600">
                         <div>已打卡 {checkedCount}天</div>
@@ -706,6 +729,7 @@ export default function CheckinClient() {
       </div>
 
       {/* Detail Modal */}
+            {/* Detail Modal */}
       <DialogModal open={modalOpen} onClose={closeDetailModal}>
         {selectedEvent && (
           <div className="w-full max-w-md bg-white rounded-lg p-6">
@@ -713,6 +737,12 @@ export default function CheckinClient() {
               <span className="inline-block h-6 w-6 rounded-full" style={{ background: selectedEvent.color }} />
               <h3 className="text-lg font-semibold">{selectedEvent.name}</h3>
             </div>
+            {selectedEvent.description && (
+              <div className="mb-4">
+                <div className="text-sm font-medium text-gray-700 mb-1">说明</div>
+                <div className="text-sm text-gray-600">{selectedEvent.description}</div>
+              </div>
+            )}
             <div className="text-sm text-gray-600 mb-4">
               {selectedEvent.start || selectedEvent.end ? `${selectedEvent.start || '—'} → ${selectedEvent.end || '—'}` : '长期'}
             </div>
