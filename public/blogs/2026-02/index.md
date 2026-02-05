@@ -4,6 +4,12 @@
 [Marco](https://github.com/Ranrar/Marco).  
  一款快速、跨平台的 Markdown 编辑器，采用 Rust 构建，支持实时预览、语法扩展和自定义解析器用于技术文档。**github rust**    
 
+[AI漫剧](https://github.com/shuyu-labs/BigBanana-AI-Director?tab=readme-ov-file).  
+BigBanana AI Director是一个 AI 一站式短剧/漫剧平台，面向创作者，实现从灵感到成片的高效生产。 它摇弃了传统的“抽卡式”生成，采用 "Script-to-Asset-to-Keyframe" 的工业化工作流。实现 “一句话生成完整短剧，从剧本到成片全自动化”，同时精准控制角色一致性、场景连续性与镜头运动.    
+
+[bigbanana](https://bigbanana.tree456.com/).  
+[大模型接口收费API](https://api.antsk.cn/)
+
 ---
 
 ### 2026-02-04
