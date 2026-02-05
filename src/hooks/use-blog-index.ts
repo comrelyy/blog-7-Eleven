@@ -6,7 +6,8 @@ export type BlogIndexItem = {
 	title: string
 	tags: string[]
 	theme?: string
-	date: string
+	date: string  // 创建日期
+	updatedAt?: string  // 最后修改日期
 	summary?: string
 	cover?: string
 	type?: 'blog' | 'thought' // 区分是博客还是碎碎念
@@ -37,8 +38,12 @@ const combinedFetcher = async () => {
 	
 	// 合并并按日期排序
 	const allItems = [...blogItems]
-		.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-	
+		.sort((a, b) => {
+			// 使用 updatedAt 字段排序，如果没有则使用 date 字段
+			const dateA = new Date(a.updatedAt || a.date).getTime()
+			const dateB = new Date(b.updatedAt || b.date).getTime()
+			return dateB - dateA  // 降序，最新的在前
+		})
 	return allItems
 }
 
@@ -58,7 +63,14 @@ export function useBlogIndex() {
 export function useLatestBlog() {
 	const { items, loading, error } = useBlogIndex()
 
-	const latestBlog = items.length > 0 ? items[0] : null
+	// 按最后更新时间排序（如果有 updatedAt 则使用，否则使用 date）
+	const sortedItems = [...items].sort((a, b) => {
+		const dateA = new Date(a.updatedAt || a.date).getTime()
+		const dateB = new Date(b.updatedAt || b.date).getTime()
+		return dateB - dateA  // 降序，最新的在前
+	})
+	
+	const latestBlog = sortedItems.length > 0 ? sortedItems[0] : null
 
 	return {
 		blog: latestBlog,

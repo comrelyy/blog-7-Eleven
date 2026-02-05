@@ -613,6 +613,26 @@ export default function CheckinClient() {
     return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom)
   }
 
+     const getStatusForEvent = (ev: CheckinEvent) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    
+    if (ev.start) {
+      const startDate = new Date(ev.start)
+      if (today < startDate) {
+        return { status: '未开始', color: 'gray' }
+      }
+    }
+    
+    if (ev.end) {
+      const endDate = new Date(ev.end)
+      if (today > endDate) {
+        return { status: '已截止', color: 'red' }
+      }
+    }
+    
+    return { status: '进行中', color: 'green' }
+  }
   return (
     <div>
       <div className="relative mb-6">
@@ -716,7 +736,22 @@ export default function CheckinClient() {
                       </div>
 
                       <div className="text-xs text-gray-400 mt-2">{ev.start || ev.end ? `${ev.start || '—'} → ${ev.end || '—'}` : '长期'}</div>
-
+                      <div className="absolute bottom-2 right-2">
+                        {(() => {
+                          const statusInfo = getStatusForEvent(ev);
+                          return (
+                            <span 
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                statusInfo.color === 'green' ? 'bg-green-100 text-green-800' : 
+                                statusInfo.color === 'red' ? 'bg-red-100 text-red-800' : 
+                                'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {statusInfo.status}
+                            </span>
+                          );
+                        })()}
+                      </div>
                       {/* Hover actions (only detail) */}
                       <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
