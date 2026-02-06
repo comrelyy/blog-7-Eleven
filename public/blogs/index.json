@@ -1,17 +1,5 @@
 [
   {
-    "slug": "thingking",
-    "title": "如何去思考",
-    "tags": [
-      "杂记",
-      "思考能力"
-    ],
-    "date": "2026-02-04",
-    "summary": "深度思考的本质：感知与反思的强化",
-    "cover": "/blogs/thingking/e7750977e8dafafe.jpeg",
-    "updatedAt": "2026-02-05"
-  },
-  {
     "slug": "2026-02",
     "title": "2026-02碎碎念",
     "tags": [
@@ -21,6 +9,18 @@
     "date": "2026-02-02",
     "summary": "人生三件事：强身、健脑、修心",
     "cover": "/blogs/2026-02/31d57a7d6359419f.webp",
+    "updatedAt": "2026-02-06"
+  },
+  {
+    "slug": "thingking",
+    "title": "如何去思考",
+    "tags": [
+      "杂记",
+      "思考能力"
+    ],
+    "date": "2026-02-04",
+    "summary": "深度思考的本质：感知与反思的强化",
+    "cover": "/blogs/thingking/e7750977e8dafafe.jpeg",
     "updatedAt": "2026-02-05"
   },
   {
