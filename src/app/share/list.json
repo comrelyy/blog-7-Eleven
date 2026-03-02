@@ -44,62 +44,12 @@
 		"stars": 3
 	},
 	{
-		"name": "Nucleo",
-		"url": "https://nucleoapp.com/app/?library=core",
-		"logo": "/images/share/7e720f35557fa9de.svg",
-		"description": "图标库，网站整体很干净。独特的是，它有一类像素风格的图标，很有意思。它的 icon 也很多，还有 grass 风格的。",
-		"tags": [
-			"Icons"
-		],
-		"stars": 3
-	},
-	{
-		"name": "Uiverse",
-		"url": "https://uiverse.io/",
-		"logo": "/images/share/5e7b29cb1a84be80.png",
-		"description": "不可错过的参考库，有很多交互效果，包括热门的 Button、Loader 设计，内容丰富，还在不断更新。",
-		"tags": [
-			"CSS"
-		],
-		"stars": 4
-	},
-	{
-		"name": "Magic UI",
-		"url": "https://magicui.design/",
-		"logo": "https://magicui.design/favicon.ico",
-		"description": "shadcn/ui 伴生库，有很多实用设计。取用也很方便，可以自己复制独立的代码。",
-		"tags": [
-			"组件",
-			"Github"
-		],
-		"stars": 4
-	},
-	{
-		"name": "Ai lman",
-		"url": "https://aliimam.in/docs/backgrounds/shader-rgb",
-		"logo": "https://aliimam.in/_next/image?url=%2Fai-logo-black.png&w=128&q=75",
-		"description": "类 Magic UI，但是感觉差点意思。可作为看完 Magic 意犹未尽时闲看。",
-		"tags": [
-			"组件"
-		],
-		"stars": 3
-	},
-	{
 		"name": "Awwwards",
 		"url": "https://www.awwwards.com/",
 		"logo": "https://assets.awwwards.com/assets/images/favicon.svg",
 		"description": "网站评选网站，你总能从这里发现惊艳的网站",
 		"tags": [
-			"网站集"
-		],
-		"stars": 3
-	},
-	{
-		"name": "CSS Design Awards",
-		"url": "https://www.cssdesignawards.com/",
-		"logo": "/images/share/aaae2bf4f74c8eb1.svg",
-		"description": "网站评选网站，跟 Awwwards 类似，可以看到每期的优秀网站。观感上会好些。",
-		"tags": [
+			"素材",
 			"网站集"
 		],
 		"stars": 3
@@ -110,49 +60,10 @@
 		"url": "https://www.404s.design/",
 		"description": "收集 404 设计的网站，无聊的时候可以看下。",
 		"tags": [
+			"素材",
 			"网站集"
 		],
 		"stars": 3
-	},
-	{
-		"name": "Igloo Inc.",
-		"logo": "https://www.igloo.inc/assets/favicon32-af94112f.png",
-		"url": "https://www.igloo.inc/",
-		"description": "abeto 作品，非常酷炫",
-		"tags": [
-			"3D"
-		],
-		"stars": 4
-	},
-	{
-		"name": "abeto 官网",
-		"logo": "https://abeto.co/assets/favicon32-11fb90a3.png",
-		"url": "https://abeto.co/",
-		"description": "无限绽开的花，飘荡的树叶，复古风格化",
-		"tags": [
-			"3D"
-		],
-		"stars": 4
-	},
-	{
-		"name": "Messenger",
-		"logo": "https://messenger.abeto.co/assets/favicon32-BC0QIL61.png",
-		"url": "https://messenger.abeto.co/",
-		"description": "abeto 作品，卡通送信员在地球小镇上奔跑，联机在线，可换装",
-		"tags": [
-			"3D"
-		],
-		"stars": 4
-	},
-	{
-		"name": "Summer Afternoon",
-		"logo": "https://summer-afternoon.vlucendo.com/assets/favicon32-e817b074.png",
-		"url": "https://summer-afternoon.vlucendo.com/",
-		"description": "夏日午后，小男孩在乡村公路上上游玩",
-		"tags": [
-			"3D"
-		],
-		"stars": 4
 	},
 	{
 		"name": "The Monolith Project",
@@ -348,7 +259,8 @@
 		"url": "https://kenney.nl/",
 		"description": "Kenney.nl 就像游戏开发世界的一座灯塔，为无数怀揣梦想的开发者指明了方向。它不仅提供了高质量的免费素材，更体现了开源和共享的精神，极大地推动了独立游戏社区的发展。无论您是经验丰富的开发者，还是刚刚入门的新手，Kenney.nl 都是您不容错过的宝藏网站",
 		"tags": [
-			"游戏素材",
+			"游戏",
+			"素材",
 			"UI设计"
 		],
 		"stars": 4
@@ -359,7 +271,8 @@
 		"url": "https://opengameart.org/",
 		"description": "一个致力于提供免费、开源游戏素材的宝藏网站",
 		"tags": [
-			"游戏素材",
+			"游戏",
+			"素材",
 			"UI设计"
 		],
 		"stars": 4
@@ -370,7 +283,7 @@
 		"url": "https://easings.net/",
 		"description": "当你在调整动画节奏时，这个 ease 表能帮助直观感受 ease 表现出的效果",
 		"tags": [
-			"Github"
+			"Github","工具"
 		],
 		"stars": 3
 	},
@@ -380,7 +293,7 @@
 		"url": "https://www.isocons.app/",
 		"description": "3D icons 网站，酷酷的，免费。",
 		"tags": [
-			"Icons"
+			"Icons","素材"
 		],
 		"stars": 3
 	},
@@ -390,7 +303,7 @@
 		"url": "https://www.yysuni.com/image-toolbox",
 		"description": "无限压缩，快且方便，可以直接对比效果",
 		"tags": [
-			"图片"
+			"图片","工具"
 		],
 		"stars": 3
 	},
@@ -400,7 +313,17 @@
 		"url": "https://limboy.me/",
 		"description": "80 后，现居杭州，曾就职于知乎、蘑菇街、字节跳动等公司，热衷创作，正在努力成为一个合格的独立创作者。这些是我中意的影音书，和我使用的工具和服务。",
 		"tags": [
-			"个人开发者"
+			"个人博客"
+		],
+		"stars": 3
+	},
+	{
+		"name": "Ein Verne",
+		"logo": "https://blog.einverne.info/images/favicon.ico?cache-bust=1772420528478",
+		"url": "https://blog.einverne.info/about.html",
+		"description": "内容很丰富，涉猎很广泛",
+		"tags": [
+			"个人博客"
 		],
 		"stars": 3
 	}
