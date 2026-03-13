@@ -556,6 +556,42 @@ export default function CheckinClient() {
     return null
   }
 
+  // 计算打卡率的函数
+  const calculateCompletionRate = (ev: CheckinEvent) => {
+    const checkedCount = checkedCountFor(ev)
+    const requiredDays = requiredDaysFor(ev)
+    
+    if (requiredDays === null) {
+      // 如果是长期事件，可以根据开始日期计算从开始到今天的总天数
+      if (ev.start) {
+        const startDate = new Date(ev.start)
+        const now = new Date()
+        // 设置时间为00:00:00，确保准确计算天数
+        now.setHours(0, 0, 0, 0)
+        startDate.setHours(0, 0, 0, 0)
+        // 计算从开始日期到今天的总天数（包含今天）
+        const totalDays = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1
+        // 确保总天数至少为1，防止除以0的情况
+        const daysFromStart = Math.max(totalDays, 1)
+        return Math.min(100, Math.round((checkedCount / daysFromStart) * 100))
+      }
+      // 对于既没有开始日期也没有结束日期的无限期事件，
+      // 我们可以使用事件创建日期（使用ID时间戳作为近似创建时间）
+      const eventCreationDate = new Date(Number(ev.id))
+      const now = new Date()
+      // 设置时间为00:00:00，确保准确计算天数
+      now.setHours(0, 0, 0, 0)
+      eventCreationDate.setHours(0, 0, 0, 0)
+      // 计算从事件创建到今天的总天数
+      const totalDays = Math.floor((now.getTime() - eventCreationDate.getTime()) / (1000 * 3600 * 24)) + 1
+      // 确保总天数至少为1，防止除以0的情况
+      const daysSinceCreation = Math.max(totalDays, 1)
+      return Math.min(100, Math.round((checkedCount / daysSinceCreation) * 100))
+    }
+    
+    return Math.min(100, Math.round((checkedCount / requiredDays) * 100))
+  }
+
   // improved collision: track velocity and separate cards with spring-like nudge
   const onDragEnd = (id: string, info: any) => {
     const src = cardRefs.current[id]
@@ -733,6 +769,21 @@ export default function CheckinClient() {
                       <div className="w-full mt-2 text-sm text-gray-600">
                         <div>已打卡 {checkedCount}天</div>
                         {required !== null && <div>需 {required} 天</div>}
+                        {/* 显示打卡率 */}
+                        <div className="mt-1">
+                          <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full" 
+                              style={{ 
+                                width: `${calculateCompletionRate(ev)}%`,
+                                backgroundColor: ev.color
+                              }}
+                            />
+                          </div>
+                          <div className="text-xs mt-1" style={{ color: ev.color }}>
+                            打卡率: {calculateCompletionRate(ev)}%
+                          </div>
+                        </div>
                       </div>
 
                       <div className="text-xs text-gray-400 mt-2">{ev.start || ev.end ? `${ev.start || '—'} → ${ev.end || '—'}` : '长期'}</div>
