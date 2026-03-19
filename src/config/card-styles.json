@@ -94,7 +94,8 @@
 		"height": 105,
 		"order": 10,
 		"offsetX": -48,
-		"offsetY": -168
+		"offsetY": -168,
+		"enabled": false
 	},
 	"beianCard": {
 		"width": 200,
@@ -111,8 +112,7 @@
 		"offsetX": null,
 		"offsetY": null,
 		"enabled": true
-	}
-	,
+	},
 	"thoughtsCard": {
 		"width": 360,
 		"height": 160,

@@ -19,8 +19,6 @@ dayjs.locale('zh-cn')
 export default function CalendarCard() {
 	const center = useCenterStore()
 
-	//const { cardStyles } = useConfigStore()
-	
 	// 使用 useState 来管理当前显示的月份
 	const [currentMonth, setCurrentMonth] = useState(dayjs())
 	const { cardStyles, siteContent } = useConfigStore()
@@ -78,27 +76,6 @@ export default function CalendarCard() {
 
 	return (
 		<HomeDraggableLayer cardKey='calendarCard' x={x} y={y} width={styles.width} height={styles.height}>
-{/* <<<<<<< HEAD
-			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y}>
-				<div className="flex items-center justify-between">
-					<button 
-						onClick={handlePrevMonth}
-						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
-					>
-						&lt;
-					</button>
-					<h3 className='text-secondary text-sm'>
-						{currentMonth.format('YYYY/M/D')} {currentMonth.format('ddd')}
-					</h3>
-					<button 
-						onClick={handleNextMonth}
-						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
-					>
-						&gt;
-					</button>
-				</div>
-				<ul className='text-secondary mt-3 grid h-[206px] grid-cols-7 gap-2 text-sm'>
-======= */}
 			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='flex flex-col'>
 				{siteContent.enableChristmas && (
 					<>

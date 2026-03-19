@@ -4,13 +4,16 @@ import { useState, useEffect } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
+import { useWeather, getWeatherType } from '@/hooks/use-weather'
 import { CARD_SPACING } from '@/consts'
 import { HomeDraggableLayer } from './home-draggable-layer'
+import WeatherEffect from './weather-effect'
 
 export default function ClockCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
 	const [time, setTime] = useState(new Date())
+	const { weather } = useWeather()
 	const styles = cardStyles.clockCard
 	const hiCardStyles = cardStyles.hiCard
 	const showSeconds = siteContent.clockShowSeconds ?? false
@@ -38,31 +41,39 @@ export default function ClockCard() {
 					<>
 						<img
 							src='/images/christmas/snow-5.webp'
-							alt='Christmas decoration'
+							alt=''
 							className='pointer-events-none absolute'
 							style={{ width: 60, left: 2, bottom: 2, opacity: 0.6 }}
 						/>
 						<img
 							src='/images/christmas/snow-6.webp'
-							alt='Christmas decoration'
+							alt=''
 							className='pointer-events-none absolute'
 							style={{ width: 80, right: -4, top: -10, opacity: 0.6 }}
 						/>
 					</>
 				)}
-				<div
-					className='bg-secondary/20 card-rounded flex h-full w-full cursor-pointer items-center justify-center gap-1.5 p-2'>
-					<SevenSegmentDigit value={parseInt(hours[0])} />
-					<SevenSegmentDigit value={parseInt(hours[1])} />
-					<Colon />
-					<SevenSegmentDigit value={parseInt(minutes[0])} />
-					<SevenSegmentDigit value={parseInt(minutes[1])} />
-					{showSeconds && (
-						<>
-							<Colon />
-							<SevenSegmentDigit value={parseInt(seconds[0])} />
-							<SevenSegmentDigit value={parseInt(seconds[1])} />
-						</>
+				<div className='bg-secondary/20 card-rounded relative flex h-full w-full cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden p-2'>
+					{weather && <WeatherEffect type={getWeatherType(weather.weatherCode)} />}
+					<div className='relative flex items-center gap-1.5'>
+						<SevenSegmentDigit value={parseInt(hours[0])} />
+						<SevenSegmentDigit value={parseInt(hours[1])} />
+						<Colon />
+						<SevenSegmentDigit value={parseInt(minutes[0])} />
+						<SevenSegmentDigit value={parseInt(minutes[1])} />
+						{showSeconds && (
+							<>
+								<Colon />
+								<SevenSegmentDigit value={parseInt(seconds[0])} />
+								<SevenSegmentDigit value={parseInt(seconds[1])} />
+							</>
+						)}
+					</div>
+					{weather && (
+						<div className='text-secondary relative flex items-center gap-1.5 text-xs'>
+							<span>{weather.description}</span>
+							<span className='text-primary font-medium'>{weather.temperature}°C</span>
+						</div>
 					)}
 				</div>
 			</Card>

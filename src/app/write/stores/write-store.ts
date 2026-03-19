@@ -75,8 +75,8 @@ export const useWriteStore = create<WriteStore>((set, get) => ({
 
 		const existingHashes = new Map<string, ImageItem>(
 			images
-				.filter((it): it is Extract<ImageItem, { type: 'file'; hash?: string }> => it.type === 'file' && (it as any).hash)
-				.map(it => [(it as any).hash as string, it])
+				.filter((it): it is Extract<ImageItem, { type: 'file' }> => it.type === 'file' && !!it.hash)
+				.map(it => [it.hash!, it])
 		)
 
 		const computed = await Promise.all(

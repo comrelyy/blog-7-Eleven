@@ -72,7 +72,7 @@ export function HomeLayout({ cardStylesData, setCardStylesData, onClose }: HomeL
 					</tr>
 				</thead>
 				<tbody>
-					{Object.entries(cardStylesData).map(([key, cardStyle]: [string, any]) => (
+					{Object.entries(cardStylesData).map(([key, cardStyle]) => (
 						<tr key={key} className='border-b last:border-0'>
 							<td className='px-3 py-2 align-middle whitespace-nowrap'>{CARD_LABELS[key] ?? key.replace(/([A-Z])/g, ' $1').trim()}</td>
 

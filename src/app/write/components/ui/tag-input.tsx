@@ -15,18 +15,18 @@ export function TagInput({ tags, onChange }: TagInputProps) {
 		}
 	}
 
-	const handleRemoveTag = (index: number) => {
-		onChange(tags.filter((_, i) => i !== index))
+	const handleRemoveTag = (tag: string) => {
+		onChange(tags.filter(t => t !== tag))
 	}
 
 	return (
 		<div className='bg-card w-full rounded-lg border px-3 py-2'>
 			{tags.length > 0 && (
 				<div className='mb-2 flex flex-wrap gap-2'>
-					{tags.map((tag, index) => (
-						<span key={index} className='flex items-center gap-1.5 rounded-md bg-blue-100 px-2 py-1 text-sm text-blue-700'>
+					{tags.map((tag) => (
+						<span key={tag} className='flex items-center gap-1.5 rounded-md bg-blue-100 px-2 py-1 text-sm text-blue-700'>
 							#{tag}
-							<button type='button' onClick={() => handleRemoveTag(index)} className='text-secondary'>
+							<button type='button' onClick={() => handleRemoveTag(tag)} className='text-secondary'>
 								×
 							</button>
 						</span>

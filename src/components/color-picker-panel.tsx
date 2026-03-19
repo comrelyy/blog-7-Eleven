@@ -54,37 +54,48 @@ export function ColorPickerPanel({ value, onChange, style, className }: ColorPic
 		}
 	}, [])
 
+	const [hueWidth, setHueWidth] = useState(0)
+	const [alphaWidth, setAlphaWidth] = useState(0)
+	const [pickerWidth, setPickerWidth] = useState(0)
+	const [pickerHeight, setPickerHeight] = useState(0)
+
+	// Measure ref dimensions after mount and when show changes
+	useEffect(() => {
+		if (hueRef.current) setHueWidth(hueRef.current.getBoundingClientRect().width)
+		if (alphaRef.current) setAlphaWidth(alphaRef.current.getBoundingClientRect().width)
+		if (pickerRef.current) {
+			setPickerWidth(pickerRef.current.getBoundingClientRect().width)
+			setPickerHeight(pickerRef.current.getBoundingClientRect().height)
+		}
+	}, [show])
+
 	const hue = useMemo(() => {
-		if (hueRef.current) {
-			const { width } = hueRef.current.getBoundingClientRect()
-			return toFixed((hueOffset / width) * 360)
+		if (hueWidth) {
+			return toFixed((hueOffset / hueWidth) * 360)
 		}
 		return 0
-	}, [hueOffset, hueRef.current])
+	}, [hueOffset, hueWidth])
 
 	const alpha = useMemo(() => {
-		if (alphaRef.current) {
-			const { width } = alphaRef.current.getBoundingClientRect()
-			return clamp(toFixed(alphaOffset / width, 4), 0, 1)
+		if (alphaWidth) {
+			return clamp(toFixed(alphaOffset / alphaWidth, 4), 0, 1)
 		}
 		return 1
-	}, [alphaOffset, alphaRef.current])
+	}, [alphaOffset, alphaWidth])
 
 	const saturation = useMemo(() => {
-		if (pickerRef.current) {
-			const { width } = pickerRef.current.getBoundingClientRect()
-			return clamp(toFixed(saturationOffset / width, 4), 0, 1)
+		if (pickerWidth) {
+			return clamp(toFixed(saturationOffset / pickerWidth, 4), 0, 1)
 		}
 		return 1
-	}, [saturationOffset, pickerRef.current])
+	}, [saturationOffset, pickerWidth])
 
 	const bright = useMemo(() => {
-		if (pickerRef.current) {
-			const { height } = pickerRef.current.getBoundingClientRect()
-			return 1 - clamp(toFixed(brightOffset / height, 4), 0, 1)
+		if (pickerHeight) {
+			return 1 - clamp(toFixed(brightOffset / pickerHeight, 4), 0, 1)
 		}
 		return 0
-	}, [brightOffset, pickerRef.current])
+	}, [brightOffset, pickerHeight])
 
 	const hsl = useMemo(() => {
 		return hsvToHsl(hue, saturation, bright)
