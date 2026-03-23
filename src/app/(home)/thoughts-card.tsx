@@ -85,13 +85,11 @@ export default function ThoughtsCard() {
 				time: `${hours}:${minutes}:${seconds}`,
 			}
 
-			const updatedThoughts = [newThought, ...allThoughts]
-
 			try {
-				await pushThoughts(updatedThoughts)
+				await pushThoughts([newThought])
 				setInputValue('')
 				setLatestThought(newThought)
-				setAllThoughts(updatedThoughts)
+				setAllThoughts([newThought, ...allThoughts])
 				toast.success('碎碎念保存成功！')
 			} catch (error) {
 				console.error('Failed to save thoughts', error)

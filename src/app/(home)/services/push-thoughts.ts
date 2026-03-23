@@ -1,4 +1,4 @@
-import { toBase64Utf8, getRef, createTree, createCommit, updateRef, createBlob, type TreeItem } from '@/lib/github-client'
+import { toBase64Utf8, getRef, createTree, createCommit, updateRef, createBlob, readTextFileFromRepo, type TreeItem } from '@/lib/github-client'
 import { getAuthToken } from '@/lib/auth'
 import { GITHUB_CONFIG } from '@/consts'
 import { toast } from 'sonner'
@@ -15,37 +15,47 @@ export interface Thought {
   time: string // HH:mm:ss
 }
 
-// 推送碎碎念数据到GitHub
-export async function pushThoughts(thoughts: Thought[]): Promise<void> {
-  // 获取认证 token
+// 推送单条碎碎念到GitHub（只更新该条所在月份的文件，不影响其他月份）
+export async function pushThoughts(newThoughts: Thought[]): Promise<void> {
   const token = await getAuthToken()
 
   toast.info('正在获取分支信息...')
   const refData = await getRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`)
   const latestCommitSha = refData.sha
 
-  // 按月份分组碎碎念数据
-  const thoughtsByMonth: Record<string, Thought[]> = {}
-  thoughts.forEach(thought => {
-    const monthKey = thought.date.substring(0, 7) // 提取 yyyy-mm 部分
-    if (!thoughtsByMonth[monthKey]) {
-      thoughtsByMonth[monthKey] = []
-    }
-    thoughtsByMonth[monthKey].push(thought)
-  })
+  // 找出需要更新的月份（只处理新增/变动的月份）
+  const monthsToUpdate = new Set<string>()
+  newThoughts.forEach(t => monthsToUpdate.add(t.date.substring(0, 7)))
 
-  toast.info('正在准备文件...')
+  toast.info('正在读取已有数据...')
 
   const treeItems: TreeItem[] = []
 
-  // 为每个月份创建JSON文件，保存到 /public/thoughts 目录
-  for (const [month, monthlyThoughts] of Object.entries(thoughtsByMonth)) {
-    const thoughtsJson = JSON.stringify(monthlyThoughts, null, '\t')
+  for (const monthKey of monthsToUpdate) {
+    // 从GitHub读取该月份已有的数据
+    const filePath = `public/thoughts/${monthKey}.json`
+    let existingThoughts: Thought[] = []
+    try {
+      const content = await readTextFileFromRepo(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, filePath, GITHUB_CONFIG.BRANCH)
+      if (content) {
+        const parsed = JSON.parse(content)
+        existingThoughts = Array.isArray(parsed) ? parsed : []
+      }
+    } catch {
+      // 文件不存在或解析失败，从空数组开始
+    }
+
+    // 合并：用新数据中该月份的条目替换/新增，按id去重
+    const newForMonth = newThoughts.filter(t => t.date.substring(0, 7) === monthKey)
+    const newIds = new Set(newForMonth.map(t => t.id))
+    const merged = [
+      ...newForMonth,
+      ...existingThoughts.filter(t => !newIds.has(t.id))
+    ].sort((a, b) => b.timestamp - a.timestamp)
+
+    const thoughtsJson = JSON.stringify(merged, null, '\t')
     const thoughtsBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(thoughtsJson), 'base64')
-    
-    // 文件路径：public/thoughts/xxxx-xx.json
-    const filePath = `public/thoughts/${month}.json`
-    
+
     treeItems.push({
       path: filePath,
       mode: '100644',
@@ -54,18 +64,12 @@ export async function pushThoughts(thoughts: Thought[]): Promise<void> {
     })
   }
 
-  // 如果没有碎碎念数据，创建一个空的目录占位文件
-  if (Object.keys(thoughtsByMonth).length === 0) {
-    const emptyBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(''), 'base64')
-    treeItems.push({
-      path: 'public/thoughts/.gitkeep',
-      mode: '100644',
-      type: 'blob',
-      sha: emptyBlob.sha
-    })
+  if (treeItems.length === 0) {
+    toast.info('没有需要更新的数据')
+    return
   }
 
-  const commitMessage = `更新碎碎念数据 (${Object.keys(thoughtsByMonth).length} 个月份)`
+  const commitMessage = `更新碎碎念数据 (${Array.from(monthsToUpdate).join(', ')})`
 
   toast.info('正在创建文件树...')
   const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, latestCommitSha)
@@ -85,39 +89,33 @@ export async function useThoughtsIndex() :Promise<ThoughtJsonArray | null>{
   
   // 创建多个 SWR 请求来加载所有可能的文件
   
-  // 合并所有数据
   const allThoughts: Thought[] = []
-  let loading = 0
-  let error = null
-  
-  // 检查所有请求的状态
+  let consecutiveNotFound = 0
+
   for (const file of possibleFiles) {
-  if (loading > 1) {
-    break
-  }
-    const res = await fetch(`/thoughts/${file}`, { 
-    cache: 'no-store',
-    headers: {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+    if (consecutiveNotFound > 1) {
+      break
     }
-  })
-  if (res.status === 404) {
-    loading++
-    continue
-  }
-  
-  if (!res.ok) {
-    throw new Error(`Failed to load ${file}`)
-  }
-  
-  
-  const data = await res.json()
-  
+    const res = await fetch(`/thoughts/${file}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
+    if (res.status === 404) {
+      consecutiveNotFound++
+      continue
+    }
 
-  allThoughts.push(...(Array.isArray(data) ? data : []))
+    if (!res.ok) {
+      throw new Error(`Failed to load ${file}`)
+    }
 
+    consecutiveNotFound = 0
+    const data = await res.json()
+    allThoughts.push(...(Array.isArray(data) ? data : []))
   }
   
   // 按时间戳排序，最新的在前
