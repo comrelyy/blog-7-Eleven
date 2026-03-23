@@ -8,12 +8,7 @@ import { toast } from 'sonner'
 import { hasAuth, generateAndCacheToken } from '@/lib/auth'
 import { pushThoughts, useThoughtsIndex, type Thought, type ThoughtJsonArray } from './services/push-thoughts'
 import { readFileAsText } from '@/lib/file-utils'
-
-// export const styles = {
-// 	width: 360,
-// 	height: 120,
-// 	order: 2
-// }
+import { useRouter } from 'next/navigation'
 
 export default function ThoughtsCard() {
 	const center = useCenterStore()
@@ -22,11 +17,11 @@ export default function ThoughtsCard() {
 	const { isAuth, setPrivateKey } = useAuthStore()
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
+	const [latestThought, setLatestThought] = useState<Thought | null>(null)
 	const [allThoughts, setAllThoughts] = useState<Thought[]>([])
-	const [currentIndex, setCurrentIndex] = useState(0)
-	const [isAnimating, setIsAnimating] = useState(false)
 	const isMounted = useRef(true)
 	const fileInputRef = useRef<HTMLInputElement>(null)
+	const router = useRouter()
 
 	const handlePrivateKeySelection = async (file: File) => {
 		try {
@@ -44,27 +39,23 @@ export default function ThoughtsCard() {
 		fileInputRef.current?.click()
 	}
 
-	// 设置所有碎碎念
 	useEffect(() => {
 		isMounted.current = true
 		const init = async () => {
 			try {
 				const data = await useThoughtsIndex()
-				// 确保组件仍然挂载
-				if (isMounted.current && data) {
-					// 获取最新的10条碎碎念
-					const latestThoughts = data.thoughts.slice(0, 10)
-					setAllThoughts(latestThoughts)
+				if (isMounted.current && data && data.thoughts.length > 0) {
+					setLatestThought(data.thoughts[0])
+					setAllThoughts(data.thoughts)
 				}
 			} catch (error) {
 				console.error('Failed to load thoughts', error)
 				toast.error('加载碎碎念失败')
 			}
 		}
-		
+
 		init()
-		
-		// 清理函数
+
 		return () => {
 			isMounted.current = false
 		}
@@ -85,24 +76,22 @@ export default function ThoughtsCard() {
 			const hours = String(date.getHours()).padStart(2, '0')
 			const minutes = String(date.getMinutes()).padStart(2, '0')
 			const seconds = String(date.getSeconds()).padStart(2, '0')
-			
+
 			const newThought: Thought = {
 				id: now.toString(),
 				text: inputValue.trim(),
 				timestamp: now,
 				date: `${year}-${month}-${day}`,
-				time: `${hours}:${minutes}:${seconds}`
+				time: `${hours}:${minutes}:${seconds}`,
 			}
-			
+
 			const updatedThoughts = [newThought, ...allThoughts]
-			
-			// 保存数据
+
 			try {
 				await pushThoughts(updatedThoughts)
-				// 更新本地状态
 				setInputValue('')
-				setAllThoughts(updatedThoughts.slice(0, 10)) // 保持最多10条
-				setCurrentIndex(0) // 重置到第一条
+				setLatestThought(newThought)
+				setAllThoughts(updatedThoughts)
 				toast.success('碎碎念保存成功！')
 			} catch (error) {
 				console.error('Failed to save thoughts', error)
@@ -120,22 +109,6 @@ export default function ThoughtsCard() {
 		return `${month}-${day} ${hours}:${minutes}`
 	}
 
-	// 点击下一条碎碎念
-	const handleNextThought = () => {
-		if (allThoughts.length === 0) return
-		
-		if (isAnimating) return // 防止重复点击
-		
-		setIsAnimating(true)
-		
-		// 撕日历效果
-		setTimeout(() => {
-			setCurrentIndex((prevIndex) => (prevIndex + 1) % allThoughts.length)
-			setIsAnimating(false)
-		}, 300) // 动画持续时间
-	}
-
-	// 计算与 hi-card 左对齐的 x 坐标
 	const alignedX = center.x - (cardStyles.hiCard?.width || 0) / 2
 
 	return (
@@ -158,7 +131,7 @@ export default function ThoughtsCard() {
 				x={alignedX}
 				y={center.y + (cardStyles.hiCard?.height || 0) / 2 + CARD_SPACING}
 				className='space-y-2 max-sm:static'>
-			{siteContent.enableChristmas && (
+				{siteContent.enableChristmas && (
 					<>
 						<img
 							src='/images/christmas/snow-7.webp'
@@ -168,92 +141,48 @@ export default function ThoughtsCard() {
 						/>
 					</>
 				)}
-			<form onSubmit={handleSubmit} className='flex flex-col h-full'>
-				<textarea
-					value={inputValue}
-					onChange={(e) => setInputValue(e.target.value)}
-					placeholder='写下你的碎碎念...'
-					className='flex-1 w-full resize-none border-none outline-none bg-transparent text-sm placeholder:text-secondary'
-				/>
-				<div className='flex justify-between items-center mt-2'>
-                    <span className='text-xs text-secondary'>
-						{/* 按回车保存 */}
-					</span>
-					<button 
-						type={isAuth ? 'submit' : 'button'}
-						onClick={!isAuth ? handleImportKey : undefined}
-						className='text-xs bg-brand text-white px-2 py-1 rounded hover:bg-brand/80 transition-colors'
-					>
-						{isAuth ? '保存' : '导入密钥'}
-					</button>
-				</div>
-			</form>
-			
-			{/* 显示碎碎念卡片堆叠效果 */}
-			{allThoughts.length > 0 && (
-				<div className='mt-3 pt-3 border-t border-white/20'>
-					<div className='flex items-center justify-between'>
-						<div className='text-xs text-secondary mb-1'>
-							最新碎碎念
-						</div>
-						<div className='text-xs text-secondary'>
-							{currentIndex + 1}/{allThoughts.length}
-						</div>
+				<form onSubmit={handleSubmit} className='flex h-full flex-col'>
+					<textarea
+						value={inputValue}
+						onChange={e => setInputValue(e.target.value)}
+						placeholder='写下你的碎碎念...'
+						className='placeholder:text-secondary w-full flex-1 resize-none border-none bg-transparent text-sm outline-none'
+					/>
+					<div className='mt-2 flex items-center justify-between'>
+						<span className='text-secondary text-xs'>{/* 按回车保存 */}</span>
+						<button
+							type={isAuth ? 'submit' : 'button'}
+							onClick={!isAuth ? handleImportKey : undefined}
+							className='bg-brand rounded px-2 py-1 text-xs text-white transition-colors hover:bg-brand/80'
+						>
+							{isAuth ? '保存' : '导入密钥'}
+						</button>
 					</div>
-					<div 
-						className='relative h-16 cursor-pointer bg-white/10 p-2 rounded border border-white/20'
-						onClick={handleNextThought}
-					>
-						{allThoughts.slice(currentIndex, Math.min(currentIndex + 3, allThoughts.length)).map((thought, index) => {
-							const zIndex = allThoughts.length - (currentIndex + index)
-							const offset = index * 6 // 增加每张卡片的偏移量
-							const opacity = index === 0 ? 1 : 0.4 // 当前卡片完全不透明，其他卡片更低透明度
-							
-							return (
-								<div
-									key={`${thought.id}-${currentIndex + index}`}
-									className={`absolute w-full text-sm rounded transition-all duration-300 ${
-										index === 0 ? 'bg-white/10' : 'bg-white/5'
-									}`}
-									style={{
-										top: `${offset}px`,
-										left: 0,
-										zIndex,
-										opacity,
-										transform: isAnimating && index === 0 ? 'translateY(-20px) rotate(-5deg)' : 'none',
-										transition: 'transform 0.3s ease, opacity 0.3s ease'
-									}}
-								>
-									<div className='flex items-start'>
-										<span className='mr-2 text-secondary flex-shrink-0'>•</span>
-										<div className='flex-1 min-w-0'>
-											<span className='text-secondary text-xs mr-2 whitespace-nowrap'>
-												{formatDateTime(thought.timestamp)}
-											</span>
-											<span className='break-words'>{thought.text}</span>
-										</div>
-									</div>
+				</form>
+
+				{/* 最新一条碎碎念 */}
+				<div className='mt-3 border-t border-white/20 pt-3'>
+					<div className='text-secondary mb-1 text-xs'>最新碎碎念</div>
+					{latestThought ? (
+						<div
+							onClick={() => router.push('/thoughts')}
+							className='cursor-pointer rounded border border-white/20 bg-white/10 p-2 transition-colors hover:bg-white/20'
+						>
+							<div className='flex items-start'>
+								<span className='text-secondary mr-2 flex-shrink-0'>•</span>
+								<div className='min-w-0 flex-1'>
+									<span className='text-secondary mr-2 whitespace-nowrap text-xs'>
+										{formatDateTime(latestThought.timestamp)}
+									</span>
+									<span className='break-words text-sm'>{latestThought.text}</span>
 								</div>
-							)
-						})}
-					</div>
-					<div className='text-xs text-secondary mt-1 text-center'>
-						点击切换下一条
-					</div>
+							</div>
+						</div>
+					) : (
+						<div className='text-secondary rounded border border-white/20 bg-white/10 p-2 text-sm italic'>暂无碎碎念</div>
+					)}
 				</div>
-			)}
-			
-			{allThoughts.length === 0 && (
-				<div className='mt-3 pt-3 border-t border-white/20'>
-					<div className='text-xs text-secondary mb-1'>
-						最新碎碎念
-					</div>
-					<div className='text-sm text-secondary italic bg-white/10 p-2 rounded border border-white/20'>
-						暂无碎碎念
-					</div>
-				</div>
-			)}
-		</Card>
+			</Card>
 		</>
 	)
 }
