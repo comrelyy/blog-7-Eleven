@@ -1,3 +1,10 @@
+### 2026-03-24
+
+一件事到底有多大的把握才能上场？我个人的答案是：40%。因为一件事如果有100%的把握、80%的把握、60%的把握，其实根本就轮不到普通人家里的孩子干。别做梦了你想都不要想。绝大多数人应该拥抱40%的机遇：把事情先从40%干到60%，再把事情从60%干到80%。但是很遗憾的是，世界是个反人性的系统：越是穷人的孩子就越喜欢观望，总是要等到有足够的确定性才会上场——但是成功恰恰又是因为敢于拥抱不确定性——富人的孩子的想法是我试100次成功2次或1次就足够了。其实世界的真相是勇敢试10次就有很大的机会成功了。
+> How sure is it that you can play one thing? My personal answer is: 40%. Because if one thing is 100% sure, 80% sure, 60% sure, it is not the turn of the children of ordinary people to do it at all. Stop dreaming. Don't even think about it. Most people should embrace a 40% opportunity: do things from 40% to 60%, and then from 60% to 80%. But unfortunately, the world is an inhumane system: the poorer the child is, the more likely he is to wait and see. Always wait until there is enough certainty to play-but success is precisely because of daring to embrace uncertainty-the idea of rich children is that it is enough for me to try 100 times and succeed twice or once. In fact, the truth of the world is that if you try bravely for 10 times, you will have a good chance of success.
+
+---
+
 ### 2026-03-19
 
 ***提升社会化程度***   
