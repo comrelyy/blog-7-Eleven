@@ -2,8 +2,11 @@
 
 ***Agent是一个学会了行动的模型***
 
-Agent 是模型。不是框架。不是提示词链。不是拖拽式工作流。
+Agent 是一个学会了行动的模型。不是框架。不是提示词链。不是拖拽式工作流。
 Agent 是一个神经网络，在行动序列数据上学会了感知环境、推理目标、采取行动
+
+> Every one of these milestones shares the same truth: the "agent" is never the surrounding code. The agent is always the model.
+
 --- 
 
 ### 2026-04-01
