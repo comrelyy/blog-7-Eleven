@@ -15,7 +15,7 @@ export default function Page() {
 	const router = useRouter()
 	const { markAsRead } = useReadArticles()
 
-	const [blog, setBlog] = useState<{ config: BlogConfig; markdown: string; cover?: string } | null>(null)
+	const [blog, setBlog] = useState<{ config: BlogConfig; markdown: string; cover?: string; images?: string[] } | null>(null)
 	const [error, setError] = useState<string | null>(null)
 	const [loading, setLoading] = useState<boolean>(true)
 
@@ -48,6 +48,21 @@ export default function Page() {
 	const date = useMemo(() => dayjs(blog?.config.date).format('YYYY年 M月 D日'), [blog?.config.date])
 	const tags = blog?.config.tags || []
 
+	// Get all images: prefer config.images, fallback to extracting from markdown
+	const images = useMemo(() => {
+		if (!blog) return []
+		if (blog.images && blog.images.length > 0) return blog.images
+		// Fallback: extract from markdown
+		const urls: string[] = []
+		const regex = /!\[.*?\]\((.*?)\)/g
+		let m
+		while ((m = regex.exec(blog.markdown)) !== null) {
+			const url = m[1]
+			if (url && !url.startsWith('local-image:')) urls.push(url)
+		}
+		return urls
+	}, [blog])
+
 	const handleEdit = () => {
 		router.push(`/write/${slug}`)
 	}
@@ -78,6 +93,7 @@ export default function Page() {
 				summary={blog.config.summary}
 				cover={blog.cover ? `${origin}${blog.cover}` : undefined}
 				slug={slug}
+				images={images}
 			/>
 
 			<motion.button

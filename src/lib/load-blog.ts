@@ -4,6 +4,7 @@ export type BlogConfig = {
 	date?: string
 	summary?: string
 	cover?: string
+	images?: string[]
 }
 
 export type LoadedBlog = {
@@ -11,6 +12,7 @@ export type LoadedBlog = {
 	config: BlogConfig
 	markdown: string
 	cover?: string
+	images?: string[]
 }
 
 /**
@@ -95,7 +97,8 @@ export async function loadBlog(slug: string): Promise<LoadedBlog> {
 			slug,
 			config,
 			markdown,
-			cover: config.cover
+			cover: config.cover,
+			images: config.images
 		}
 	}
 }

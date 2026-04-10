@@ -115,6 +115,22 @@ export async function pushBlog(params: PushBlogParams): Promise<void> {
 		sha: mdBlob.sha
 	})
 
+	// collect all image paths in this blog directory
+	const blogImages: string[] = []
+	// images from content (already uploaded or URL-based)
+	for (const img of images || []) {
+		if (img.type === 'url' && img.url.startsWith(`/blogs/${form.slug}/`)) {
+			blogImages.push(img.url)
+		}
+	}
+	// images just uploaded (local files)
+	for (const { img } of allLocalImages) {
+		const hash = img.hash || (await hashFileSHA256(img.file))
+		const ext = getFileExt(img.file.name)
+		const publicPath = `/blogs/${form.slug}/${hash}${ext}`
+		if (!blogImages.includes(publicPath)) blogImages.push(publicPath)
+	}
+
 	// create blob for config.json
 	const dateStr = form.date || new Date().toISOString().slice(0, 10)
 	const config = {
@@ -122,7 +138,8 @@ export async function pushBlog(params: PushBlogParams): Promise<void> {
 		tags: form.tags,
 		date: dateStr,
 		summary: form.summary,
-		cover: coverPath
+		cover: coverPath,
+		images: blogImages
 	}
 	const configBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(JSON.stringify(config, null, 2)), 'base64')
 	treeItems.push({

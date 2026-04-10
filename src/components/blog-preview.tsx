@@ -15,9 +15,10 @@ type BlogPreviewProps = {
 	summary?: string
 	cover?: string
 	slug?: string
+	images?: string[]
 }
 
-export function BlogPreview({ markdown, title, tags, date, summary, cover, slug }: BlogPreviewProps) {
+export function BlogPreview({ markdown, title, tags, date, summary, cover, slug, images }: BlogPreviewProps) {
 	const { maxSM: isMobile } = useSize()
 	const { content, toc, loading } = useMarkdownRender(markdown)
 	const { siteContent } = useConfigStore()
@@ -51,7 +52,7 @@ export function BlogPreview({ markdown, title, tags, date, summary, cover, slug 
 				</div>
 			</motion.article>
 
-			{!isMobile && <BlogSidebar cover={cover} summary={summary} toc={toc} slug={slug} />}
+			{!isMobile && <BlogSidebar cover={cover} summary={summary} toc={toc} slug={slug} images={images} />}
 		</div>
 	)
 }

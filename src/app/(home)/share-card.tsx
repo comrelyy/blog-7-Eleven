@@ -5,126 +5,72 @@ import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
-import shareList from '@/app/share/list.json'
 import { poetryData } from './poetry-data'
-import Link from 'next/link'
+import { getPoetryMood } from './poetry-mood'
+import { PoetryScene } from './poetry-scene'
 import { HomeDraggableLayer } from './home-draggable-layer'
-
-type ShareItem = {
-	name: string
-	url: string
-	logo: string
-	description: string
-	tags: string[]
-	stars: number
-}
-
-type PoetryItem = {
-	title: string
-	author?: string
-	chapter?: string
-	content: string
-}
 
 export default function ShareCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
-	const [randomItem, setRandomItem] = useState<ShareItem | null>(null)
-	const [randomPoetry, setRandomPoetry] = useState<PoetryItem | null>(null)
 	const styles = cardStyles.shareCard
 	const hiCardStyles = cardStyles.hiCard
 	const socialButtonsStyles = cardStyles.socialButtons
 	const [isAnimating, setIsAnimating] = useState(false)
-    const [currentIndex, setCurrentIndex] = useState(0)
+	const [currentIndex, setCurrentIndex] = useState(0)
 
 	useEffect(() => {
-		// 随机决定展示分享项目还是诗词
-		//const showPoetry = Math.random() > 0.5
-		
-		//if (showPoetry) {
-			// 随机选择一个诗词
-			const randomIndex = Math.floor(Math.random() * poetryData.length)
-			setRandomPoetry(poetryData[randomIndex])
-			setCurrentIndex(randomIndex)
-		//	setRandomItem(null)
-		// } else {
-		// 	// 随机选择一个分享项目
-		// 	const randomIndex = Math.floor(Math.random() * shareList.length)
-		// 	setRandomItem(shareList[randomIndex])
-		// 	setRandomPoetry(null)
-		// }
+		const randomIndex = Math.floor(Math.random() * poetryData.length)
+		setCurrentIndex(randomIndex)
 	}, [])
 
-	
-
-	if (!randomItem && !randomPoetry) {
-		return null
-	}
-
 	const handleNextItem = () => {
-		if (poetryData.length === 0) return
-		
-		if (isAnimating) return // 防止重复点击
-		
+		if (poetryData.length === 0 || isAnimating) return
 		setIsAnimating(true)
-		
-		// 切换效果
 		setTimeout(() => {
-			setCurrentIndex((prevIndex) => (prevIndex + 1) % poetryData.length)
+			setCurrentIndex(prevIndex => (prevIndex + 1) % poetryData.length)
 			setIsAnimating(false)
-		}, 300) // 动画持续时间
+		}, 300)
 	}
 
 	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + hiCardStyles.width / 2 + CARD_SPACING
-	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING / 2	
+	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING / 2
 
 	const currentItem = poetryData[currentIndex]
-	return (
-		<HomeDraggableLayer cardKey='shareCard' x={x} y={y} width={styles.width} height={styles.height} >
-{/* <<<<<<< HEAD
-		<Card order={styles.order} width={styles.width} x={x} y={y}>
-			{/* <h2 className='text-secondary text-sm'>随机推荐</h2> */}
+	const mood = currentItem ? getPoetryMood(currentItem) : 'default'
 
-			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} >
+	return (
+		<HomeDraggableLayer cardKey='shareCard' x={x} y={y} width={styles.width} height={styles.height}>
+			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y}>
 				{siteContent.enableChristmas && (
-					<>
-						<img
-							src='/images/christmas/snow-12.webp'
-							alt='Christmas decoration'
-							className='pointer-events-none absolute'
-							style={{ width: 120, left: -12, top: -12, opacity: 0.8 }}
-						/>
-					</>
+					<img
+						src='/images/christmas/snow-12.webp'
+						alt='Christmas decoration'
+						className='pointer-events-none absolute'
+						style={{ width: 120, left: -12, top: -12, opacity: 0.8 }}
+					/>
 				)}
 
-				<h2 className='text-secondary text-sm' onClick={handleNextItem}>随机推荐</h2>
-{/* <div 
-					className='mt-2 cursor-pointer bg-white/10 p-2 rounded border border-white/20 relative'
-					onClick={handleNextItem}
-				> */}
-			{currentItem ? (
-				<div className='mt-2 space-y-2'>
-					<div className='flex items-center justify-between'>
-						<h3 className='text-sm font-medium'>{currentItem.title}</h3>
-						<span className='text-xs text-secondary'>
-							{currentItem.author ? `作者：${currentItem.author}` : `${currentItem.chapter}`}
-						</span>
-					</div>
-					<p className='text-secondary text-xs leading-relaxed'>{currentItem.content}</p>
+				{/* Poetry scene background */}
+				<div className='pointer-events-none absolute inset-6 overflow-hidden rounded-[34px] opacity-60 transition-all duration-700'>
+					<PoetryScene mood={mood} />
 				</div>
-			) : randomItem ? (
-				<a href={randomItem.url} target="_blank" rel="noopener noreferrer" className='mt-2 block space-y-2'>
-					<div className='flex items-center'>
-						<div className='relative mr-3 h-12 w-12 shrink-0 overflow-hidden rounded-xl'>
-							<img src={randomItem.logo} alt={randomItem.name} className='h-full w-full object-contain' />
+
+				<div className='relative'>
+					<h2 className='text-secondary cursor-pointer text-sm' onClick={handleNextItem}>
+						随机推荐
+					</h2>
+					{currentItem && (
+						<div className='mt-2 space-y-2'>
+							<div className='flex items-center justify-between'>
+								<h3 className='text-sm font-medium'>{currentItem.title}</h3>
+								<span className='text-secondary text-xs'>{currentItem.author ? `作者：${currentItem.author}` : `${currentItem.chapter}`}</span>
+							</div>
+							<p className='text-secondary text-xs leading-relaxed'>{currentItem.content}</p>
 						</div>
-						<h3 className='text-sm font-medium'>{randomItem.name}</h3>
-					</div>
-					<p className='text-secondary line-clamp-3 text-xs'>{randomItem.description}</p>
-				</a>
-			) : null}
-			{/* </div> */}
-		</Card>
+					)}
+				</div>
+			</Card>
 		</HomeDraggableLayer>
 	)
 }

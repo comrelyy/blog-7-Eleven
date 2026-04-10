@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { useWriteStore } from '../../stores/write-store'
 import Link from 'next/link'
@@ -10,7 +10,7 @@ type ImagesSectionProps = {
 }
 
 export function ImagesSection({ delay = 0 }: ImagesSectionProps) {
-	const { images, cover, addUrlImage, addFiles, deleteImage } = useWriteStore()
+	const { images, cover, addUrlImage, addFiles, deleteImage, setCover } = useWriteStore()
 	const [urlInput, setUrlInput] = useState<string>('')
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -96,7 +96,12 @@ export function ImagesSection({ delay = 0 }: ImagesSectionProps) {
 								}}
 							/>
 							{isCover && <div className='absolute top-1 left-1 rounded-md bg-blue-500 px-1.5 py-0.5 text-white shadow'>封面</div>}
-							<div className='absolute top-1 right-1 hidden group-hover:flex'>
+							<div className='absolute top-1 right-1 hidden gap-1 group-hover:flex'>
+								{!isCover && (
+									<button type='button' className='rounded-md bg-blue-500/80 px-1.5 py-0.5 text-white shadow hover:bg-blue-500' onClick={() => setCover(item)}>
+										封面
+									</button>
+								)}
 								<button type='button' className='rounded-md bg-white/80 px-1.5 py-0.5 shadow hover:bg-white' onClick={() => deleteImage(item.id)}>
 									删除
 								</button>

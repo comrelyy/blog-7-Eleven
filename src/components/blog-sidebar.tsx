@@ -18,9 +18,10 @@ type BlogSidebarProps = {
 	summary?: string
 	toc: TocItem[]
 	slug?: string
+	images?: string[]
 }
 
-export function BlogSidebar({ cover, summary, toc, slug }: BlogSidebarProps) {
+export function BlogSidebar({ cover, summary, toc, slug, images }: BlogSidebarProps) {
 	const { siteContent } = useConfigStore()
 	const summaryInContent = siteContent.summaryInContent ?? false
 
@@ -33,6 +34,24 @@ export function BlogSidebar({ cover, summary, toc, slug }: BlogSidebarProps) {
 					transition={{ delay: INIT_DELAY + ANIMATION_DELAY * 1 }}
 					className='bg-card w-full rounded-xl border p-3'>
 					<img src={cover} alt='cover' className='h-auto w-full rounded-xl border object-cover' />
+				</motion.div>
+			)}
+
+			{images && images.length > 0 && (
+				<motion.div
+					initial={{ opacity: 0, scale: 0.8 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ delay: INIT_DELAY + ANIMATION_DELAY * 1.5 }}
+					className='bg-card w-full rounded-xl border p-3'
+				>
+					<h2 className='text-secondary mb-2 text-sm font-medium'>图片 ({images.length})</h2>
+					<div className='grid grid-cols-3 gap-1.5'>
+						{images.map((src, i) => (
+							<a key={i} href={src} target='_blank' rel='noopener noreferrer'>
+								<img src={src} alt='' className='aspect-square w-full rounded-lg border object-cover transition-opacity hover:opacity-80' />
+							</a>
+						))}
+					</div>
 				</motion.div>
 			)}
 

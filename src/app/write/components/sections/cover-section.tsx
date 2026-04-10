@@ -89,7 +89,17 @@ export function CoverSection({ delay = 0 }: CoverSectionProps) {
 				}}
 				onDrop={handleCoverDrop}>
 				{!!coverPreviewUrl ? (
-					<img src={coverPreviewUrl} alt='cover preview' className='h-full w-full rounded-2xl object-cover' />
+					<div className='group relative h-full w-full'>
+						<img src={coverPreviewUrl} alt='cover preview' className='h-full w-full rounded-2xl object-cover' />
+						<div className='absolute inset-0 hidden items-center justify-center gap-2 rounded-2xl bg-black/30 group-hover:flex'>
+							<button type='button' className='rounded-lg bg-white/80 px-3 py-1.5 text-sm shadow hover:bg-white' onClick={handleClickUpload}>
+								更换
+							</button>
+							<button type='button' className='rounded-lg bg-red-500/80 px-3 py-1.5 text-sm text-white shadow hover:bg-red-500' onClick={() => setCover(null)}>
+								移除
+							</button>
+						</div>
+					</div>
 				) : (
 					<div className='grid h-full w-full cursor-pointer place-items-center transition-colors hover:bg-white/60' onClick={handleClickUpload}>
 						<span className='text-3xl leading-none text-neutral-400'>+</span>
