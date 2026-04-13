@@ -12,7 +12,7 @@ export type PushPicturesParams = {
 	imageItems?: Map<string, ImageItem>
 }
 
-export async function pushPictures(params: PushPicturesParams): Promise<void> {
+export async function pushPictures(params: PushPicturesParams): Promise<Picture[]> {
 	const { pictures, imageItems } = params
 
 	const token = await getAuthToken()
@@ -67,6 +67,16 @@ export async function pushPictures(params: PushPicturesParams): Promise<void> {
 						images: nextImages
 					}
 				})
+			}
+		}
+	}
+
+	// 保护性检查：确保没有 blob: URL 残留（会破坏持久化数据）
+	for (const p of updatedPictures) {
+		const allUrls = [...(p.images || []), p.image].filter(Boolean) as string[]
+		for (const url of allUrls) {
+			if (url.startsWith('blob:')) {
+				throw new Error('图片上传处理异常，存在未替换的临时链接，请重试')
 			}
 		}
 	}
@@ -144,4 +154,5 @@ export async function pushPictures(params: PushPicturesParams): Promise<void> {
 	await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`, commitData.sha)
 
 	toast.success('发布成功！')
+	return updatedPictures
 }
