@@ -36,7 +36,8 @@ export default function UploadDialog({ onClose, onSubmit }: UploadDialogProps) {
 			})
 		}
 
-		setImages(nextImages)
+		setImages(prev => [...prev, ...nextImages])
+		if (e.target) e.target.value = ''
 	}
 
 	const handleSubmit = () => {

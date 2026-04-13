@@ -30,6 +30,12 @@ export function PoetryScene({ mood }: { mood: PoetryMood }) {
 			return <NostalgiaScene />
 		case 'pastoral':
 			return <PastoralScene />
+		case 'plum':
+			return <PlumScene />
+		case 'orchid':
+			return <OrchidScene />
+		case 'chrysanthemum':
+			return <ChrysanthemumScene />
 		default:
 			return <DefaultScene />
 	}
@@ -923,6 +929,148 @@ function PastoralScene() {
 			<Bamboo x={50} y={165} opacity={0.12} />
 			{/* 云纹 */}
 			<CloudPattern x={180} y={30} scale={0.8} opacity={0.05} />
+		</SceneWrapper>
+	)
+}
+
+// 梅：月下寒梅、文人赏梅、疏影横斜
+function PlumScene() {
+	return (
+		<SceneWrapper>
+			<defs>
+				<linearGradient id='plumSky' x1='0' y1='0' x2='0' y2='1'>
+					<stop offset='0%' stopColor='#e1e8f5' />
+					<stop offset='50%' stopColor='#eef1f8' />
+					<stop offset='100%' stopColor='#f5f5f5' />
+				</linearGradient>
+			</defs>
+			<rect width='400' height='200' fill='url(#plumSky)' />
+			{/* 淡月 */}
+			<circle cx='310' cy='45' r='16' fill='#fff9c4' opacity='0.4' />
+			<circle cx='314' cy='42' r='13' fill='#eef1f8' opacity='0.7' />
+			{/* 远山 */}
+			<InkMountain d='M0,115 Q80,75 170,100 Q260,65 350,92 Q385,80 400,88 L400,200 L0,200Z' opacity={0.06} />
+			{/* 雪地 */}
+			<path d='M0,165 Q100,155 200,162 Q300,150 400,160 L400,200 L0,200Z' fill='#fff' opacity='0.8' />
+			{/* 主体墨梅 — 大 */}
+			<PlumBlossom x={140} y={165} scale={1.8} opacity={0.55} />
+			<PlumBlossom x={260} y={168} scale={1.4} opacity={0.4} />
+			<PlumBlossom x={60} y={170} scale={0.9} opacity={0.3} />
+			{/* 文人赏梅 */}
+			<Scholar x={200} y={160} scale={0.75} opacity={0.4} />
+			{/* 飘落花瓣 */}
+			{Array.from({ length: 8 }, (_, i) => {
+				const cx = 30 + i * 45
+				const cy = 30 + (i % 3) * 25
+				return (
+					<circle key={i} cx={cx} cy={cy} r={1.5} fill='none' stroke='#1a1a1a' strokeWidth='0.6' opacity='0.4'>
+						<animate attributeName='cy' values={`${cy};${cy + 30}`} dur={`${4 + i * 0.4}s`} repeatCount='indefinite' />
+						<animate attributeName='opacity' values='0.4;0.1' dur={`${4 + i * 0.4}s`} repeatCount='indefinite' />
+					</circle>
+				)
+			})}
+			{/* 云纹 */}
+			<CloudPattern x={50} y={40} opacity={0.05} />
+		</SceneWrapper>
+	)
+}
+
+// 兰：幽谷空山、君子赏兰、数丛兰草
+function OrchidScene() {
+	return (
+		<SceneWrapper>
+			<defs>
+				<linearGradient id='orchidSky' x1='0' y1='0' x2='0' y2='1'>
+					<stop offset='0%' stopColor='#e8f5e9' />
+					<stop offset='50%' stopColor='#f1f8e9' />
+					<stop offset='100%' stopColor='#f9fbe7' />
+				</linearGradient>
+			</defs>
+			<rect width='400' height='200' fill='url(#orchidSky)' />
+			{/* 空谷远山 */}
+			<InkMountain d='M0,100 Q60,50 130,85 Q200,45 280,80 Q340,60 400,75 L400,200 L0,200Z' opacity={0.08} />
+			<InkMountain d='M0,135 Q80,95 160,120 Q250,85 340,115 Q380,105 400,110 L400,200 L0,200Z' opacity={0.1} />
+			{/* 岩石 */}
+			<path d='M20,175 Q35,160 55,168 Q70,172 75,178 Q45,180 20,178Z' fill='#1a1a1a' opacity='0.15' filter='url(#inkBrush)' />
+			<path d='M300,172 Q320,158 340,165 Q355,170 360,175 Q330,178 300,175Z' fill='#1a1a1a' opacity='0.12' filter='url(#inkBrush)' />
+			{/* 主体兰草群 */}
+			<Orchid x={80} y={172} scale={1.4} opacity={0.45} />
+			<Orchid x={130} y={175} scale={1.1} opacity={0.35} />
+			<Orchid x={320} y={170} scale={1.2} opacity={0.4} />
+			<Orchid x={360} y={172} scale={0.9} opacity={0.3} />
+			{/* 文人赏兰 */}
+			<Scholar x={210} y={170} scale={0.75} opacity={0.4} />
+			{/* 蝴蝶 */}
+			<g transform='translate(180,110)' opacity='0.3'>
+				<path d='M0,0 Q-4,-3 -2,-6 Q0,-4 0,0Z' fill='#1a1a1a'>
+					<animate attributeName='d' values='M0,0 Q-4,-3 -2,-6 Q0,-4 0,0Z;M0,0 Q-2,-2 -1,-5 Q0,-3 0,0Z' dur='0.5s' repeatCount='indefinite' />
+				</path>
+				<path d='M0,0 Q4,-3 2,-6 Q0,-4 0,0Z' fill='#1a1a1a'>
+					<animate attributeName='d' values='M0,0 Q4,-3 2,-6 Q0,-4 0,0Z;M0,0 Q2,-2 1,-5 Q0,-3 0,0Z' dur='0.5s' repeatCount='indefinite' />
+				</path>
+			</g>
+			{/* 竹 */}
+			<Bamboo x={50} y={172} opacity={0.15} />
+			{/* 云纹 */}
+			<CloudPattern x={240} y={35} scale={0.8} opacity={0.05} />
+		</SceneWrapper>
+	)
+}
+
+// 菊：采菊东篱、陶渊明式、南山
+function ChrysanthemumScene() {
+	return (
+		<SceneWrapper>
+			<defs>
+				<linearGradient id='chrySky' x1='0' y1='0' x2='0' y2='1'>
+					<stop offset='0%' stopColor='#fff8e1' />
+					<stop offset='50%' stopColor='#fff3e0' />
+					<stop offset='100%' stopColor='#efebe9' />
+				</linearGradient>
+			</defs>
+			<rect width='400' height='200' fill='url(#chrySky)' />
+			{/* 南山 */}
+			<InkMountain d='M0,100 Q80,55 170,85 Q260,50 350,78 Q385,68 400,72 L400,200 L0,200Z' opacity={0.1} />
+			<InkMountain d='M0,135 Q100,105 200,125 Q300,100 400,120 L400,200 L0,200Z' opacity={0.08} />
+			{/* 田野 */}
+			<path d='M0,165 Q100,155 200,162 Q300,150 400,160 L400,200 L0,200Z' fill='#d7ccc8' opacity='0.3' />
+			{/* 东篱 */}
+			{[260, 270, 280, 290, 300, 310].map((x, i) => (
+				<line key={i} x1={x} y1='160' x2={x} y2='172' stroke='#1a1a1a' strokeWidth='0.8' opacity='0.3' />
+			))}
+			<line x1='258' y1='164' x2='312' y2='164' stroke='#1a1a1a' strokeWidth='0.5' opacity='0.25' />
+			<line x1='258' y1='169' x2='312' y2='169' stroke='#1a1a1a' strokeWidth='0.5' opacity='0.25' />
+			{/* 主体菊花丛 */}
+			<Chrysanthemum x={90} y={170} scale={1.5} opacity={0.4} />
+			<Chrysanthemum x={135} y={173} scale={1.2} opacity={0.35} />
+			<Chrysanthemum x={175} y={170} scale={1.0} opacity={0.3} />
+			<Chrysanthemum x={285} y={172} scale={0.9} opacity={0.3} />
+			{/* 采菊人 */}
+			<g transform='translate(220,168)' opacity='0.4'>
+				<path d='M1,-34 Q-1,-38 2,-40 Q5,-38 3,-34' fill='#1a1a1a' />
+				<path d='M-2,-32 Q-5,-28 -3,-23 Q0,-21 3,-23 Q5,-28 2,-32 Q0,-34 -2,-32Z' fill='#1a1a1a' />
+				{/* 弯腰姿态 */}
+				<path d='M0,-21 C-2,-14 -6,-8 -8,0 Q-6,5 0,8 Q8,5 10,0 Q6,-8 4,-14 C3,-17 2,-20 0,-21Z' fill='#1a1a1a' />
+				{/* 伸手采菊 */}
+				<path d='M-5,-12 C-10,-8 -14,-4 -16,0' stroke='#1a1a1a' strokeWidth='2.2' strokeLinecap='round' fill='none' />
+				<path d='M5,-12 C10,-8 13,-4 14,0' stroke='#1a1a1a' strokeWidth='2.2' strokeLinecap='round' fill='none' />
+			</g>
+			{/* 飞雁 — 悠然见南山 */}
+			{[[80, 50], [95, 45], [110, 50]].map(([cx, cy], i) => (
+				<path key={i} d={`M${cx},${cy} Q${(cx as number) + 4},${(cy as number) - 3} ${(cx as number) + 8},${cy}`} stroke='#1a1a1a' strokeWidth='0.7' fill='none' opacity='0.2' />
+			))}
+			{/* 飘落菊瓣 */}
+			{Array.from({ length: 6 }, (_, i) => {
+				const cx = 50 + i * 55
+				const cy = 40 + (i % 3) * 20
+				return (
+					<ellipse key={i} cx={cx} cy={cy} rx='2' ry='1' fill='#1a1a1a' opacity='0.25' transform={`rotate(${i * 40},${cx},${cy})`}>
+						<animateTransform attributeName='transform' type='translate' values={`0,0;${i % 2 ? 5 : -5},25`} dur={`${4 + i * 0.4}s`} repeatCount='indefinite' />
+					</ellipse>
+				)
+			})}
+			{/* 云纹 */}
+			<CloudPattern x={30} y={35} scale={0.8} opacity={0.05} />
 		</SceneWrapper>
 	)
 }

@@ -178,12 +178,20 @@ export default function Page() {
 		setIsSaving(true)
 
 		try {
-			await pushPictures({
+			const savedPictures = await pushPictures({
 				pictures,
 				imageItems
 			})
 
-			setOriginalPictures(pictures)
+			// 释放所有本地文件的 blob URL
+			for (const item of imageItems.values()) {
+				if (item.type === 'file') {
+					URL.revokeObjectURL(item.previewUrl)
+				}
+			}
+
+			setPictures(savedPictures)
+			setOriginalPictures(savedPictures)
 			setImageItems(new Map())
 			setIsEditMode(false)
 			toast.success('保存成功！')
