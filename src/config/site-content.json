@@ -59,14 +59,6 @@
 			"url": "/images/background/320dafbbe585cc71.png"
 		},
 		{
-			"id": "15c3d033d0610847",
-			"url": "/images/background/15c3d033d0610847.png"
-		},
-		{
-			"id": "da7a7a448452d94d",
-			"url": "/images/background/da7a7a448452d94d.png"
-		},
-		{
 			"id": "1725a2d9af4c442c",
 			"url": "/images/background/1725a2d9af4c442c.png"
 		},
@@ -75,7 +67,7 @@
 			"url": "/images/background/7baaaf848f1c6ea5.png"
 		}
 	],
-	"currentBackgroundImageId": "15c3d033d0610847",
+	"currentBackgroundImageId": "1725a2d9af4c442c",
 	"socialButtons": [
 		{
 			"id": "github",
