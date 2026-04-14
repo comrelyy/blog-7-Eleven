@@ -129,33 +129,30 @@ export async function useThoughtsIndex() :Promise<ThoughtJsonArray | null>{
   return { thoughts: sortedThoughts }
 }
 
-// 只获取最近一条碎碎念（首页卡片使用，避免拉取所有月份文件）
+// 只获取最近一条碎碎念（首页卡片使用）
+// 使用共享月份缓存：保证 pushThoughts 失效后能拿到最新数据，避免与 tooltip 重复请求
 export async function getLatestThought(): Promise<Thought | null> {
   const possibleFiles = getAllPossibleThoughtFiles()
-  let consecutiveNotFound = 0
+  let consecutiveEmpty = 0
 
   for (const file of possibleFiles) {
-    if (consecutiveNotFound > 1) break
-    try {
-      const res = await fetch(`/thoughts/${file}`, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+    if (consecutiveEmpty > 1) break
+    const yearMonth = file.replace(/\.json$/, '')
+    let promise = monthlyThoughtsCache.get(yearMonth)
+    if (!promise) {
+      promise = loadMonthThoughts(yearMonth).catch(() => {
+        monthlyThoughtsCache.delete(yearMonth)
+        return []
       })
-      if (res.status === 404) {
-        consecutiveNotFound++
-        continue
-      }
-      if (!res.ok) continue
-      consecutiveNotFound = 0
-      const data = await res.json()
-      const thoughts = Array.isArray(data) ? data : []
-      if (thoughts.length > 0) {
-        // 找到即返回，无需继续
-        return thoughts.reduce((a, b) => (a.timestamp > b.timestamp ? a : b))
-      }
-    } catch {
-      consecutiveNotFound++
+      monthlyThoughtsCache.set(yearMonth, promise)
     }
+    const thoughts = await promise
+    if (thoughts.length === 0) {
+      consecutiveEmpty++
+      continue
+    }
+    consecutiveEmpty = 0
+    return thoughts.reduce((a, b) => (a.timestamp > b.timestamp ? a : b))
   }
   return null
 }
