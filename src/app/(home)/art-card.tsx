@@ -46,8 +46,8 @@ export default function ArtCard() {
 	}, [siteContent.artImages, siteContent.currentArtImageId])
 
 	const [index, setIndex] = useState(0)
-	// Track which images are portrait (height > width)
-	const [portraitSet, setPortraitSet] = useState<Set<string>>(new Set())
+	// Lazy orientation map — only filled when image has actually been seen
+	const [orientation, setOrientation] = useState<Record<string, 'portrait' | 'landscape'>>({})
 
 	useEffect(() => {
 		if (allImages.length <= 1) return
@@ -57,30 +57,25 @@ export default function ArtCard() {
 		return () => clearInterval(timer)
 	}, [allImages.length])
 
-	// Preload images to detect orientation
+	// Lazily detect orientation for current + next image only (no upfront bulk preload)
 	useEffect(() => {
-		const set = new Set<string>()
+		const toCheck = [allImages[index], allImages[(index + 1) % allImages.length]].filter(Boolean)
 		let cancelled = false
-		Promise.all(
-			allImages.map(
-				url =>
-					new Promise<void>(resolve => {
-						const img = new Image()
-						img.onload = () => {
-							if (img.naturalHeight > img.naturalWidth) set.add(url)
-							resolve()
-						}
-						img.onerror = () => resolve()
-						img.src = url
-					})
-			)
-		).then(() => {
-			if (!cancelled) setPortraitSet(set)
-		})
+		for (const url of toCheck) {
+			if (orientation[url]) continue
+			const img = new Image()
+			img.onload = () => {
+				if (cancelled) return
+				setOrientation(prev => ({ ...prev, [url]: img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape' }))
+			}
+			img.src = url
+		}
 		return () => {
 			cancelled = true
 		}
-	}, [allImages])
+	}, [index, allImages, orientation])
+
+	const isPortrait = orientation[allImages[index]] === 'portrait'
 
 	const handleClick = useCallback(() => router.push('/pictures'), [router])
 
@@ -98,7 +93,7 @@ export default function ArtCard() {
 
 				<div className='relative h-full w-full cursor-pointer overflow-hidden rounded-[32px]' onClick={handleClick}>
 					<AnimatePresence mode='wait'>
-						{portraitSet.has(allImages[index]) ? (
+						{isPortrait ? (
 							<motion.div
 								key={allImages[index]}
 								className='absolute inset-0'

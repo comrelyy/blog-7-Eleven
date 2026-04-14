@@ -80,6 +80,11 @@ export async function pushThoughts(newThoughts: Thought[]): Promise<void> {
   toast.info('正在更新分支...')
   await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`, commitData.sha)
 
+  // 清除受影响月份的缓存，确保下次读取拿到最新数据
+  for (const month of monthsToUpdate) {
+    invalidateThoughtsCache(month)
+  }
+
   toast.success('碎碎念保存成功！')
 }
 
@@ -124,45 +129,65 @@ export async function useThoughtsIndex() :Promise<ThoughtJsonArray | null>{
   return { thoughts: sortedThoughts }
 }
 
-// 获取指定日期的碎碎念数据
-export async function getThoughtsByDate(date: string): Promise<Thought[]> {
-  // 从日期提取年月
-  const yearMonth = date.substring(0, 7); // YYYY-MM
-  const fileName = `${yearMonth}.json`;
-  
-  try {
-    // 尝试获取该月份的碎碎念数据
-    const res = await fetch(`/thoughts/${fileName}`, { 
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
-    
-    if (res.status === 404) {
-      // 文件不存在，返回空数组
-      return [];
+// 只获取最近一条碎碎念（首页卡片使用）
+// 使用共享月份缓存：保证 pushThoughts 失效后能拿到最新数据，避免与 tooltip 重复请求
+export async function getLatestThought(): Promise<Thought | null> {
+  const possibleFiles = getAllPossibleThoughtFiles()
+  let consecutiveEmpty = 0
+
+  for (const file of possibleFiles) {
+    if (consecutiveEmpty > 1) break
+    const yearMonth = file.replace(/\.json$/, '')
+    let promise = monthlyThoughtsCache.get(yearMonth)
+    if (!promise) {
+      promise = loadMonthThoughts(yearMonth).catch(() => {
+        monthlyThoughtsCache.delete(yearMonth)
+        return []
+      })
+      monthlyThoughtsCache.set(yearMonth, promise)
     }
-    
-    if (!res.ok) {
-      throw new Error(`Failed to load ${fileName}`);
+    const thoughts = await promise
+    if (thoughts.length === 0) {
+      consecutiveEmpty++
+      continue
     }
-    
-    const data = await res.json();
-    
-    // 筛选出指定日期的碎碎念
-    const thoughtsForDate = Array.isArray(data) 
-      ? data.filter(thought => thought.date === date)
-      : [];
-    
-    // 按时间戳排序，最新的在前
-    return thoughtsForDate.sort((a, b) => b.timestamp - a.timestamp);
-  } catch (error) {
-    console.error(`Error fetching thoughts for date ${date}:`, error);
-    return [];
+    consecutiveEmpty = 0
+    return thoughts.reduce((a, b) => (a.timestamp > b.timestamp ? a : b))
   }
+  return null
+}
+
+// Session 级月份缓存 —— 同一月份的请求（包括不同日期）只发一次 fetch
+// 失效时机：页面刷新 / pushThoughts 成功后清除相关月份
+const monthlyThoughtsCache = new Map<string, Promise<Thought[]>>()
+
+export function invalidateThoughtsCache(yearMonth?: string) {
+  if (yearMonth) monthlyThoughtsCache.delete(yearMonth)
+  else monthlyThoughtsCache.clear()
+}
+
+async function loadMonthThoughts(yearMonth: string): Promise<Thought[]> {
+  const res = await fetch(`/thoughts/${yearMonth}.json`, { cache: 'no-store' })
+  if (res.status === 404) return []
+  if (!res.ok) throw new Error(`Failed to load ${yearMonth}.json`)
+  const data = await res.json()
+  return Array.isArray(data) ? data : []
+}
+
+// 获取指定日期的碎碎念数据（命中月份缓存）
+export async function getThoughtsByDate(date: string): Promise<Thought[]> {
+  const yearMonth = date.substring(0, 7)
+  let promise = monthlyThoughtsCache.get(yearMonth)
+  if (!promise) {
+    promise = loadMonthThoughts(yearMonth).catch(err => {
+      console.error(`Error fetching thoughts for ${yearMonth}:`, err)
+      monthlyThoughtsCache.delete(yearMonth) // 失败不缓存
+      return []
+    })
+    monthlyThoughtsCache.set(yearMonth, promise)
+  }
+  const monthThoughts = await promise
+  return monthThoughts.filter(t => t.date === date).sort((a, b) => b.timestamp - a.timestamp)
 }
 
 // 获取所有可能的碎碎念文件列表
