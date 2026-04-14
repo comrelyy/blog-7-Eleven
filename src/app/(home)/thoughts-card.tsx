@@ -6,7 +6,7 @@ import { CARD_SPACING } from '@/consts'
 import { useAuthStore } from '@/hooks/use-auth'
 import { toast } from 'sonner'
 import { hasAuth, generateAndCacheToken } from '@/lib/auth'
-import { pushThoughts, useThoughtsIndex, type Thought, type ThoughtJsonArray } from './services/push-thoughts'
+import { pushThoughts, getLatestThought, type Thought } from './services/push-thoughts'
 import { readFileAsText } from '@/lib/file-utils'
 import { useRouter } from 'next/navigation'
 
@@ -18,7 +18,6 @@ export default function ThoughtsCard() {
 	const initAuth = hasAuth()
 	const [inputValue, setInputValue] = useState('')
 	const [latestThought, setLatestThought] = useState<Thought | null>(null)
-	const [allThoughts, setAllThoughts] = useState<Thought[]>([])
 	const isMounted = useRef(true)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 	const router = useRouter()
@@ -43,10 +42,9 @@ export default function ThoughtsCard() {
 		isMounted.current = true
 		const init = async () => {
 			try {
-				const data = await useThoughtsIndex()
-				if (isMounted.current && data && data.thoughts.length > 0) {
-					setLatestThought(data.thoughts[0])
-					setAllThoughts(data.thoughts)
+				const latest = await getLatestThought()
+				if (isMounted.current && latest) {
+					setLatestThought(latest)
 				}
 			} catch (error) {
 				console.error('Failed to load thoughts', error)
@@ -89,7 +87,6 @@ export default function ThoughtsCard() {
 				await pushThoughts([newThought])
 				setInputValue('')
 				setLatestThought(newThought)
-				setAllThoughts([newThought, ...allThoughts])
 				toast.success('碎碎念保存成功！')
 			} catch (error) {
 				console.error('Failed to save thoughts', error)
