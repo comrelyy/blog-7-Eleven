@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { Thought } from '@/app/(home)/services/push-thoughts'
+import { STICKERS } from './stickers'
 
 const STICKY_COLORS = [
 	{ bg: 'rgba(254,255,156,0.55)', pin: '#e6c02a' }, // yellow
@@ -239,14 +240,22 @@ export default function ThoughtsPage() {
 							const pos = positions[idx]
 							if (!pos) return null
 							const stickyColor = STICKY_COLORS[pos.colorIndex]
+							const h = hashStr(thought.id)
+							const showSticker = seededRandom(h + 400) > 0.55
+							const StickerComp = STICKERS[h % STICKERS.length]
+							const stickerOnRight = h % 2 === 0
 							return (
 								<motion.div
 									key={thought.id}
 									initial={{ opacity: 0, scale: 0.6, rotate: pos.rotation - 10 }}
 									animate={{ opacity: 1, scale: 1, rotate: pos.rotation }}
 									transition={{ delay: idx * 0.03, type: 'spring', stiffness: 180, damping: 18 }}
-									whileHover={{ scale: 1.06, rotate: 0, zIndex: 50 }}
-									className='absolute w-[200px] cursor-default rounded-2xl border border-white/30 p-4 pt-5 backdrop-blur-xl transition-shadow hover:shadow-xl'
+									whileHover={{ scale: 1.06, zIndex: 50 }}
+									whileDrag={{ scale: 1.1, zIndex: 100, cursor: 'grabbing' }}
+									drag
+									dragMomentum={false}
+									dragElastic={0}
+									className='absolute w-[200px] cursor-grab touch-none rounded-2xl border border-white/30 p-4 pt-5 backdrop-blur-xl transition-shadow hover:shadow-xl'
 									style={{
 										left: pos.x,
 										top: pos.y,
@@ -259,6 +268,19 @@ export default function ThoughtsPage() {
 										<span>{thought.date}</span>
 										<span>{thought.time}</span>
 									</div>
+									{showSticker && (
+										<div
+											className='pointer-events-none absolute select-none'
+											style={{
+												[stickerOnRight ? 'right' : 'left']: -20,
+												bottom: -18,
+												transform: `rotate(${-pos.rotation * 1.5 + (stickerOnRight ? 10 : -10)}deg)`,
+												filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))',
+											}}
+										>
+											<StickerComp size={52} />
+										</div>
+									)}
 								</motion.div>
 							)
 						})
