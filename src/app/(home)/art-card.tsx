@@ -6,16 +6,12 @@ import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
-import { useRouter } from 'next/navigation'
 import { HomeDraggableLayer } from './home-draggable-layer'
 import picturesList from '@/app/pictures/list.json'
-
-const INTERVAL = 5000
 
 export default function ArtCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
-	const router = useRouter()
 	const styles = cardStyles.artCard
 	const hiCardStyles = cardStyles.hiCard
 
@@ -34,7 +30,6 @@ export default function ArtCard() {
 				urls.push(pic.image)
 			}
 		}
-		// Fallback to configured art images
 		if (urls.length === 0) {
 			const artImages = siteContent.artImages ?? []
 			const currentId = siteContent.currentArtImageId
@@ -45,39 +40,35 @@ export default function ArtCard() {
 		return urls
 	}, [siteContent.artImages, siteContent.currentArtImageId])
 
-	const [index, setIndex] = useState(0)
-	// Lazy orientation map — only filled when image has actually been seen
+	// 刷新时随机选一张
+	const [index, setIndex] = useState(() => Math.floor(Math.random() * Math.max(1, allImages.length)))
 	const [orientation, setOrientation] = useState<Record<string, 'portrait' | 'landscape'>>({})
 
+	// 检测当前图片方向
 	useEffect(() => {
-		if (allImages.length <= 1) return
-		const timer = setInterval(() => {
-			setIndex(prev => (prev + 1) % allImages.length)
-		}, INTERVAL)
-		return () => clearInterval(timer)
-	}, [allImages.length])
-
-	// Lazily detect orientation for current + next image only (no upfront bulk preload)
-	useEffect(() => {
-		const toCheck = [allImages[index], allImages[(index + 1) % allImages.length]].filter(Boolean)
-		let cancelled = false
-		for (const url of toCheck) {
-			if (orientation[url]) continue
-			const img = new Image()
-			img.onload = () => {
-				if (cancelled) return
-				setOrientation(prev => ({ ...prev, [url]: img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape' }))
-			}
-			img.src = url
+		const url = allImages[index]
+		if (!url || orientation[url]) return
+		const img = new Image()
+		img.onload = () => {
+			setOrientation(prev => ({ ...prev, [url]: img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape' }))
 		}
-		return () => {
-			cancelled = true
-		}
+		img.src = url
 	}, [index, allImages, orientation])
 
-	const isPortrait = orientation[allImages[index]] === 'portrait'
+	// 点击切换下一张
+	const handleClick = useCallback(() => {
+		if (allImages.length <= 1) return
+		setIndex(prev => {
+			let next: number
+			do {
+				next = Math.floor(Math.random() * allImages.length)
+			} while (next === prev && allImages.length > 1)
+			return next
+		})
+	}, [allImages.length])
 
-	const handleClick = useCallback(() => router.push('/pictures'), [router])
+	const isPortrait = orientation[allImages[index]] === 'portrait'
+	const currentUrl = allImages[index] ?? allImages[0]
 
 	return (
 		<HomeDraggableLayer cardKey='artCard' x={x} y={y} width={styles.width} height={styles.height}>
@@ -95,26 +86,26 @@ export default function ArtCard() {
 					<AnimatePresence mode='wait'>
 						{isPortrait ? (
 							<motion.div
-								key={allImages[index]}
+								key={currentUrl}
 								className='absolute inset-0'
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								transition={{ duration: 0.6 }}
+								transition={{ duration: 0.4 }}
 							>
-								<img src={allImages[index]} alt='' className='absolute inset-0 h-full w-full scale-110 object-cover blur-lg' />
-								<img src={allImages[index]} alt='wall art' className='relative h-full w-full object-contain' />
+								<img src={currentUrl} alt='' className='absolute inset-0 h-full w-full scale-110 object-cover blur-lg' />
+								<img src={currentUrl} alt='wall art' className='relative h-full w-full object-contain' />
 							</motion.div>
 						) : (
 							<motion.img
-								key={allImages[index]}
-								src={allImages[index]}
+								key={currentUrl}
+								src={currentUrl}
 								alt='wall art'
 								className='absolute inset-0 h-full w-full object-cover'
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								transition={{ duration: 0.6 }}
+								transition={{ duration: 0.4 }}
 							/>
 						)}
 					</AnimatePresence>
