@@ -356,15 +356,15 @@ export default function BlogPage() {
 											</div>
 											<div
 												className={cn(
-													'flex-1 truncate text-sm font-medium transition-all',
+													'min-w-0 flex-1 truncate text-sm font-medium transition-all',
 													editMode ? null : 'group-hover:text-brand group-hover:translate-x-2'
 												)}>
 												{it.title || it.slug}
 												{hasRead && <span className='text-secondary ml-2 text-xs'>[已阅读]</span>}
 											</div>
-											<div className='flex flex-wrap items-center gap-2 max-sm:hidden'>
-												{(it.tags || []).map(t => (
-													<span key={t} className='text-secondary text-sm'>
+											<div className='flex w-[220px] shrink-0 items-center justify-end gap-2 overflow-hidden max-sm:hidden'>
+												{(it.tags || []).slice(0, 3).map(t => (
+													<span key={t} className='text-secondary shrink-0 text-sm'>
 														#{t}
 													</span>
 												))}

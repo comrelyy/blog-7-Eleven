@@ -36,15 +36,18 @@ const combinedFetcher = async () => {
 	const blogItems = blogData.status === 'fulfilled' ? blogData.value : []
 	const thoughtItems = thoughtData.status === 'fulfilled' ? thoughtData.value : []
 	
-	// 合并并按日期排序
-	const allItems = [...blogItems]
-		.sort((a, b) => {
-			// 使用 updatedAt 字段排序，如果没有则使用 date 字段
-			const dateA = new Date(a.updatedAt || a.date).getTime()
-			const dateB = new Date(b.updatedAt || b.date).getTime()
-			return dateB - dateA  // 降序，最新的在前
-		})
+	// 合并并按日期排序：先比较更新时间，更新时间一致时再比较创建时间
+	const allItems = [...blogItems].sort(compareByUpdatedThenCreated)
 	return allItems
+}
+
+function compareByUpdatedThenCreated(a: BlogIndexItem, b: BlogIndexItem) {
+	const updatedA = new Date(a.updatedAt || a.date).getTime()
+	const updatedB = new Date(b.updatedAt || b.date).getTime()
+	if (updatedA !== updatedB) return updatedB - updatedA
+	const createdA = new Date(a.date).getTime()
+	const createdB = new Date(b.date).getTime()
+	return createdB - createdA
 }
 
 export function useBlogIndex() {
@@ -63,13 +66,9 @@ export function useBlogIndex() {
 export function useLatestBlog() {
 	const { items, loading, error } = useBlogIndex()
 
-	// 按最后更新时间排序（如果有 updatedAt 则使用，否则使用 date）
-	const sortedItems = [...items].sort((a, b) => {
-		const dateA = new Date(a.updatedAt || a.date).getTime()
-		const dateB = new Date(b.updatedAt || b.date).getTime()
-		return dateB - dateA  // 降序，最新的在前
-	})
-	
+	// 先比较更新时间，更新时间一致时再比较创建时间
+	const sortedItems = [...items].sort(compareByUpdatedThenCreated)
+
 	const latestBlog = sortedItems.length > 0 ? sortedItems[0] : null
 
 	return {
