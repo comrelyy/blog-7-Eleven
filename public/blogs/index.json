@@ -1,5 +1,18 @@
 [
   {
+    "slug": "r-w",
+    "title": "如何记读书笔记",
+    "tags": [
+      "读书",
+      "读书笔记",
+      "读后感"
+    ],
+    "date": "2026-03-05",
+    "summary": "读书笔记的内容及习惯养成",
+    "cover": "/blogs/r-w/268df5e7e13a7fbb.webp",
+    "updatedAt": "2026-04-21"
+  },
+  {
     "slug": "read-smart",
     "title": "《清晰思考》读后感：把握人生无常",
     "tags": [
@@ -90,17 +103,6 @@
     "summary": "增强势能，积蓄力量",
     "cover": "/blogs/20260312/b7dfcb75b5d33a52.jpeg",
     "updatedAt": "2026-03-16"
-  },
-  {
-    "slug": "r-w",
-    "title": "如何记读书笔记",
-    "tags": [
-      "杂记",
-      "读书"
-    ],
-    "date": "2026-03-05",
-    "summary": "读书笔记的内容及习惯养成",
-    "updatedAt": "2026-03-05"
   },
   {
     "slug": "20260227",
