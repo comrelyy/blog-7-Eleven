@@ -336,5 +336,15 @@
 			"个人博客"
 		],
 		"stars": 3
+	},
+	{
+		"name": "乔木博客",
+		"logo": "https://blog.qiaomu.ai/icon-192.png",
+		"url": "https://blog.qiaomu.ai/",
+		"description": "记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。",
+		"tags": [
+			"个人博客"
+		],
+		"stars": 3
 	}
 ]
