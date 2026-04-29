@@ -95,16 +95,6 @@ export default function ArtCard() {
 				)}
 
 				<div className='relative h-full w-full cursor-pointer overflow-hidden rounded-[32px]' onClick={handleClick}>
-					{!hideEditButton && (
-						<motion.button
-							whileHover={{ scale: 1.1 }}
-							whileTap={{ scale: 0.9 }}
-							onClick={handleManageClick}
-							aria-label='管理图片'
-							className='absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-neutral-700 shadow-sm backdrop-blur-sm transition-colors hover:bg-white'>
-							<Settings2 className='h-4 w-4' />
-						</motion.button>
-					)}
 					<AnimatePresence mode='wait'>
 						{isPortrait ? (
 							<motion.div
@@ -132,6 +122,17 @@ export default function ArtCard() {
 						)}
 					</AnimatePresence>
 				</div>
+
+				{!hideEditButton && (
+					<motion.button
+						whileHover={{ scale: 1.1 }}
+						whileTap={{ scale: 0.9 }}
+						onClick={handleManageClick}
+						aria-label='管理图片'
+						className='absolute top-4 right-4 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-neutral-700 shadow-sm backdrop-blur-sm transition-colors hover:bg-white'>
+						<Settings2 className='h-4 w-4' />
+					</motion.button>
+				)}
 			</Card>
 		</HomeDraggableLayer>
 	)
