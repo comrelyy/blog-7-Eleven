@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useRouter } from 'next/navigation'
+import { Settings2 } from 'lucide-react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
@@ -11,9 +13,11 @@ import picturesList from '@/app/pictures/list.json'
 
 export default function ArtCard() {
 	const center = useCenterStore()
+	const router = useRouter()
 	const { cardStyles, siteContent } = useConfigStore()
 	const styles = cardStyles.artCard
 	const hiCardStyles = cardStyles.hiCard
+	const hideEditButton = siteContent.hideEditButton ?? false
 
 	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x - styles.width / 2
 	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y - hiCardStyles.height / 2 - styles.height - CARD_SPACING
@@ -67,6 +71,14 @@ export default function ArtCard() {
 		})
 	}, [allImages.length])
 
+	const handleManageClick = useCallback(
+		(e: React.MouseEvent) => {
+			e.stopPropagation()
+			router.push('/pictures')
+		},
+		[router]
+	)
+
 	const isPortrait = orientation[allImages[index]] === 'portrait'
 	const currentUrl = allImages[index] ?? allImages[0]
 
@@ -83,6 +95,16 @@ export default function ArtCard() {
 				)}
 
 				<div className='relative h-full w-full cursor-pointer overflow-hidden rounded-[32px]' onClick={handleClick}>
+					{!hideEditButton && (
+						<motion.button
+							whileHover={{ scale: 1.1 }}
+							whileTap={{ scale: 0.9 }}
+							onClick={handleManageClick}
+							aria-label='管理图片'
+							className='absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-neutral-700 shadow-sm backdrop-blur-sm transition-colors hover:bg-white'>
+							<Settings2 className='h-4 w-4' />
+						</motion.button>
+					)}
 					<AnimatePresence mode='wait'>
 						{isPortrait ? (
 							<motion.div
