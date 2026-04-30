@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
@@ -12,6 +13,8 @@ import { DialogModal } from '@/components/dialog-modal'
 import DateActivityModal from './date-activity-modal'
 import DateActivityTooltip from './date-activity-tooltip'
 import { HomeDraggableLayer } from './home-draggable-layer'
+import { loadEmotionLossData, saveEmotionLossData, getDayRecord, type EmotionLossData } from './services/emotion-loss-service'
+import { Angry, Smile } from 'lucide-react'
 
 
 dayjs.locale('zh-cn')
@@ -38,6 +41,51 @@ export default function CalendarCard() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(null)
 	const [showModal, setShowModal] = useState(false)
 	const [hoveredDate, setHoveredDate] = useState<string | null>(null)
+	const [emotionLoss, setEmotionLoss] = useState<EmotionLossData>({})
+	const [emotionSavingKind, setEmotionSavingKind] = useState<'lost' | 'controlled' | null>(null)
+	const todayKey = now.format('YYYY-MM-DD')
+	const todayRecord = getDayRecord(emotionLoss, todayKey)
+
+	const monthStats = useMemo(() => {
+		const prefix = currentMonth.format('YYYY-MM')
+		let lost = 0
+		let controlled = 0
+		for (const [date, rec] of Object.entries(emotionLoss)) {
+			if (date.startsWith(prefix)) {
+				lost += rec.lost
+				controlled += rec.controlled
+			}
+		}
+		return { lost, controlled }
+	}, [emotionLoss, currentMonth])
+
+	const monthMax = Math.max(monthStats.lost, monthStats.controlled, 5)
+	const lostPercent = (monthStats.lost / monthMax) * 100
+	const controlledPercent = (monthStats.controlled / monthMax) * 100
+
+	useEffect(() => {
+		void loadEmotionLossData().then(setEmotionLoss)
+	}, [])
+
+	const handleEmotionRecord = async (kind: 'lost' | 'controlled') => {
+		if (emotionSavingKind) return
+		const current = getDayRecord(emotionLoss, todayKey)
+		const next: EmotionLossData = {
+			...emotionLoss,
+			[todayKey]: { ...current, [kind]: current[kind] + 1 }
+		}
+		setEmotionLoss(next)
+		try {
+			setEmotionSavingKind(kind)
+			await saveEmotionLossData(next)
+		} catch (error: any) {
+			console.error(error)
+			toast.error(error?.message || '记录失败')
+			setEmotionLoss(emotionLoss)
+		} finally {
+			setEmotionSavingKind(null)
+		}
+	}
 
 	// 切换到上个月
 	const handlePrevMonth = () => {
@@ -139,6 +187,34 @@ export default function CalendarCard() {
 						)
 					})}
 				</ul>
+				<div className='mt-3 flex items-center gap-2'>
+					<div
+						title={`本月情绪失控 ${monthStats.lost} 次`}
+						className='flex h-1.5 flex-1 justify-end overflow-hidden rounded-full bg-red-100'>
+						<div className='h-full rounded-full bg-red-400 transition-all' style={{ width: `${lostPercent}%` }} />
+					</div>
+					<button
+						onClick={() => handleEmotionRecord('lost')}
+						disabled={emotionSavingKind !== null}
+						title={`情绪失控 +1（今日 ${todayRecord.lost} 次）`}
+						className='inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 disabled:opacity-60'>
+						<Angry className='h-3.5 w-3.5' />
+						<span>{todayRecord.lost}</span>
+					</button>
+					<button
+						onClick={() => handleEmotionRecord('controlled')}
+						disabled={emotionSavingKind !== null}
+						title={`情绪控制 +1（今日 ${todayRecord.controlled} 次）`}
+						className='inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-60'>
+						<Smile className='h-3.5 w-3.5' />
+						<span>{todayRecord.controlled}</span>
+					</button>
+					<div
+						title={`本月情绪控制 ${monthStats.controlled} 次`}
+						className='flex h-1.5 flex-1 overflow-hidden rounded-full bg-blue-100'>
+						<div className='h-full rounded-full bg-blue-400 transition-all' style={{ width: `${controlledPercent}%` }} />
+					</div>
+				</div>
 			</Card>
 
 
