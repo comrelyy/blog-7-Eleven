@@ -13,7 +13,7 @@ import { DialogModal } from '@/components/dialog-modal'
 import DateActivityModal from './date-activity-modal'
 import DateActivityTooltip from './date-activity-tooltip'
 import { HomeDraggableLayer } from './home-draggable-layer'
-import { loadEmotionLossData, saveEmotionLossData, getDayRecord, type EmotionLossData } from './services/emotion-loss-service'
+import { loadEmotionLossData, saveEmotionLossData, getDayRecord, getMonthRecord, type EmotionLossData } from './services/emotion-loss-service'
 import { Angry, Smile } from 'lucide-react'
 
 
@@ -182,7 +182,7 @@ export default function CalendarCard() {
 									isCurrentDay && 'bg-linear border font-medium'
 								)}>
 								{day}
-								{isHovered && <DateActivityTooltip date={dateStr} />}
+								{isHovered && <DateActivityTooltip date={dateStr} emotion={getMonthRecord(emotionLoss, dateStr)} />}
 							</li>
 						)
 					})}
@@ -196,18 +196,18 @@ export default function CalendarCard() {
 					<button
 						onClick={() => handleEmotionRecord('lost')}
 						disabled={emotionSavingKind !== null}
-						title={`情绪失控 +1（今日 ${todayRecord.lost} 次）`}
+						title={`本月情绪失控 ${monthStats.lost} 次（今日 ${todayRecord.lost}，点击为今日 +1）`}
 						className='inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 disabled:opacity-60'>
 						<Angry className='h-3.5 w-3.5' />
-						<span>{todayRecord.lost}</span>
+						<span>{monthStats.lost}</span>
 					</button>
 					<button
 						onClick={() => handleEmotionRecord('controlled')}
 						disabled={emotionSavingKind !== null}
-						title={`情绪控制 +1（今日 ${todayRecord.controlled} 次）`}
+						title={`本月情绪控制 ${monthStats.controlled} 次（今日 ${todayRecord.controlled}，点击为今日 +1）`}
 						className='inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-60'>
 						<Smile className='h-3.5 w-3.5' />
-						<span>{todayRecord.controlled}</span>
+						<span>{monthStats.controlled}</span>
 					</button>
 					<div
 						title={`本月情绪控制 ${monthStats.controlled} 次`}
@@ -221,7 +221,9 @@ export default function CalendarCard() {
 
 
 			<DialogModal open={showModal} onClose={handleCloseModal}>
-				{selectedDate && <DateActivityModal date={selectedDate} onClose={handleCloseModal} />}
+				{selectedDate && (
+					<DateActivityModal date={selectedDate} emotion={getMonthRecord(emotionLoss, selectedDate)} onClose={handleCloseModal} />
+				)}
 			</DialogModal>
 		</HomeDraggableLayer>
 	)

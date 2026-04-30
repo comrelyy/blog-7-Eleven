@@ -25,6 +25,19 @@ export function getDayRecord(data: EmotionLossData, date: string): EmotionDayRec
 	return data[date] ?? { lost: 0, controlled: 0 }
 }
 
+export function getMonthRecord(data: EmotionLossData, date: string): EmotionDayRecord {
+	const prefix = date.slice(0, 7)
+	let lost = 0
+	let controlled = 0
+	for (const [d, rec] of Object.entries(data)) {
+		if (d.startsWith(prefix)) {
+			lost += rec.lost
+			controlled += rec.controlled
+		}
+	}
+	return { lost, controlled }
+}
+
 export async function loadEmotionLossData(): Promise<EmotionLossData> {
 	try {
 		const res = await fetch('/emotion-loss/data.json', {

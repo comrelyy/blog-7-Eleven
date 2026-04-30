@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Angry, Smile } from 'lucide-react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
@@ -19,9 +20,23 @@ dayjs.extend(isBetween)
 
 interface DateActivityTooltipProps {
 	date: string // YYYY-MM-DD format
+	emotion?: { lost: number; controlled: number }
 }
 
-export default function DateActivityTooltip({ date }: DateActivityTooltipProps) {
+export default function DateActivityTooltip({ date, emotion }: DateActivityTooltipProps) {
+	const emotionRecord = emotion ?? { lost: 0, controlled: 0 }
+	const emotionRow = (
+		<div className='mb-2 flex items-center gap-3'>
+			<span className='inline-flex items-center gap-1 text-red-600'>
+				<Angry className='h-3.5 w-3.5' />
+				{emotionRecord.lost}
+			</span>
+			<span className='inline-flex items-center gap-1 text-blue-600'>
+				<Smile className='h-3.5 w-3.5' />
+				{emotionRecord.controlled}
+			</span>
+		</div>
+	)
 	const [checkinData, setCheckinData] = useState<CheckinData | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
@@ -95,6 +110,7 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 	if (loading) {
 		return (
 			<div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 rounded-lg bg-white border border-gray-200 shadow-lg p-3 text-xs pointer-events-none text-gray-800'>
+				{emotionRow}
 				<div className='space-y-1'>
 					<p className='text-gray-600 font-medium'>文章: {postsOnDate.length}</p>
 					{postsOnDate.slice(0, 2).map(post => (
@@ -110,6 +126,7 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 	if (error) {
 		return (
 			<div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 rounded-lg bg-white border border-gray-200 shadow-lg p-3 text-xs pointer-events-none text-gray-800'>
+				{emotionRow}
 				<div className='text-red-500 mb-2'>加载打卡数据失败</div>
 				<div className='space-y-1'>
 					<p className='text-gray-600 font-medium'>文章: {postsOnDate.length}</p>
@@ -127,6 +144,7 @@ export default function DateActivityTooltip({ date }: DateActivityTooltipProps) 
 
 	return (
 		<div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 rounded-lg bg-white border border-gray-200 shadow-lg p-3 text-xs pointer-events-none text-gray-800'>
+			{emotionRow}
 			{/* Checkin events */}
 			{eventsOnDate.length > 0 && (
 				<div className='mb-2'>
