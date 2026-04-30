@@ -157,7 +157,7 @@ export default function ThoughtsCard() {
 
 				{/* 最新一条碎碎念 */}
 				<div className='mt-3 border-t border-white/20 pt-3'>
-					<div className='text-secondary mb-1 text-xs'>最新碎碎念</div>
+					<div className='text-secondary mb-1 text-xs'>查看所有碎碎念</div>
 					{latestThought ? (
 						<div
 							onClick={() => router.push('/thoughts')}
