@@ -101,7 +101,7 @@ export default function Home() {
 				{cardStyles.artCard?.enabled !== false && <ArtCard />}
 				{cardStyles.hiCard?.enabled !== false && <HiCard />}
 				{!maxSM && cardStyles.clockCard?.enabled !== false && <ClockCard />}
-				{!maxSM && cardStyles.calendarCard?.enabled !== false && <CalendarCard />}
+				{cardStyles.calendarCard?.enabled !== false && <CalendarCard />}
 				{!maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
 			 	{cardStyles.thoughtsCard?.enabled !== false && <ThoughtsCard />}
 				{!maxSM && cardStyles.shareCard?.enabled !== false && <ShareCard />}
