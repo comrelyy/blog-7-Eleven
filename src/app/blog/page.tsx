@@ -405,7 +405,7 @@ export default function BlogPage() {
 			<motion.div
 				initial={{ opacity: 0, scale: 0.6 }}
 				animate={{ opacity: 1, scale: 1 }}
-				className='absolute top-4 right-6 flex items-center gap-3 max-sm:top-auto max-sm:right-4 max-sm:bottom-4 max-sm:flex-wrap max-sm:justify-end max-sm:gap-2'>
+				className='absolute top-4 right-6 flex items-center gap-3 max-sm:fixed max-sm:top-2 max-sm:right-2 max-sm:z-50 max-sm:max-w-[calc(100vw-1rem)] max-sm:flex-wrap max-sm:justify-end max-sm:gap-2'>
 				{editMode ? (
 					<>
 						<motion.button

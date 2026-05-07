@@ -102,7 +102,7 @@ export default function Page() {
 				whileHover={{ scale: 1.05 }}
 				whileTap={{ scale: 0.95 }}
 				onClick={handleEdit}
-				className='absolute top-4 right-6 rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80 max-sm:top-auto max-sm:right-4 max-sm:bottom-4 max-sm:px-4 max-sm:shadow-lg'>
+				className='absolute top-4 right-6 rounded-xl border bg-white/60 px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80 max-sm:fixed max-sm:top-2 max-sm:right-2 max-sm:z-50 max-sm:px-4 max-sm:shadow-lg'>
 				编辑
 			</motion.button>
 
