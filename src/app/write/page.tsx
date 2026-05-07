@@ -2,8 +2,7 @@
 
 import { useWriteStore } from './stores/write-store'
 import { usePreviewStore } from './stores/preview-store'
-import { WriteEditor } from './components/editor'
-import { WriteSidebar } from './components/sidebar'
+import { WriteLayout } from './components/write-layout'
 import { WriteActions } from './components/actions'
 import { WritePreview } from './components/preview'
 import { useEffect } from 'react'
@@ -19,9 +18,8 @@ export default function WritePage() {
 		<WritePreview form={form} coverPreviewUrl={coverPreviewUrl} onClose={closePreview} />
 	) : (
 		<>
-			<div className='flex h-full justify-center gap-6 px-6 pt-24 pb-12'>
-				<WriteEditor />
-				<WriteSidebar />
+			<div className='flex h-full justify-center gap-6 px-6 pt-24 pb-12 max-sm:flex-col max-sm:items-stretch max-sm:px-4 max-sm:pt-20 max-sm:pb-32'>
+				<WriteLayout />
 			</div>
 
 			<WriteActions />

@@ -405,7 +405,7 @@ export default function BlogPage() {
 			<motion.div
 				initial={{ opacity: 0, scale: 0.6 }}
 				animate={{ opacity: 1, scale: 1 }}
-				className='absolute top-4 right-6 flex items-center gap-3 max-sm:hidden'>
+				className='absolute top-4 right-6 flex items-center gap-3 max-sm:top-auto max-sm:right-4 max-sm:bottom-4 max-sm:flex-wrap max-sm:justify-end max-sm:gap-2'>
 				{editMode ? (
 					<>
 						<motion.button
@@ -413,14 +413,14 @@ export default function BlogPage() {
 							whileTap={{ scale: 0.95 }}
 							onClick={handleCancel}
 							disabled={saving}
-							className='rounded-xl border bg-white/60 px-6 py-2 text-sm'>
+							className='rounded-xl border bg-white/60 px-6 py-2 text-sm max-sm:px-3 max-sm:shadow-lg'>
 							取消
 						</motion.button>
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							onClick={selectedCount === editableItems.length ? handleDeselectAll : handleSelectAll}
-							className='rounded-xl border bg-white/60 px-4 py-2 text-sm transition-colors hover:bg-white/80'>
+							className='rounded-xl border bg-white/60 px-4 py-2 text-sm transition-colors hover:bg-white/80 max-sm:px-3 max-sm:shadow-lg'>
 							{selectedCount === editableItems.length ? '取消全选' : '全选'}
 						</motion.button>
 						<motion.button
@@ -428,10 +428,15 @@ export default function BlogPage() {
 							whileTap={{ scale: 0.95 }}
 							onClick={handleDeleteSelected}
 							disabled={selectedCount === 0}
-							className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 transition-colors disabled:opacity-60'>
+							className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 transition-colors disabled:opacity-60 max-sm:px-3 max-sm:shadow-lg'>
 							删除(已选:{selectedCount}篇)
 						</motion.button>
-						<motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSaveClick} disabled={saving} className='brand-btn px-6'>
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={handleSaveClick}
+							disabled={saving}
+							className='brand-btn px-6 max-sm:px-4 max-sm:shadow-lg'>
 							{saving ? '保存中...' : buttonText}
 						</motion.button>
 					</>
@@ -441,7 +446,7 @@ export default function BlogPage() {
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							onClick={toggleEditMode}
-							className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80'>
+							className='bg-card rounded-xl border px-6 py-2 text-sm backdrop-blur-sm transition-colors hover:bg-white/80 max-sm:px-4 max-sm:shadow-lg'>
 							编辑
 						</motion.button>
 					)

@@ -160,8 +160,8 @@ export function WriteEditor() {
 			initial={{ opacity: 0, scale: 0.8 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ delay: INIT_DELAY }}
-			className='bg-card flex min-h-[800px] w-[800px] flex-col rounded-[40px] border p-6 shadow'>
-			<div className='mb-3 flex gap-3'>
+			className='bg-card flex min-h-[800px] w-[800px] flex-col rounded-[40px] border p-6 shadow max-sm:min-h-[500px] max-sm:w-full max-sm:rounded-3xl max-sm:p-4'>
+			<div className='mb-3 flex gap-3 max-sm:flex-col max-sm:gap-2'>
 				<input
 					type='text'
 					placeholder='标题'
@@ -172,7 +172,7 @@ export function WriteEditor() {
 				<input
 					type='text'
 					placeholder='slug（xx-xx）'
-					className='bg-card w-[200px] rounded-lg border px-3 py-2 text-sm'
+					className='bg-card w-[200px] rounded-lg border px-3 py-2 text-sm max-sm:w-full'
 					value={form.slug}
 					onChange={e => updateForm({ slug: e.target.value })}
 				/>
@@ -180,7 +180,7 @@ export function WriteEditor() {
 			<textarea
 				ref={textareaRef}
 				placeholder='Markdown 内容'
-				className='bg-card h-[650px] w-full flex-1 resize-none rounded-xl border p-4 text-sm'
+				className='bg-card h-[650px] w-full flex-1 resize-none rounded-xl border p-4 text-sm max-sm:h-[420px] max-sm:p-3'
 				value={form.md}
 				onChange={e => updateForm({ md: e.target.value })}
 				onKeyDown={handleKeyDown}

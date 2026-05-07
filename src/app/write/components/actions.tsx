@@ -81,11 +81,11 @@ export function WriteActions() {
 			/>
 			<input ref={mdInputRef} type='file' accept='.md' className='hidden' onChange={handleMdFileChange} />
 
-			<ul className='absolute top-4 right-6 flex items-center gap-2'>
+			<ul className='absolute top-4 right-6 flex items-center gap-2 max-sm:fixed max-sm:top-auto max-sm:right-2 max-sm:bottom-2 max-sm:left-2 max-sm:flex-wrap max-sm:justify-end'>
 				{mode === 'edit' && (
 					<>
 						<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='flex items-center gap-2'>
-							<div className='rounded-lg border bg-blue-50 px-4 py-2 text-sm text-blue-700'>编辑模式</div>
+							<div className='rounded-lg border bg-blue-50 px-4 py-2 text-sm text-blue-700 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs max-sm:shadow-lg'>编辑模式</div>
 						</motion.div>
 
 						<motion.button
@@ -93,7 +93,7 @@ export function WriteActions() {
 							animate={{ opacity: 1, scale: 1 }}
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
-							className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-100'
+							className='rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-100 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs max-sm:shadow-lg'
 							disabled={loading}
 							onClick={handleDelete}>
 							删除
@@ -104,7 +104,7 @@ export function WriteActions() {
 							whileTap={{ scale: 0.95 }}
 							onClick={handleCancel}
 							disabled={saving}
-							className='bg-card rounded-xl border px-4 py-2 text-sm'>
+							className='bg-card rounded-xl border px-4 py-2 text-sm max-sm:px-3 max-sm:py-1.5 max-sm:text-xs max-sm:shadow-lg'>
 							取消
 						</motion.button>
 					</>
@@ -115,7 +115,7 @@ export function WriteActions() {
 					animate={{ opacity: 1, scale: 1 }}
 					whileHover={{ scale: 1.05 }}
 					whileTap={{ scale: 0.95 }}
-					className='bg-card rounded-xl border px-4 py-2 text-sm'
+					className='bg-card rounded-xl border px-4 py-2 text-sm max-sm:px-3 max-sm:py-1.5 max-sm:text-xs max-sm:shadow-lg'
 					disabled={loading}
 					onClick={handleImportMd}>
 					导入 MD
@@ -125,7 +125,7 @@ export function WriteActions() {
 					animate={{ opacity: 1, scale: 1 }}
 					whileHover={{ scale: 1.05 }}
 					whileTap={{ scale: 0.95 }}
-					className='bg-card rounded-xl border px-6 py-2 text-sm'
+					className='bg-card rounded-xl border px-6 py-2 text-sm max-sm:px-3 max-sm:py-1.5 max-sm:text-xs max-sm:shadow-lg'
 					disabled={loading}
 					onClick={openPreview}>
 					预览
@@ -135,7 +135,7 @@ export function WriteActions() {
 					animate={{ opacity: 1, scale: 1 }}
 					whileHover={{ scale: 1.05 }}
 					whileTap={{ scale: 0.95 }}
-					className='brand-btn px-6'
+					className='brand-btn px-6 max-sm:px-4 max-sm:py-1.5 max-sm:text-xs max-sm:shadow-lg'
 					disabled={loading}
 					onClick={handleImportOrPublish}>
 					{buttonText}

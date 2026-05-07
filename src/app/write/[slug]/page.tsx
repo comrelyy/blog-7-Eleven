@@ -4,8 +4,7 @@ import { useParams } from 'next/navigation'
 import { useWriteStore } from '../stores/write-store'
 import { usePreviewStore } from '../stores/preview-store'
 import { useLoadBlog } from '../hooks/use-load-blog'
-import { WriteEditor } from '../components/editor'
-import { WriteSidebar } from '../components/sidebar'
+import { WriteLayout } from '../components/write-layout'
 import { WriteActions } from '../components/actions'
 import { WritePreview } from '../components/preview'
 
@@ -31,9 +30,8 @@ export default function EditBlogPage() {
 		<WritePreview form={form} coverPreviewUrl={coverPreviewUrl} onClose={closePreview} slug={slug} />
 	) : (
 		<>
-			<div className='flex h-full justify-center gap-6 px-6 pt-24 pb-12'>
-				<WriteEditor />
-				<WriteSidebar />
+			<div className='flex h-full justify-center gap-6 px-6 pt-24 pb-12 max-sm:flex-col max-sm:items-stretch max-sm:px-4 max-sm:pt-20 max-sm:pb-32'>
+				<WriteLayout />
 			</div>
 
 			<WriteActions />
