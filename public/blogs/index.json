@@ -1,5 +1,16 @@
 [
   {
+    "slug": "ai-hermes",
+    "title": "Hermes Agent",
+    "tags": [
+      "AI",
+      "Hermes Agent"
+    ],
+    "date": "2026-05-12",
+    "summary": "第一个出厂就带缰绳的 AI Agent;\n自改进Agent · 跨会话记忆 · Skill系统 · MCP · 多平台",
+    "updatedAt": "2026-05-12"
+  },
+  {
     "slug": "reading-tmhc",
     "title": "读《天幕红尘》：见路不走的勇气",
     "tags": [
