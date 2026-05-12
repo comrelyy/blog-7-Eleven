@@ -85,7 +85,18 @@ export default function ArticlesList() {
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: INIT_DELAY + ANIMATION_DELAY * (gIdx * 6 + idx) }}
-                                    className='card relative flex flex-col gap-3 p-6'>
+                                    className='card group relative flex flex-col gap-3 overflow-hidden p-6'>
+                                    {item.cover && (
+                                        <Link href={`/blog/${item.slug}`} className='-m-6 mb-0 block aspect-[16/9] overflow-hidden'>
+                                            <img
+                                                src={item.cover}
+                                                alt={item.title || item.slug}
+                                                loading='lazy'
+                                                decoding='async'
+                                                className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+                                            />
+                                        </Link>
+                                    )}
                                     <div className='flex items-start justify-between gap-4'>
                                         <div>
                                             <Link href={`/blog/${item.slug}`} className='text-lg font-semibold hover:text-brand'>

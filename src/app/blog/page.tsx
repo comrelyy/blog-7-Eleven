@@ -354,6 +354,17 @@ export default function BlogPage() {
 												<div className='bg-secondary group-hover:bg-brand h-[5px] w-[5px] rounded-full transition-all group-hover:h-4'></div>
 												<ShortLineSVG className='absolute bottom-4' />
 											</div>
+											<div className='h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-white/40 bg-white/40 max-sm:h-8 max-sm:w-8'>
+												{it.cover && (
+													<img
+														src={it.cover}
+														alt=''
+														loading='lazy'
+														decoding='async'
+														className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
+													/>
+												)}
+											</div>
 											<div
 												className={cn(
 													'min-w-0 flex-1 truncate text-sm font-medium transition-all',
