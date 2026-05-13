@@ -1,6 +1,20 @@
 {
   "stocks": [
     {
+      "symbol": "600198",
+      "name": "大唐电信",
+      "market": "A",
+      "color": "#e0413c",
+      "trades": [],
+      "initial": {
+        "costPrice": 7.973,
+        "shares": 200,
+        "pnl": 572.28,
+        "heldDays": 72,
+        "asOf": "2026-05-13"
+      }
+    },
+    {
       "symbol": "002138",
       "name": "顺络电子",
       "market": "A",
