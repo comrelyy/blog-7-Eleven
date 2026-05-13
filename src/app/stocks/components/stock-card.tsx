@@ -2,7 +2,12 @@
 
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
-import { computeStock, formatMoney, marketLabel, moneySymbol, type Stock, type StockTrade } from '@/lib/cost-basis'
+import { computeHeldDays, computeStock, formatMoney, marketLabel, moneySymbol, type Stock, type StockTrade } from '@/lib/cost-basis'
+
+function todayStr() {
+	const t = new Date()
+	return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
+}
 
 const CARD_HEIGHT = 320
 
@@ -39,6 +44,8 @@ export default function StockCard({
 	const [confirmDelete, setConfirmDelete] = useState(false)
 
 	const c = useMemo(() => computeStock(stock), [stock])
+	const today = useMemo(todayStr, [])
+	const heldDays = useMemo(() => computeHeldDays(stock, today), [stock, today])
 	const isCleared = c.heldShares === 0
 	const lastTrade = c.sortedTrades[c.sortedTrades.length - 1]
 
@@ -116,11 +123,20 @@ export default function StockCard({
 						{isCleared ? '补记交易' : '+ 添加交易'}
 					</button>
 
-					{lastTrade && (
-						<div className='mt-3 text-[11px] text-secondary'>
-							最近：{lastTrade.date} {lastTrade.type === 'buy' ? '买入' : '卖出'} {lastTrade.shares} @ {lastTrade.price.toLocaleString()}
-						</div>
-					)}
+					<div className='mt-3 text-[11px] text-secondary'>
+						{heldDays !== null && (
+							<>
+								持有 <span className='font-semibold text-primary'>{heldDays}</span> 天
+								{lastTrade && <span className='mx-1 text-secondary/50'>·</span>}
+							</>
+						)}
+						{lastTrade && (
+							<>
+								最近：{lastTrade.date} {lastTrade.type === 'buy' ? '买入' : '卖出'} {lastTrade.shares} @ {lastTrade.price.toLocaleString()}
+							</>
+						)}
+						{heldDays === null && !lastTrade && '暂无交易'}
+					</div>
 
 					<button onClick={() => setFlipped(true)} className='mt-auto pt-2 text-[11px] text-secondary transition hover:text-primary'>
 						翻面看历史 →

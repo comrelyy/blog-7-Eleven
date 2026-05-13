@@ -6,45 +6,77 @@ import Svg1 from './about-outline.svg'
 import Svg2 from './checkin-filled.svg'
 import Svg3 from './checkin-outline.svg'
 import Svg4 from './dots.svg'
-import Svg5 from './email.svg'
-import Svg6 from './github.svg'
-import Svg7 from './juejin.svg'
-import Svg8 from './music.svg'
-import Svg9 from './pen.svg'
-import Svg10 from './play.svg'
-import Svg11 from './projects-filled.svg'
-import Svg12 from './projects-outline.svg'
-import Svg13 from './scroll-filled.svg'
-import Svg14 from './scroll-outline.svg'
-import Svg15 from './share-filled.svg'
-import Svg16 from './share-outline.svg'
-import Svg17 from './short-line.svg'
-import Svg18 from './top.svg'
-import Svg19 from './website-filled.svg'
-import Svg20 from './website-outline.svg'
+import Svg5 from './dragger.svg'
+import Svg6 from './email.svg'
+import Svg7 from './facebook.svg'
+import Svg8 from './github.svg'
+import Svg9 from './instagram.svg'
+import Svg10 from './juejin.svg'
+import Svg11 from './music.svg'
+import Svg12 from './pen.svg'
+import Svg13 from './pictures.svg'
+import Svg14 from './play.svg'
+import Svg15 from './projects-filled.svg'
+import Svg16 from './projects-outline.svg'
+import Svg17 from './qq.svg'
+import Svg18 from './scroll-filled.svg'
+import Svg19 from './scroll-outline.svg'
+import Svg20 from './share-filled.svg'
+import Svg21 from './share-outline.svg'
+import Svg22 from './short-line.svg'
+import Svg23 from './stocks-filled.svg'
+import Svg24 from './stocks-outline.svg'
+import Svg25 from './tg.svg'
+import Svg26 from './tiktok.svg'
+import Svg27 from './top.svg'
+import Svg28 from './weather.svg'
+import Svg29 from './website-filled.svg'
+import Svg30 from './website-outline.svg'
+import Svg31 from './wechat.svg'
+import Svg32 from './weibo.svg'
+import Svg33 from './x.svg'
+import Svg34 from './哔哩哔哩.svg'
+import Svg35 from './小红书.svg'
+import Svg36 from './知乎.svg'
 
 export type SvgComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>
 
 export const svgItems: { key: string; Component: SvgComponent }[] = [
-	{ key: 'about-filled.svg', Component: Svg0 },
-	{ key: 'about-outline.svg', Component: Svg1 },
-	{ key: 'checkin-filled.svg', Component: Svg2 },
-	{ key: 'checkin-outline.svg', Component: Svg3 },
-	{ key: 'dots.svg', Component: Svg4 },
-	{ key: 'email.svg', Component: Svg5 },
-	{ key: 'github.svg', Component: Svg6 },
-	{ key: 'juejin.svg', Component: Svg7 },
-	{ key: 'music.svg', Component: Svg8 },
-	{ key: 'pen.svg', Component: Svg9 },
-	{ key: 'play.svg', Component: Svg10 },
-	{ key: 'projects-filled.svg', Component: Svg11 },
-	{ key: 'projects-outline.svg', Component: Svg12 },
-	{ key: 'scroll-filled.svg', Component: Svg13 },
-	{ key: 'scroll-outline.svg', Component: Svg14 },
-	{ key: 'share-filled.svg', Component: Svg15 },
-	{ key: 'share-outline.svg', Component: Svg16 },
-	{ key: 'short-line.svg', Component: Svg17 },
-	{ key: 'top.svg', Component: Svg18 },
-	{ key: 'website-filled.svg', Component: Svg19 },
-	{ key: 'website-outline.svg', Component: Svg20 }
+	{ key: './about-filled.svg', Component: Svg0 },
+	{ key: './about-outline.svg', Component: Svg1 },
+	{ key: './checkin-filled.svg', Component: Svg2 },
+	{ key: './checkin-outline.svg', Component: Svg3 },
+	{ key: './dots.svg', Component: Svg4 },
+	{ key: './dragger.svg', Component: Svg5 },
+	{ key: './email.svg', Component: Svg6 },
+	{ key: './facebook.svg', Component: Svg7 },
+	{ key: './github.svg', Component: Svg8 },
+	{ key: './instagram.svg', Component: Svg9 },
+	{ key: './juejin.svg', Component: Svg10 },
+	{ key: './music.svg', Component: Svg11 },
+	{ key: './pen.svg', Component: Svg12 },
+	{ key: './pictures.svg', Component: Svg13 },
+	{ key: './play.svg', Component: Svg14 },
+	{ key: './projects-filled.svg', Component: Svg15 },
+	{ key: './projects-outline.svg', Component: Svg16 },
+	{ key: './qq.svg', Component: Svg17 },
+	{ key: './scroll-filled.svg', Component: Svg18 },
+	{ key: './scroll-outline.svg', Component: Svg19 },
+	{ key: './share-filled.svg', Component: Svg20 },
+	{ key: './share-outline.svg', Component: Svg21 },
+	{ key: './short-line.svg', Component: Svg22 },
+	{ key: './stocks-filled.svg', Component: Svg23 },
+	{ key: './stocks-outline.svg', Component: Svg24 },
+	{ key: './tg.svg', Component: Svg25 },
+	{ key: './tiktok.svg', Component: Svg26 },
+	{ key: './top.svg', Component: Svg27 },
+	{ key: './weather.svg', Component: Svg28 },
+	{ key: './website-filled.svg', Component: Svg29 },
+	{ key: './website-outline.svg', Component: Svg30 },
+	{ key: './wechat.svg', Component: Svg31 },
+	{ key: './weibo.svg', Component: Svg32 },
+	{ key: './x.svg', Component: Svg33 },
+	{ key: './哔哩哔哩.svg', Component: Svg34 },
+	{ key: './小红书.svg', Component: Svg35 },
+	{ key: './知乎.svg', Component: Svg36 }
 ]

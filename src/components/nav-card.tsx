@@ -19,6 +19,8 @@ import WebsiteFilledSVG from '@/svgs/website-filled.svg'
 import WebsiteOutlineSVG from '@/svgs/website-outline.svg'
 import CheckinFilledSVG from '@/svgs/checkin-filled.svg'
 import CheckinOutlineSVG from '@/svgs/checkin-outline.svg'
+import StocksFilledSVG from '@/svgs/stocks-filled.svg'
+import StocksOutlineSVG from '@/svgs/stocks-outline.svg'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { cn } from '@/lib/utils'
@@ -51,7 +53,12 @@ const list = [
 		label: '我的打卡',
 		href: '/checkin'
 	},
-	
+	{
+		icon: StocksOutlineSVG,
+		iconActive: StocksFilledSVG,
+		label: '股票跟踪',
+		href: '/stocks'
+	},
 	{
 		icon: ShareOutlineSVG,
 		iconActive: ShareFilledSVG,
@@ -111,7 +118,7 @@ export default function NavCard() {
 
 	const size = useMemo(() => {
 		if (form === 'mini') return { width: 64, height: 64 }
-		else if (form === 'icons') return { width: 340, height: 64 }
+		else if (form === 'icons') return { width: 400, height: 64 }
 		else return { width: styles.width, height: styles.height }
 	}, [form, styles])
 
