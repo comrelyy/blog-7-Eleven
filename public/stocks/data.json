@@ -1,3 +1,18 @@
 {
-  "stocks": []
+  "stocks": [
+    {
+      "symbol": "002138",
+      "name": "顺络电子",
+      "market": "A",
+      "color": "#e0413c",
+      "trades": [],
+      "initial": {
+        "costPrice": 36.18,
+        "shares": 400,
+        "pnl": 540.38,
+        "heldDays": 72,
+        "asOf": "2026-05-13"
+      }
+    }
+  ]
 }
