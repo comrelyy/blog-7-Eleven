@@ -1,6 +1,20 @@
 {
   "stocks": [
     {
+      "symbol": "601929",
+      "name": "吉视传媒",
+      "market": "A",
+      "color": "#35bfab",
+      "trades": [],
+      "initial": {
+        "costPrice": 3.04,
+        "shares": 800,
+        "pnl": 1467.04,
+        "heldDays": 245,
+        "asOf": "2026-05-13"
+      }
+    },
+    {
       "symbol": "600839",
       "name": "四川长虹",
       "market": "A",
