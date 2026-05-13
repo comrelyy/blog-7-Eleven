@@ -1,6 +1,20 @@
 {
   "stocks": [
     {
+      "symbol": "600839",
+      "name": "四川长虹",
+      "market": "A",
+      "color": "#e0413c",
+      "trades": [],
+      "initial": {
+        "costPrice": 8.87,
+        "shares": 1100,
+        "pnl": -2367.88,
+        "heldDays": 555,
+        "asOf": "2026-05-13"
+      }
+    },
+    {
       "symbol": "600848",
       "name": "上海临港",
       "market": "A",
