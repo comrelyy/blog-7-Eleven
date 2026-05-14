@@ -6,12 +6,23 @@ import { useBlogIndex } from '@/hooks/use-blog-index'
 import { motion } from 'motion/react'
 import { ANIMATION_DELAY, INIT_DELAY } from '@/consts'
 
+const RECENT_TAG_LIMIT = 10
+
 export default function ArticlesList() {
     const { items, loading } = useBlogIndex()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedTag, setSelectedTag] = useState<string>('all')
+    const [showAllTags, setShowAllTags] = useState(false)
 
+    // items 已按更新/创建时间降序排序，按出现顺序去重即可得到"最近用过"的标签序列
     const allTags = Array.from(new Set(items.flatMap(i => i.tags || [])))
+    const visibleTags = showAllTags ? allTags : allTags.slice(0, RECENT_TAG_LIMIT)
+    const hasMoreTags = allTags.length > RECENT_TAG_LIMIT
+    // 当选中的标签不在前 10 之内时，把它补进可见列表，避免选中态被隐藏
+    const tagsToRender =
+        !showAllTags && selectedTag !== 'all' && !visibleTags.includes(selectedTag) && allTags.includes(selectedTag)
+            ? [...visibleTags, selectedTag]
+            : visibleTags
 
     const filtered = items.filter(item => {
         const matchesSearch = (item.title || item.slug).toLowerCase().includes(searchTerm.toLowerCase()) || (item.summary || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -53,7 +64,7 @@ export default function ArticlesList() {
                         }`}>
                         全部
                     </button>
-                    {allTags.map(tag => (
+                    {tagsToRender.map(tag => (
                         <button
                             key={tag}
                             onClick={() => setSelectedTag(tag)}
@@ -63,6 +74,13 @@ export default function ArticlesList() {
                             {tag}
                         </button>
                     ))}
+                    {hasMoreTags && (
+                        <button
+                            onClick={() => setShowAllTags(v => !v)}
+                            className='rounded-full bg-gray-100 px-4 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-200'>
+                            {showAllTags ? '收起 ▴' : `更多 ▾ (${allTags.length - RECENT_TAG_LIMIT})`}
+                        </button>
+                    )}
                 </div>
             </div>
 
