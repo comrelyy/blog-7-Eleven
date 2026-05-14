@@ -68,6 +68,7 @@ export default function EventCard({
 	const [flipped, setFlipped] = useState(false)
 	const [confirmDelete, setConfirmDelete] = useState(false)
 
+	const ended = !!event.end && event.end < today
 	const streak = useMemo(() => streakFor(records, event.id, today), [records, event.id, today])
 	const history = useMemo(
 		() =>
@@ -162,7 +163,7 @@ export default function EventCard({
 							color: checkedToday ? '#6b7280' : 'white',
 							boxShadow: checkedToday ? undefined : `0 6px 16px ${event.color}55`
 						}}>
-						{checkedToday ? '✓ 今日已打 · 取消' : '今日打卡'}
+						{ended ? '打卡截止' : checkedToday ? '✓ 今日已打 · 取消' : '今日打卡'}
 					</button>
 
 					{event.description && (
