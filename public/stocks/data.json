@@ -9,9 +9,9 @@
       "initial": {
         "costPrice": 3.04,
         "shares": 800,
-        "pnl": 1467.04,
-        "heldDays": 245,
-        "asOf": "2026-05-13"
+        "pnl": -1467.04,
+        "heldDays": 246,
+        "asOf": "2026-05-14"
       }
     },
     {
