@@ -63,11 +63,11 @@
       "color": "#e0413c",
       "trades": [],
       "initial": {
-        "costPrice": 36.18,
+        "costPrice": 36.709,
         "shares": 400,
-        "pnl": 540.38,
-        "heldDays": 72,
-        "asOf": "2026-05-13"
+        "pnl": 0,
+        "heldDays": 73,
+        "asOf": "2026-05-14"
       }
     }
   ]
