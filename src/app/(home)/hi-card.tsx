@@ -108,9 +108,10 @@ export default function HiCard() {
 							className='shrink-0 cursor-pointer rounded-full'
 							style={{ width: 56, height: 56, boxShadow: '0 8px 16px -4px #E2D9CE' }}
 						/>
-						<h1 className='font-averia text-lg leading-snug'>
+						<h1 className='font-averia text-base leading-snug'>
 							{greeting}, <br />
-							I'm <span className='text-linear text-xl'>{username}</span>
+							I'm <span className='text-linear text-lg'>{username}</span>, Nice to <br />
+							meet you!
 						</h1>
 					</div>
 					<div className='mt-4'>
