@@ -109,9 +109,8 @@ export default function HiCard() {
 							style={{ width: 56, height: 56, boxShadow: '0 8px 16px -4px #E2D9CE' }}
 						/>
 						<h1 className='font-averia text-base leading-snug'>
-							{greeting}, <br />
-							I'm <span className='text-linear text-lg'>{username}</span>, Nice to <br />
-							meet you!
+							{greeting}, I'm <span className='text-linear text-lg'>{username}</span> <br />
+							Nice to meet you!
 						</h1>
 					</div>
 					<div className='mt-4'>

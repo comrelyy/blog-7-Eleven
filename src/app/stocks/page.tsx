@@ -8,17 +8,19 @@ import StocksClient from './components/stocks-client'
 
 export default function StocksPage() {
 	const router = useRouter()
-	const { isAuth } = useAuthStore()
+	const isAuth = useAuthStore(state => state.isAuth)
+	const refreshAuthState = useAuthStore(state => state.refreshAuthState)
 	const [checked, setChecked] = useState(false)
 
 	useEffect(() => {
-		if (!isAuth) {
+		refreshAuthState()
+		if (!useAuthStore.getState().isAuth) {
 			toast.error('请先在首页导入密钥后再访问股票追踪')
 			router.replace('/')
 			return
 		}
 		setChecked(true)
-	}, [isAuth, router])
+	}, [isAuth, router, refreshAuthState])
 
 	if (!checked) return null
 
