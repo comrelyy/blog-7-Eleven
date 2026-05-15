@@ -1,11 +1,12 @@
 'use client'
 
 import { useMemo } from 'react'
+import { cn } from '@/lib/utils'
 import type { CheckinEvent, CheckinRecord } from '../services/checkin-data-service'
 
-const WEEKS_BACK = 53
-const CELL = 12
-const GAP = 3
+const DEFAULT_WEEKS_BACK = 53
+const DEFAULT_CELL = 12
+const DEFAULT_GAP = 3
 
 function fmtDate(d: Date) {
 	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -31,12 +32,24 @@ export default function AggregatedHeatmap({
 	events,
 	records,
 	today,
-	onClickDate
+	onClickDate,
+	weeksBack = DEFAULT_WEEKS_BACK,
+	cell = DEFAULT_CELL,
+	gap = DEFAULT_GAP,
+	bare = false,
+	showLegend = true,
+	showMonthLabels = true
 }: {
 	events: CheckinEvent[]
 	records: CheckinRecord[]
 	today: string
 	onClickDate?: (date: string) => void
+	weeksBack?: number
+	cell?: number
+	gap?: number
+	bare?: boolean
+	showLegend?: boolean
+	showMonthLabels?: boolean
 }) {
 	const eventIds = useMemo(() => new Set(events.map(e => e.id)), [events])
 
@@ -54,9 +67,9 @@ export default function AggregatedHeatmap({
 		const todayDow = todayDate.getDay()
 		const mondayOffset = todayDow === 0 ? 6 : todayDow - 1
 		const lastMonday = new Date(todayDate.getTime() - mondayOffset * 86400000)
-		const start = new Date(lastMonday.getTime() - (WEEKS_BACK - 1) * 7 * 86400000)
+		const start = new Date(lastMonday.getTime() - (weeksBack - 1) * 7 * 86400000)
 		const grid: string[][] = []
-		for (let w = 0; w < WEEKS_BACK; w++) {
+		for (let w = 0; w < weeksBack; w++) {
 			const col: string[] = []
 			for (let d = 0; d < 7; d++) {
 				const dt = new Date(start.getTime() + (w * 7 + d) * 86400000)
@@ -65,7 +78,7 @@ export default function AggregatedHeatmap({
 			grid.push(col)
 		}
 		return grid
-	}, [today])
+	}, [today, weeksBack])
 
 	const monthLabels = useMemo(() => {
 		const labels: { weekIdx: number; label: string }[] = []
@@ -81,11 +94,11 @@ export default function AggregatedHeatmap({
 	}, [weeks])
 
 	return (
-		<div className='rounded-2xl border border-white/40 bg-white/40 p-4 backdrop-blur-md shadow-sm'>
+		<div className={cn(!bare && 'rounded-2xl border border-white/40 bg-white/40 p-4 backdrop-blur-md shadow-sm')}>
 			<div className='overflow-x-auto'>
-				<div style={{ display: 'flex', gap: GAP }} className='pb-1'>
+				<div style={{ display: 'flex', gap }} className='pb-1'>
 					{weeks.map((col, wi) => (
-						<div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+						<div key={wi} style={{ display: 'flex', flexDirection: 'column', gap }}>
 							{col.map(date => {
 								const count = countByDate.get(date) ?? 0
 								const future = date > today
@@ -100,8 +113,8 @@ export default function AggregatedHeatmap({
 										onClick={clickable ? () => onClickDate!(date) : undefined}
 										title={future ? '' : `${date} · ${count === 0 ? '未打卡' : `打了 ${count} 项`}${clickable ? ' · 点击编辑' : ''}`}
 										style={{
-											width: CELL,
-											height: CELL,
+											width: cell,
+											height: cell,
 											borderRadius: 3,
 											background: future ? 'rgba(0,0,0,0.02)' : LEVELS[lv],
 											outline: isToday ? `1.5px solid ${BRAND}` : 'none',
@@ -117,21 +130,25 @@ export default function AggregatedHeatmap({
 						</div>
 					))}
 				</div>
-				<div className='relative mt-1 h-3 text-[9px] text-secondary/70'>
-					{monthLabels.map((m, i) => (
-						<span key={i} style={{ position: 'absolute', left: m.weekIdx * (CELL + GAP) }}>
-							{m.label}
-						</span>
+				{showMonthLabels && (
+					<div className='relative mt-1 h-3 text-[9px] text-secondary/70'>
+						{monthLabels.map((m, i) => (
+							<span key={i} style={{ position: 'absolute', left: m.weekIdx * (cell + gap) }}>
+								{m.label}
+							</span>
+						))}
+					</div>
+				)}
+			</div>
+			{showLegend && (
+				<div className='mt-3 flex items-center justify-end gap-2 text-[10px] text-secondary'>
+					<span>少</span>
+					{LEVELS.map((bg, i) => (
+						<span key={i} style={{ width: cell, height: cell, background: bg, borderRadius: 3, display: 'inline-block' }} />
 					))}
+					<span>多</span>
 				</div>
-			</div>
-			<div className='mt-3 flex items-center justify-end gap-2 text-[10px] text-secondary'>
-				<span>少</span>
-				{LEVELS.map((bg, i) => (
-					<span key={i} style={{ width: CELL, height: CELL, background: bg, borderRadius: 3, display: 'inline-block' }} />
-				))}
-				<span>多</span>
-			</div>
+			)}
 		</div>
 	)
 }

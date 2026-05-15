@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useCenterStore } from '@/hooks/use-center'
 import Card from '@/components/card'
@@ -8,7 +8,9 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { readFileAsText } from '@/lib/file-utils'
 import { toast } from 'sonner'
 import { generateAndCacheToken } from '@/lib/auth'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import AggregatedHeatmap from '@/app/checkin/components/aggregated-heatmap'
+import { loadCheckinData, type CheckinData } from '@/app/checkin/services/checkin-data-service'
 
 function getGreeting() {
 	const hour = new Date().getHours()
@@ -24,6 +26,10 @@ function getGreeting() {
 	}
 }
 
+function fmtToday(d: Date) {
+	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export default function HiCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
@@ -32,6 +38,18 @@ export default function HiCard() {
 	const username = siteContent.meta.username || 'Suni'
 	const { setPrivateKey } = useAuthStore()
 	const fileInputRef = useRef<HTMLInputElement>(null)
+	const [checkinData, setCheckinData] = useState<CheckinData | null>(null)
+	const today = fmtToday(new Date())
+
+	useEffect(() => {
+		let cancelled = false
+		void loadCheckinData().then(data => {
+			if (!cancelled) setCheckinData(data)
+		})
+		return () => {
+			cancelled = true
+		}
+	}, [])
 
 	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x - styles.width / 2
 	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y - styles.height / 2
@@ -66,27 +84,45 @@ export default function HiCard() {
 				}}
 			/>
 			<HomeDraggableLayer cardKey='hiCard' x={x} y={y} width={styles.width} height={styles.height}>
-				<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='relative text-center max-sm:static max-sm:translate-0 cursor-pointer'>
+				<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className='relative max-sm:static max-sm:translate-0'>
 					{siteContent.enableChristmas && (
 						<>
 							<img
 								src='/images/christmas/snow-1.webp'
 								alt='Christmas decoration'
 								className='pointer-events-none absolute'
-								style={{ width: 180, left: -20, top: -25, opacity: 0.9 }}
+								style={{ width: 140, left: -16, top: -20, opacity: 0.9 }}
 							/>
 							<img
 								src='/images/christmas/snow-2.webp'
 								alt='Christmas decoration'
 								className='pointer-events-none absolute'
-								style={{ width: 160, bottom: -12, right: -8, opacity: 0.9 }}
+								style={{ width: 120, bottom: -10, right: -6, opacity: 0.9 }}
 							/>
 						</>
 					)}
-					<img src='/images/avatar.png' className='mx-auto rounded-full' style={{ width: 120, height: 120, boxShadow: ' 0 16px 32px -5px #E2D9CE' }} />
-					<h1 className='font-averia mt-3 text-2xl' onClick={handleImportKey}>
-						{greeting} <br /> I'm <span className='text-linear text-[32px]'>{username}</span> , Nice to <br /> meet you!
-					</h1>
+					<div className='flex items-center gap-3'>
+						<img
+							src='/images/avatar.png'
+							onClick={handleImportKey}
+							className='shrink-0 cursor-pointer rounded-full'
+							style={{ width: 56, height: 56, boxShadow: '0 8px 16px -4px #E2D9CE' }}
+						/>
+						<h1 className='font-averia text-lg leading-snug'>
+							{greeting}, <br />
+							I'm <span className='text-linear text-xl'>{username}</span>
+						</h1>
+					</div>
+					<div className='mt-4'>
+						<AggregatedHeatmap
+							events={checkinData?.events ?? []}
+							records={checkinData?.records ?? []}
+							today={today}
+							weeksBack={20}
+							bare
+							showLegend={false}
+						/>
+					</div>
 				</Card>
 			</HomeDraggableLayer>
 		</>
