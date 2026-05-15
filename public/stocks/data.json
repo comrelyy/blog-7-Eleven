@@ -5,7 +5,16 @@
       "name": "吉视传媒",
       "market": "A",
       "color": "#35bfab",
-      "trades": [],
+      "trades": [
+        {
+          "id": "1778811850649",
+          "type": "sell",
+          "date": "2026-05-15",
+          "price": 2.92,
+          "shares": 800,
+          "note": "割肉止损"
+        }
+      ],
       "initial": {
         "costPrice": 3.04,
         "shares": 800,
