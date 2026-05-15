@@ -1,5 +1,17 @@
 [
   {
+    "slug": "ai-hermes",
+    "title": "Hermes Agent",
+    "tags": [
+      "AI",
+      "Hermes Agent"
+    ],
+    "date": "2026-05-12",
+    "summary": "第一个出厂就带缰绳的 AI Agent;\n自改进Agent · 跨会话记忆 · Skill系统 · MCP · 多平台",
+    "cover": "/blogs/ai-hermes/9146ad0e4e797891.png",
+    "updatedAt": "2026-05-15"
+  },
+  {
     "slug": "2026-05",
     "title": "2026-05",
     "tags": [
@@ -10,18 +22,6 @@
     "summary": "因缺有需-->为啥不多想点-->考虑条件与目的的有效",
     "cover": "/blogs/2026-05/da7a7a448452d94d.png",
     "updatedAt": "2026-05-14"
-  },
-  {
-    "slug": "ai-hermes",
-    "title": "Hermes Agent",
-    "tags": [
-      "AI",
-      "Hermes Agent"
-    ],
-    "date": "2026-05-12",
-    "summary": "第一个出厂就带缰绳的 AI Agent;\n自改进Agent · 跨会话记忆 · Skill系统 · MCP · 多平台",
-    "cover": "/blogs/ai-hermes/9146ad0e4e797891.png",
-    "updatedAt": "2026-05-12"
   },
   {
     "slug": "reading-mby",
