@@ -100,6 +100,15 @@
           "dayLow": 36.22,
           "dayHigh": 39.97,
           "note": "卖出"
+        },
+        {
+          "id": "1779232331686",
+          "type": "sell",
+          "date": "2026-05-20",
+          "price": 39,
+          "shares": 100,
+          "dayLow": 36.22,
+          "dayHigh": 39.97
         }
       ],
       "initial": {
