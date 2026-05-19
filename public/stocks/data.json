@@ -70,7 +70,18 @@
       "name": "顺络电子",
       "market": "A",
       "color": "#e0413c",
-      "trades": [],
+      "trades": [
+        {
+          "id": "1779231765950",
+          "type": "buy",
+          "date": "2026-05-20",
+          "price": 38,
+          "shares": 100,
+          "dayLow": 36.22,
+          "dayHigh": 39.97,
+          "note": "分批卖"
+        }
+      ],
       "initial": {
         "costPrice": 36.709,
         "shares": 400,
