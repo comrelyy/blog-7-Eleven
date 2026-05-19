@@ -80,6 +80,16 @@
           "dayLow": 36.22,
           "dayHigh": 39.97,
           "note": "分批卖"
+        },
+        {
+          "id": "1779231953431",
+          "type": "sell",
+          "date": "2026-05-20",
+          "price": 38,
+          "shares": 100,
+          "dayLow": 36.22,
+          "dayHigh": 39.97,
+          "note": "填平交易"
         }
       ],
       "initial": {
