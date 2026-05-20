@@ -42,7 +42,17 @@
       "name": "上海临港",
       "market": "A",
       "color": "#e0413c",
-      "trades": [],
+      "trades": [
+        {
+          "id": "1779260563549",
+          "type": "sell",
+          "date": "2026-05-20",
+          "price": 8.95,
+          "shares": 200,
+          "dayLow": 8.62,
+          "dayHigh": 8.98
+        }
+      ],
       "initial": {
         "costPrice": 14.02,
         "shares": 1120,
