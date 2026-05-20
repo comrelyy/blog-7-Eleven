@@ -1,6 +1,20 @@
 {
   "stocks": [
     {
+      "symbol": "600481",
+      "name": "双良节能",
+      "market": "A",
+      "color": "#EDDD62",
+      "trades": [],
+      "initial": {
+        "costPrice": 7.305,
+        "shares": 200,
+        "pnl": 2.99,
+        "heldDays": 0,
+        "asOf": "2026-05-20"
+      }
+    },
+    {
       "symbol": "601929",
       "name": "吉视传媒",
       "market": "A",
