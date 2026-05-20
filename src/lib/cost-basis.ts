@@ -65,6 +65,10 @@ export function computeStock(stock: Stock): ComputedStock {
 	let currentRound = 0
 	let currentRoundPnl = 0
 	let inActiveRound = false
+	// 当前轮的摊薄成本口径：累计买入金额（含初始持仓与买入手续费）− 累计卖出回收（已扣卖出手续费）。
+	// 清仓换轮时归零，避免上一轮已实现盈亏渗入新建仓的成本。
+	let roundBuyCost = 0
+	let roundSellProceeds = 0
 
 	// 初始持仓压入栈底作为 phantom lot；新交易在其上叠加，LIFO 卖出先吃新买入，吃完后回退到此
 	if (stock.initial && stock.initial.shares > 0) {
@@ -75,6 +79,7 @@ export function computeStock(stock: Stock): ComputedStock {
 			remaining: stock.initial.shares,
 			isPhantom: true
 		})
+		roundBuyCost += stock.initial.shares * stock.initial.costPrice
 		inActiveRound = true
 	}
 
@@ -82,6 +87,7 @@ export function computeStock(stock: Stock): ComputedStock {
 		tradeRound[t.id] = currentRound
 		if (t.type === 'buy') {
 			stack.push({ price: t.price, shares: t.shares, fee: t.fee || 0, remaining: t.shares })
+			roundBuyCost += t.shares * t.price + (t.fee || 0)
 			inActiveRound = true
 		} else {
 			let remaining = t.shares
@@ -102,18 +108,21 @@ export function computeStock(stock: Stock): ComputedStock {
 			tradePnl[t.id] = pnl
 			realized += pnl
 			currentRoundPnl += pnl
+			roundSellProceeds += t.shares * t.price - (t.fee || 0)
 			if (stack.length === 0 && inActiveRound) {
 				roundPnls.push(currentRoundPnl)
 				currentRoundPnl = 0
 				currentRound++
 				inActiveRound = false
+				roundBuyCost = 0
+				roundSellProceeds = 0
 			}
 		}
 	}
 
 	const heldShares = stack.reduce((s, lot) => s + lot.remaining, 0)
-	const heldCost = stack.reduce((s, lot) => s + lot.remaining * lot.price, 0)
-	const avgPrice = heldShares > 0 ? heldCost / heldShares : null
+	// 摊薄成本价（券商风格）：卖出盈利会拉低成本、卖出亏损会抬高成本；无卖出时等于买入加权均价
+	const avgPrice = heldShares > 0 ? (roundBuyCost - roundSellProceeds) / heldShares : null
 	const phantomRemaining = stack.find(l => l.isPhantom)?.remaining ?? 0
 
 	return { heldShares, avgPrice, realized, tradePnl, tradeRound, roundPnls, errors, sortedTrades: trades, phantomRemaining }

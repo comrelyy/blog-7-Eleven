@@ -99,7 +99,7 @@ export default function StockCard({
 						</div>
 						<div className='h-7 w-px bg-secondary/20' />
 						<div className='min-w-[3.5rem]'>
-							<div className='text-[10px] text-secondary'>均价</div>
+							<div className='text-[10px] text-secondary'>成本价</div>
 							<div className='text-lg font-bold leading-none text-primary tabular-nums'>
 								{c.avgPrice !== null ? formatMoney(stock.market, c.avgPrice, { decimals: 2 }) : '—'}
 							</div>
