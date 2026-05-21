@@ -122,6 +122,15 @@
           "shares": 100,
           "dayLow": 39.81,
           "dayHigh": 42.15
+        },
+        {
+          "id": "1779357197364",
+          "type": "buy",
+          "date": "2026-05-21",
+          "price": 41,
+          "shares": 100,
+          "dayLow": 39.81,
+          "dayHigh": 42.12
         }
       ],
       "initial": {
