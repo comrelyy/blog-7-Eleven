@@ -124,6 +124,12 @@ export default function EventCard({
 						<span className='text-[11px] text-secondary'>{dateRangeLine}</span>
 					</div>
 
+					{event.category && (
+						<span className='mt-2 rounded-full px-2 py-0.5 text-[10px] font-medium' style={{ background: `${event.color}22`, color: event.color }}>
+							{event.category}
+						</span>
+					)}
+
 					<h2 className='mt-2 line-clamp-2 text-base font-semibold text-primary max-sm:text-sm'>{event.name}</h2>
 
 					<div className='mt-3 flex items-end gap-3'>
@@ -189,7 +195,14 @@ export default function EventCard({
 						</button>
 					</div>
 
-					<div className='mb-3 text-[10px] text-secondary'>{dateRangeLine}</div>
+					<div className='mb-3 flex items-center gap-2 text-[10px] text-secondary'>
+						<span>{dateRangeLine}</span>
+						{event.category && (
+							<span className='rounded-full px-2 py-0.5 font-medium' style={{ background: `${event.color}22`, color: event.color }}>
+								{event.category}
+							</span>
+						)}
+					</div>
 
 					<div className='min-h-0 flex-1 overflow-y-auto rounded-xl bg-white/40 p-3'>
 						<div className='mb-2 text-[11px] font-medium text-primary'>打卡记录 · {total}</div>

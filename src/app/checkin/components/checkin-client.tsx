@@ -8,10 +8,12 @@ import { useAuthStore } from '@/hooks/use-auth'
 import { generateAndCacheToken } from '@/lib/auth'
 import { readFileAsText } from '@/lib/file-utils'
 import { loadCheckinData, migrateLocalDataIfNeeded, saveCheckinData, type CheckinEvent, type CheckinPosition, type CheckinRecord } from '../services/checkin-data-service'
+import { appendLearningLog } from '../services/append-learning-log'
 import AggregatedHeatmap from './aggregated-heatmap'
 import EventCard from './event-card'
 import EventFormDialog from './event-form-dialog'
 import BackfillDialog from './backfill-dialog'
+import JournalDialog from './journal-dialog'
 
 function todayStr() {
 	const t = new Date()
@@ -75,6 +77,8 @@ export default function CheckinClient() {
 	const [formInitial, setFormInitial] = useState<CheckinEvent | undefined>(undefined)
 
 	const [backfillDate, setBackfillDate] = useState<string | null>(null)
+	const [journalEvent, setJournalEvent] = useState<CheckinEvent | null>(null)
+	const [journalSubmitting, setJournalSubmitting] = useState(false)
 	const [allDoneTriggered, setAllDoneTriggered] = useState(false)
 	const [mounted, setMounted] = useState(false)
 
@@ -149,12 +153,55 @@ export default function CheckinClient() {
 		if (!requireAuth()) return
 		const exists = checkedTodaySet.has(ev.id)
 		if (exists) {
+			// 取消打卡只删当天记录；不回滚已追加的博客内容
 			setRecords(prev => prev.filter(r => !(r.eventId === ev.id && r.date === today)))
-		} else {
-			setRecords(prev => [...prev, { eventId: ev.id, date: today }])
-			fireConfetti(ev.color)
+			setHasUnsavedChanges(true)
+			return
 		}
+		// 开启了「写学习总结」的事件：先弹输入框，由 handleJournalConfirm 记录打卡
+		if (ev.journal) {
+			setJournalEvent(ev)
+			return
+		}
+		setRecords(prev => [...prev, { eventId: ev.id, date: today }])
+		fireConfetti(ev.color)
 		setHasUnsavedChanges(true)
+	}
+
+	const handleJournalConfirm = async (summary: string) => {
+		const ev = journalEvent
+		if (!ev || !requireAuth()) return
+		const text = summary.trim()
+		// 去重：重试（commit1 成功、博客追加失败）时不会重复插入打卡记录
+		const already = records.some(r => r.eventId === ev.id && r.date === today)
+		const nextRecords = already ? records : [...records, { eventId: ev.id, date: today }]
+
+		// 无总结：等同普通打卡，走防抖自动保存
+		if (!text) {
+			setRecords(nextRecords)
+			fireConfetti(ev.color)
+			setHasUnsavedChanges(true)
+			setJournalEvent(null)
+			return
+		}
+
+		// 有总结：先提交打卡记录（commit 1），再追加到当月博客（commit 2）
+		setJournalSubmitting(true)
+		try {
+			const eventIdSet = new Set(events.map(e => e.id))
+			const cleanRecords = nextRecords.filter(r => eventIdSet.has(r.eventId))
+			await saveCheckinData({ events, records: cleanRecords, positions })
+			setRecords(cleanRecords)
+			setHasUnsavedChanges(false)
+			await appendLearningLog({ eventName: ev.name, summary: text, date: today })
+			fireConfetti(ev.color)
+			setJournalEvent(null)
+		} catch (err) {
+			console.error('打卡总结追加失败:', err)
+			toast.error('追加博客失败，请重试')
+		} finally {
+			setJournalSubmitting(false)
+		}
 	}
 
 	const handleCreate = async (ev: CheckinEvent) => {
@@ -220,6 +267,7 @@ export default function CheckinClient() {
 		() => [...events].filter(ev => statusFor(ev, today) !== 'ended').sort((a, b) => eventRank(a) - eventRank(b)),
 		[events, today, checkedTodaySet]
 	)
+	const existingCategories = useMemo(() => Array.from(new Set(events.map(e => e.category?.trim()).filter((c): c is string => !!c))), [events])
 	const endedEvents = events.filter(ev => statusFor(ev, today) === 'ended')
 	const todayActiveEvents = activeEvents.filter(ev => statusFor(ev, today) === 'active')
 	const todayDone = todayActiveEvents.filter(ev => checkedTodaySet.has(ev.id)).length
@@ -361,6 +409,7 @@ export default function CheckinClient() {
 				open={formOpen}
 				mode={formMode}
 				initial={formInitial}
+				existingCategories={existingCategories}
 				onClose={() => setFormOpen(false)}
 				onSubmit={formMode === 'create' ? handleCreate : handleEdit}
 			/>
@@ -372,6 +421,15 @@ export default function CheckinClient() {
 				records={records}
 				onClose={() => setBackfillDate(null)}
 				onCommit={handleBackfillCommit}
+			/>
+
+			<JournalDialog
+				open={journalEvent !== null}
+				event={journalEvent ?? undefined}
+				date={today}
+				submitting={journalSubmitting}
+				onClose={() => setJournalEvent(null)}
+				onConfirm={handleJournalConfirm}
 			/>
 		</div>
 	)
