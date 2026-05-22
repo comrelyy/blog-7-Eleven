@@ -13,8 +13,12 @@ import { DialogModal } from '@/components/dialog-modal'
 import DateActivityModal from './date-activity-modal'
 import DateActivityTooltip from './date-activity-tooltip'
 import { HomeDraggableLayer } from './home-draggable-layer'
-import { loadEmotionLossData, saveEmotionLossData, getDayRecord, getMonthRecord, type EmotionLossData } from './services/emotion-loss-service'
-import { Angry, Smile } from 'lucide-react'
+import { loadEmotionEventData, saveEmotionEventData, getDayEmotions, getMonthEmotionCounts, type EmotionEventData } from './services/emotion-event-service'
+import { EMOTION_ORDER, getEmotion } from './services/emotions'
+import { appendLearningLog } from '@/app/checkin/services/append-learning-log'
+import { useAuthStore } from '@/hooks/use-auth'
+import EmotionJournalDialog from './emotion-journal-dialog'
+import { Zap } from 'lucide-react'
 
 
 dayjs.locale('zh-cn')
@@ -41,49 +45,53 @@ export default function CalendarCard() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(null)
 	const [showModal, setShowModal] = useState(false)
 	const [hoveredDate, setHoveredDate] = useState<string | null>(null)
-	const [emotionLoss, setEmotionLoss] = useState<EmotionLossData>({})
-	const [emotionSavingKind, setEmotionSavingKind] = useState<'lost' | 'controlled' | null>(null)
+	const [emotionEvents, setEmotionEvents] = useState<EmotionEventData>({})
+	const [emotionSaving, setEmotionSaving] = useState(false)
+	const [journalOpen, setJournalOpen] = useState(false)
+	const { isAuth } = useAuthStore()
 	const todayKey = now.format('YYYY-MM-DD')
-	const todayRecord = getDayRecord(emotionLoss, todayKey)
 
-	const monthStats = useMemo(() => {
-		const prefix = currentMonth.format('YYYY-MM')
-		let lost = 0
-		let controlled = 0
-		for (const [date, rec] of Object.entries(emotionLoss)) {
-			if (date.startsWith(prefix)) {
-				lost += rec.lost
-				controlled += rec.controlled
-			}
-		}
-		return { lost, controlled }
-	}, [emotionLoss, currentMonth])
-
-	const monthMax = Math.max(monthStats.lost, monthStats.controlled, 5)
-	const lostPercent = (monthStats.lost / monthMax) * 100
-	const controlledPercent = (monthStats.controlled / monthMax) * 100
+	const monthEmotionCounts = useMemo(() => getMonthEmotionCounts(emotionEvents, currentMonth.format('YYYY-MM-DD')), [emotionEvents, currentMonth])
+	const monthCount = useMemo(() => Object.values(monthEmotionCounts).reduce((a, b) => a + b, 0), [monthEmotionCounts])
+	// 本月翻涌/沉静堆叠成彩条，按枚举顺序排列
+	const segments = EMOTION_ORDER.map(key => ({ def: getEmotion(key), count: monthEmotionCounts[key] || 0 })).filter(s => s.count > 0)
+	const lostCount = monthEmotionCounts['lost'] || 0
+	const ctrlCount = monthEmotionCounts['controlled'] || 0
 
 	useEffect(() => {
-		void loadEmotionLossData().then(setEmotionLoss)
+		void loadEmotionEventData().then(setEmotionEvents)
 	}, [])
 
-	const handleEmotionRecord = async (kind: 'lost' | 'controlled') => {
-		if (emotionSavingKind) return
-		const current = getDayRecord(emotionLoss, todayKey)
-		const next: EmotionLossData = {
-			...emotionLoss,
-			[todayKey]: { ...current, [kind]: current[kind] + 1 }
+	const handleOpenJournal = () => {
+		if (!isAuth) {
+			toast.error('请先导入密钥')
+			return
 		}
-		setEmotionLoss(next)
+		setJournalOpen(true)
+	}
+
+	const handleEmotionConfirm = async (emotion: string, text: string) => {
+		if (emotionSaving || !emotion) return
+		const trimmed = text.trim()
+		const next: EmotionEventData = {
+			...emotionEvents,
+			[todayKey]: [...(emotionEvents[todayKey] ?? []), { emotion, time: new Date().toISOString() }]
+		}
+		setEmotionEvents(next)
+		setEmotionSaving(true)
 		try {
-			setEmotionSavingKind(kind)
-			await saveEmotionLossData(next)
+			// 先存记录（commit 1），有文字再追加到当月博客（commit 2）
+			await saveEmotionEventData(next)
+			if (trimmed) {
+				await appendLearningLog({ eventName: `心境 · ${getEmotion(emotion).label}`, summary: trimmed, date: todayKey })
+			}
+			setJournalOpen(false)
 		} catch (error: any) {
 			console.error(error)
 			toast.error(error?.message || '记录失败')
-			setEmotionLoss(emotionLoss)
+			setEmotionEvents(emotionEvents)
 		} finally {
-			setEmotionSavingKind(null)
+			setEmotionSaving(false)
 		}
 	}
 
@@ -137,7 +145,7 @@ export default function CalendarCard() {
 				)}
 
 				<div className="flex items-center justify-between">
-					<button 
+					<button
 						onClick={handlePrevMonth}
 						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
 					>
@@ -146,7 +154,7 @@ export default function CalendarCard() {
 					<h3 className='text-secondary text-sm'>
 						{currentMonth.format('YYYY/M/D')} {currentMonth.format('ddd')}
 					</h3>
-					<button 
+					<button
 						onClick={handleNextMonth}
 						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
 					>
@@ -182,39 +190,34 @@ export default function CalendarCard() {
 									isCurrentDay && 'bg-linear border font-medium'
 								)}>
 								{day}
-								{isHovered && <DateActivityTooltip date={dateStr} emotion={getMonthRecord(emotionLoss, dateStr)} />}
+								{isHovered && <DateActivityTooltip date={dateStr} emotions={getDayEmotions(emotionEvents, dateStr)} />}
 							</li>
 						)
 					})}
 				</ul>
-				<div className='mt-3 flex items-center gap-2'>
-					<div
-						title={`本月情绪失控 ${monthStats.lost} 次`}
-						className='flex h-1.5 flex-1 justify-end overflow-hidden rounded-full bg-red-100'>
-						<div className='h-full rounded-full bg-red-400 transition-all' style={{ width: `${lostPercent}%` }} />
+				<button
+					onClick={handleOpenJournal}
+					disabled={emotionSaving}
+					title={`本月翻涌 ${lostCount} · 沉静 ${ctrlCount}（点击记录这次）`}
+					className='mt-3 flex w-full items-center gap-2 disabled:opacity-60'>
+					<span className='inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-secondary transition-colors hover:bg-gray-100'>
+						<Zap className='h-3.5 w-3.5' />
+						<span>心境</span>
+					</span>
+					<div className='flex h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100'>
+						{segments.map(s => (
+							<div
+								key={s.def.key}
+								title={`${s.def.label} ${s.count} 次`}
+								className='h-full transition-all'
+								style={{ width: `${(s.count / monthCount) * 100}%`, background: s.def.color }}
+							/>
+						))}
 					</div>
-					<button
-						onClick={() => handleEmotionRecord('lost')}
-						disabled={emotionSavingKind !== null}
-						title={`本月情绪失控 ${monthStats.lost} 次（今日 ${todayRecord.lost}，点击为今日 +1）`}
-						className='inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 disabled:opacity-60'>
-						<Angry className='h-3.5 w-3.5' />
-						<span>{monthStats.lost}</span>
-					</button>
-					<button
-						onClick={() => handleEmotionRecord('controlled')}
-						disabled={emotionSavingKind !== null}
-						title={`本月情绪控制 ${monthStats.controlled} 次（今日 ${todayRecord.controlled}，点击为今日 +1）`}
-						className='inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-60'>
-						<Smile className='h-3.5 w-3.5' />
-						<span>{monthStats.controlled}</span>
-					</button>
-					<div
-						title={`本月情绪控制 ${monthStats.controlled} 次`}
-						className='flex h-1.5 flex-1 overflow-hidden rounded-full bg-blue-100'>
-						<div className='h-full rounded-full bg-blue-400 transition-all' style={{ width: `${controlledPercent}%` }} />
-					</div>
-				</div>
+					<span className='whitespace-nowrap text-xs text-secondary'>
+					翻涌 <span className='font-medium text-red-500'>{lostCount}</span> · 沉静 <span className='font-medium text-emerald-500'>{ctrlCount}</span>
+				</span>
+				</button>
 			</Card>
 
 
@@ -222,9 +225,17 @@ export default function CalendarCard() {
 
 			<DialogModal open={showModal} onClose={handleCloseModal}>
 				{selectedDate && (
-					<DateActivityModal date={selectedDate} emotion={getMonthRecord(emotionLoss, selectedDate)} onClose={handleCloseModal} />
+					<DateActivityModal date={selectedDate} emotions={getDayEmotions(emotionEvents, selectedDate)} onClose={handleCloseModal} />
 				)}
 			</DialogModal>
+
+			<EmotionJournalDialog
+				open={journalOpen}
+				date={todayKey}
+				submitting={emotionSaving}
+				onClose={() => setJournalOpen(false)}
+				onConfirm={handleEmotionConfirm}
+			/>
 		</HomeDraggableLayer>
 	)
 }

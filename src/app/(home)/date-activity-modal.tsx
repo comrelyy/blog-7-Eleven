@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Angry, Smile } from 'lucide-react'
+import { getEmotion } from './services/emotions'
 import { motion } from 'motion/react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -23,28 +23,30 @@ dayjs.extend(isBetween)
 
 interface DateActivityModalProps {
 	date: string // YYYY-MM-DD format
-	emotion?: { lost: number; controlled: number }
+	emotions?: string[]
 	onClose: () => void
 }
 
-export default function DateActivityModal({ date, emotion, onClose }: DateActivityModalProps) {
-	const emotionRecord = emotion ?? { lost: 0, controlled: 0 }
-	const emotionSection = (
-		<motion.div
-			initial={{ opacity: 0, y: 8 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ delay: INIT_DELAY + ANIMATION_DELAY * 0.5 }}
-			className='mb-4 flex gap-2'>
-			<div className='flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600'>
-				<Angry className='h-4 w-4' />
-				<span className='font-semibold'>{emotionRecord.lost}</span>
-			</div>
-			<div className='flex flex-1 items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-600'>
-				<Smile className='h-4 w-4' />
-				<span className='font-semibold'>{emotionRecord.controlled}</span>
-			</div>
-		</motion.div>
-	)
+export default function DateActivityModal({ date, emotions = [], onClose }: DateActivityModalProps) {
+	const distinctEmotions = Array.from(new Set(emotions))
+	const emotionSection =
+		emotions.length > 0 ? (
+			<motion.div
+				initial={{ opacity: 0, y: 8 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: INIT_DELAY + ANIMATION_DELAY * 0.5 }}
+				className='mb-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-secondary'>
+				<span>
+					心境 <span className='font-semibold'>{emotions.length}</span> 次
+				</span>
+				{distinctEmotions.map(k => (
+					<span key={k} className='inline-flex items-center gap-1' style={{ color: getEmotion(k).color }}>
+						<span className='h-2.5 w-2.5 rounded-full' style={{ background: getEmotion(k).color }} />
+						<span className='text-xs'>{getEmotion(k).label}</span>
+					</span>
+				))}
+			</motion.div>
+		) : null
 	const [checkinData, setCheckinData] = useState<CheckinData | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)

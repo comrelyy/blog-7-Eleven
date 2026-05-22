@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Angry, Smile } from 'lucide-react'
+import { getEmotion } from './services/emotions'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
@@ -20,23 +20,22 @@ dayjs.extend(isBetween)
 
 interface DateActivityTooltipProps {
 	date: string // YYYY-MM-DD format
-	emotion?: { lost: number; controlled: number }
+	emotions?: string[]
 }
 
-export default function DateActivityTooltip({ date, emotion }: DateActivityTooltipProps) {
-	const emotionRecord = emotion ?? { lost: 0, controlled: 0 }
-	const emotionRow = (
-		<div className='mb-2 flex items-center gap-3'>
-			<span className='inline-flex items-center gap-1 text-red-600'>
-				<Angry className='h-3.5 w-3.5' />
-				{emotionRecord.lost}
-			</span>
-			<span className='inline-flex items-center gap-1 text-blue-600'>
-				<Smile className='h-3.5 w-3.5' />
-				{emotionRecord.controlled}
-			</span>
-		</div>
-	)
+export default function DateActivityTooltip({ date, emotions = [] }: DateActivityTooltipProps) {
+	const distinctEmotions = Array.from(new Set(emotions))
+	const emotionRow =
+		emotions.length > 0 ? (
+			<div className='mb-2 flex items-center gap-2 text-secondary'>
+				<span>心境 {emotions.length} 次</span>
+				<span className='flex gap-1'>
+					{distinctEmotions.map(k => (
+						<span key={k} title={getEmotion(k).label} className='h-2 w-2 rounded-full' style={{ background: getEmotion(k).color }} />
+					))}
+				</span>
+			</div>
+		) : null
 	const [checkinData, setCheckinData] = useState<CheckinData | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
