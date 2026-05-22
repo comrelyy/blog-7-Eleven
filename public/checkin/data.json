@@ -4,8 +4,6 @@
       "id": "1779256076912",
       "name": "阅读-《白鹿原》",
       "color": "#35bfab",
-      "category": "学习类",
-      "journal": true,
       "start": "2026-05-20",
       "description": "20页以上"
     },
@@ -13,6 +11,8 @@
       "id": "1772699844388",
       "name": "AI Agent开发学习",
       "color": "#4285f0",
+      "category": "学习类",
+      "journal": true,
       "start": "2026-03-05"
     },
     {
