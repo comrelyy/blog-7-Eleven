@@ -185,15 +185,20 @@ export default function CheckinClient() {
 			return
 		}
 
-		// 有总结：先提交打卡记录（commit 1），再追加到当月博客（commit 2）
+		// 有总结：打卡记录 + 博客追加合并为单次 commit，避免连续提交的竞态失败
 		setJournalSubmitting(true)
 		try {
 			const eventIdSet = new Set(events.map(e => e.id))
 			const cleanRecords = nextRecords.filter(r => eventIdSet.has(r.eventId))
-			await saveCheckinData({ events, records: cleanRecords, positions })
+			const checkinJson = JSON.stringify({ events, records: cleanRecords, positions }, null, 2)
+			await appendLearningLog({
+				eventName: ev.name,
+				summary: text,
+				date: today,
+				extraFiles: [{ path: 'public/checkin/data.json', content: checkinJson }]
+			})
 			setRecords(cleanRecords)
 			setHasUnsavedChanges(false)
-			await appendLearningLog({ eventName: ev.name, summary: text, date: today })
 			fireConfetti(ev.color)
 			setJournalEvent(null)
 		} catch (err) {

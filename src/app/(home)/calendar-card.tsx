@@ -80,10 +80,17 @@ export default function CalendarCard() {
 		setEmotionEvents(next)
 		setEmotionSaving(true)
 		try {
-			// 先存记录（commit 1），有文字再追加到当月博客（commit 2）
-			await saveEmotionEventData(next)
 			if (trimmed) {
-				await appendLearningLog({ eventName: `心境 · ${getEmotion(emotion).label}`, summary: trimmed, date: todayKey })
+				// 心境数据 + 博客追加合并为单次 commit
+				const emotionJson = JSON.stringify(next, null, 2)
+				await appendLearningLog({
+					eventName: `心境 · ${getEmotion(emotion).label}`,
+					summary: trimmed,
+					date: todayKey,
+					extraFiles: [{ path: 'public/emotion-events/data.json', content: emotionJson }]
+				})
+			} else {
+				await saveEmotionEventData(next)
 			}
 			setJournalOpen(false)
 		} catch (error: any) {

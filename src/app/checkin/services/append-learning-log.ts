@@ -5,6 +5,9 @@ import type { BlogIndexItem } from '@/lib/blog-index'
 import { toast } from 'sonner'
 
 const INDEX_PATH = 'public/blogs/index.json'
+const MAX_RETRIES = 3
+
+export type ExtraFile = { path: string; content: string }
 
 /** 把一条总结合并进当月博客的 markdown。同一天小节存在则追加到末尾，否则在文章顶部新建当天小节。 */
 export function mergeMonthMarkdown(existing: string | null, date: string, entry: string): string {
@@ -46,10 +49,16 @@ function upsertIndex(list: BlogIndexItem[], slug: string, date: string, summaryF
 /**
  * 把学习类打卡的总结追加到当月博客（slug = date 的 YYYY-MM，如 2026-05）。
  * - 当月博客不存在时自动新建 index.md + config.json。
- * - 一次 GitHub 提交完成 index.md（+ 新建时的 config.json）+ index.json。
+ * - 可选传入 extraFiles，合并为单次 commit 避免连续提交的竞态失败。
+ * - 内置重试：updateRef 失败时重新获取最新 ref 并重建 tree/commit 再试。
  */
-export async function appendLearningLog(params: { eventName: string; summary: string; date: string }): Promise<{ slug: string; created: boolean }> {
-	const { eventName, summary, date } = params
+export async function appendLearningLog(params: {
+	eventName: string
+	summary: string
+	date: string
+	extraFiles?: ExtraFile[]
+}): Promise<{ slug: string; created: boolean }> {
+	const { eventName, summary, date, extraFiles } = params
 	const slug = date.slice(0, 7) // YYYY-MM
 	const trimmed = summary.trim()
 	const entry = `***${eventName}***\n${trimmed}`
@@ -74,27 +83,56 @@ export async function appendLearningLog(params: { eventName: string; summary: st
 	}
 	const nextIndex = upsertIndex(indexList, slug, date, trimmed.slice(0, 80))
 
-	// 组装提交
-	const refData = await getRef(token, OWNER, REPO, `heads/${BRANCH}`)
-	const latestCommitSha = refData.sha
-	const treeItems: TreeItem[] = []
-
+	// 预先创建 blob（blob 是不可变的，不受 ref 变化影响，无需重试）
 	const mdBlob = await createBlob(token, OWNER, REPO, toBase64Utf8(nextMd), 'base64')
-	treeItems.push({ path: mdPath, mode: '100644', type: 'blob', sha: mdBlob.sha })
+	const indexBlob = await createBlob(token, OWNER, REPO, toBase64Utf8(JSON.stringify(nextIndex, null, 2)), 'base64')
 
+	let configBlob: { sha: string } | null = null
 	if (created) {
 		const config = { title: slug, tags: ['碎碎念', slug], date, summary: trimmed.slice(0, 80), images: [] as string[] }
-		const configBlob = await createBlob(token, OWNER, REPO, toBase64Utf8(JSON.stringify(config, null, 2)), 'base64')
-		treeItems.push({ path: `public/blogs/${slug}/config.json`, mode: '100644', type: 'blob', sha: configBlob.sha })
+		configBlob = await createBlob(token, OWNER, REPO, toBase64Utf8(JSON.stringify(config, null, 2)), 'base64')
 	}
 
-	const indexBlob = await createBlob(token, OWNER, REPO, toBase64Utf8(JSON.stringify(nextIndex, null, 2)), 'base64')
-	treeItems.push({ path: INDEX_PATH, mode: '100644', type: 'blob', sha: indexBlob.sha })
+	const extraBlobs: { path: string; sha: string }[] = []
+	if (extraFiles?.length) {
+		for (const f of extraFiles) {
+			const blob = await createBlob(token, OWNER, REPO, toBase64Utf8(f.content), 'base64')
+			extraBlobs.push({ path: f.path, sha: blob.sha })
+		}
+	}
 
-	const treeData = await createTree(token, OWNER, REPO, treeItems, latestCommitSha)
-	const commitData = await createCommit(token, OWNER, REPO, `打卡总结追加: ${slug}`, treeData.sha, [latestCommitSha])
-	await updateRef(token, OWNER, REPO, `heads/${BRANCH}`, commitData.sha)
+	// 带重试的提交：updateRef 失败（422 竞态）时重新获取 ref 再试
+	for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+		const refData = await getRef(token, OWNER, REPO, `heads/${BRANCH}`)
+		const latestCommitSha = refData.sha
 
-	toast.success(created ? `已新建《${slug}》并追加总结` : `已追加到《${slug}》`)
-	return { slug, created }
+		const treeItems: TreeItem[] = [
+			{ path: mdPath, mode: '100644', type: 'blob', sha: mdBlob.sha },
+			{ path: INDEX_PATH, mode: '100644', type: 'blob', sha: indexBlob.sha }
+		]
+		if (configBlob) {
+			treeItems.push({ path: `public/blogs/${slug}/config.json`, mode: '100644', type: 'blob', sha: configBlob.sha })
+		}
+		for (const eb of extraBlobs) {
+			treeItems.push({ path: eb.path, mode: '100644', type: 'blob', sha: eb.sha })
+		}
+
+		const treeData = await createTree(token, OWNER, REPO, treeItems, latestCommitSha)
+		const commitMsg = extraBlobs.length ? `更新碎碎念数据 (${slug})` : `打卡总结追加: ${slug}`
+		const commitData = await createCommit(token, OWNER, REPO, commitMsg, treeData.sha, [latestCommitSha])
+
+		try {
+			await updateRef(token, OWNER, REPO, `heads/${BRANCH}`, commitData.sha)
+			toast.success(created ? `已新建《${slug}》并追加总结` : `已追加到《${slug}》`)
+			return { slug, created }
+		} catch (err) {
+			if (attempt < MAX_RETRIES - 1) {
+				await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+				continue
+			}
+			throw err
+		}
+	}
+
+	throw new Error('appendLearningLog: max retries exceeded')
 }

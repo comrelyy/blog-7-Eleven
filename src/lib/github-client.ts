@@ -169,7 +169,7 @@ export async function updateRef(token: string, owner: string, repo: string, ref:
 		body: JSON.stringify({ sha, force })
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
+	if (res.status === 422) throw new Error(`update ref failed: 422 (conflict)`)
 	if (!res.ok) throw new Error(`update ref failed: ${res.status}`)
 }
 
