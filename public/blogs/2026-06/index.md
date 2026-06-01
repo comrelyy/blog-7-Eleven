@@ -18,3 +18,12 @@
 1* A2A Provider（服务提供)
 2*注册中心（阿里的Nacos 3.1 ）〔服务注册)
 3* A2A Consumer（服务发现）
+
+***AI Agent开发学习***
+*智能体卡片：*
+1. name 远程智能体的name
+2. description 远程智能体的描述
+3.url 注册中心的地址
+4. version 远程智能体的版本
+5. capabilities 远程智能体的能力
+6. skills 远程智能体的专业领域技能
