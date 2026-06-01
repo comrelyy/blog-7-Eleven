@@ -78,6 +78,7 @@ export default function CheckinClient() {
 
 	const [backfillDate, setBackfillDate] = useState<string | null>(null)
 	const [journalEvent, setJournalEvent] = useState<CheckinEvent | null>(null)
+	const [journalMode, setJournalMode] = useState<'checkin' | 'append'>('checkin')
 	const [journalSubmitting, setJournalSubmitting] = useState(false)
 	const [allDoneTriggered, setAllDoneTriggered] = useState(false)
 	const [mounted, setMounted] = useState(false)
@@ -160,6 +161,7 @@ export default function CheckinClient() {
 		}
 		// 开启了「写学习总结」的事件：先弹输入框，由 handleJournalConfirm 记录打卡
 		if (ev.journal) {
+			setJournalMode('checkin')
 			setJournalEvent(ev)
 			return
 		}
@@ -168,24 +170,15 @@ export default function CheckinClient() {
 		setHasUnsavedChanges(true)
 	}
 
-	const handleJournalConfirm = async (summary: string) => {
-		const ev = journalEvent
-		if (!ev || !requireAuth()) return
-		const text = summary.trim()
-		// 去重：重试（commit1 成功、博客追加失败）时不会重复插入打卡记录
-		const already = records.some(r => r.eventId === ev.id && r.date === today)
-		const nextRecords = already ? records : [...records, { eventId: ev.id, date: today }]
+	// 打卡后翻面追加：仅对已打卡的总结类事件开放，不新增打卡记录，只往当月博客追加内容
+	const openAppendJournal = (ev: CheckinEvent) => {
+		if (!requireAuth()) return
+		setJournalMode('append')
+		setJournalEvent(ev)
+	}
 
-		// 无总结：等同普通打卡，走防抖自动保存
-		if (!text) {
-			setRecords(nextRecords)
-			fireConfetti(ev.color)
-			setHasUnsavedChanges(true)
-			setJournalEvent(null)
-			return
-		}
-
-		// 有总结：打卡记录 + 博客追加合并为单次 commit，避免连续提交的竞态失败
+	// 总结 + 当前打卡数据合并为单次 commit，避免连续提交的竞态失败
+	const submitJournal = async (ev: CheckinEvent, text: string, nextRecords: CheckinRecord[]) => {
 		setJournalSubmitting(true)
 		try {
 			const eventIdSet = new Set(events.map(e => e.id))
@@ -207,6 +200,39 @@ export default function CheckinClient() {
 		} finally {
 			setJournalSubmitting(false)
 		}
+	}
+
+	const handleJournalConfirm = async (summary: string) => {
+		const ev = journalEvent
+		if (!ev || !requireAuth()) return
+		const text = summary.trim()
+
+		// 追加模式：记录不变，仅往博客追加；空内容直接关闭
+		if (journalMode === 'append') {
+			if (!text) {
+				setJournalEvent(null)
+				return
+			}
+			await submitJournal(ev, text, records)
+			return
+		}
+
+		// 打卡模式
+		// 去重：重试（commit1 成功、博客追加失败）时不会重复插入打卡记录
+		const already = records.some(r => r.eventId === ev.id && r.date === today)
+		const nextRecords = already ? records : [...records, { eventId: ev.id, date: today }]
+
+		// 无总结：等同普通打卡，走防抖自动保存
+		if (!text) {
+			setRecords(nextRecords)
+			fireConfetti(ev.color)
+			setHasUnsavedChanges(true)
+			setJournalEvent(null)
+			return
+		}
+
+		// 有总结：打卡记录 + 博客追加合并为单次 commit
+		await submitJournal(ev, text, nextRecords)
 	}
 
 	const handleCreate = async (ev: CheckinEvent) => {
@@ -377,6 +403,7 @@ export default function CheckinClient() {
 								checkedToday={checkedTodaySet.has(ev.id)}
 								disabled={statusFor(ev, today) === 'upcoming'}
 								onToggleCheck={() => handleToggleCheck(ev)}
+								onAppendJournal={ev.journal ? () => openAppendJournal(ev) : undefined}
 								onEdit={() => openEdit(ev)}
 								onDelete={() => handleDelete(ev.id)}
 							/>
@@ -433,6 +460,7 @@ export default function CheckinClient() {
 				event={journalEvent ?? undefined}
 				date={today}
 				submitting={journalSubmitting}
+				mode={journalMode}
 				onClose={() => setJournalEvent(null)}
 				onConfirm={handleJournalConfirm}
 			/>

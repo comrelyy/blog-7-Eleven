@@ -53,6 +53,7 @@ export default function EventCard({
 	checkedToday,
 	disabled,
 	onToggleCheck,
+	onAppendJournal,
 	onEdit,
 	onDelete
 }: {
@@ -62,6 +63,7 @@ export default function EventCard({
 	checkedToday: boolean
 	disabled?: boolean
 	onToggleCheck: () => void
+	onAppendJournal?: () => void
 	onEdit: () => void
 	onDelete: () => void
 }) {
@@ -219,6 +221,15 @@ export default function EventCard({
 							</div>
 						)}
 					</div>
+
+					{onAppendJournal && checkedToday && (
+						<button
+							onClick={onAppendJournal}
+							className='mt-3 w-full rounded-xl py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90'
+							style={{ background: event.color, boxShadow: `0 4px 12px ${event.color}44` }}>
+							✏️ 追加今日总结到博客
+						</button>
+					)}
 
 					<div className='mt-3 flex items-center justify-between gap-2'>
 						<button

@@ -9,6 +9,7 @@ export default function JournalDialog({
 	event,
 	date,
 	submitting,
+	mode = 'checkin',
 	onClose,
 	onConfirm
 }: {
@@ -16,6 +17,7 @@ export default function JournalDialog({
 	event?: CheckinEvent
 	date: string
 	submitting: boolean
+	mode?: 'checkin' | 'append'
 	onClose: () => void
 	onConfirm: (summary: string) => void
 }) {
@@ -27,16 +29,19 @@ export default function JournalDialog({
 
 	if (!event) return null
 	const slug = date.slice(0, 7)
+	const isAppend = mode === 'append'
 
 	return (
 		<DialogModal open={open} onClose={submitting ? () => {} : onClose}>
 			<div className='w-[min(30rem,calc(100vw-2rem))] rounded-3xl bg-white p-6 shadow-xl'>
 				<div className='mb-1 flex items-center gap-3'>
 					<span className='inline-block h-5 w-5 rounded-full' style={{ background: event.color }} />
-					<h3 className='text-lg font-semibold text-primary'>{event.name} · 今日打卡</h3>
+					<h3 className='text-lg font-semibold text-primary'>{event.name} · {isAppend ? '追加内容' : '今日打卡'}</h3>
 				</div>
 				<p className='mb-4 text-xs text-secondary'>
-					简单总结今天学到的与感悟，确认后会追加到《{slug}》月度博客；留空直接确认则只打卡、不追加。
+					{isAppend
+						? `继续补充今天的内容，确认后会追加到《${slug}》月度博客今天的小节末尾。`
+						: `简单总结今天学到的与感悟，确认后会追加到《${slug}》月度博客；留空直接确认则只打卡、不追加。`}
 				</p>
 
 				<textarea
@@ -57,9 +62,9 @@ export default function JournalDialog({
 					</button>
 					<button
 						onClick={() => onConfirm(summary)}
-						disabled={submitting}
+						disabled={submitting || (isAppend && !summary.trim())}
 						className='rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'>
-						{submitting ? '提交中…' : summary.trim() ? '确认并追加博客' : '仅打卡'}
+						{submitting ? '提交中…' : isAppend ? '确认并追加博客' : summary.trim() ? '确认并追加博客' : '仅打卡'}
 					</button>
 				</div>
 			</div>
