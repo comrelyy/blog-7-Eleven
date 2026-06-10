@@ -1,6 +1,15 @@
 {
   "events": [
     {
+      "id": "1781056689734",
+      "name": "读-《天才的回声》",
+      "color": "#35bfab",
+      "category": "学习类",
+      "journal": true,
+      "start": "2026-06-10",
+      "description": "经济学大师与他们塑造的世界"
+    },
+    {
       "id": "1781008754038",
       "name": "英语学习",
       "color": "#35bfab",
