@@ -1,6 +1,15 @@
 {
   "events": [
     {
+      "id": "1781057081486",
+      "name": "每日小结",
+      "color": "#35bfab",
+      "category": "日常习惯",
+      "journal": true,
+      "start": "2026-06-10",
+      "description": "3件事"
+    },
+    {
       "id": "1781056689734",
       "name": "读-《天才的回声》",
       "color": "#35bfab",
