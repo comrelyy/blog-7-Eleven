@@ -6,5 +6,13 @@
   ],
   "date": "2026-06-16",
   "summary": "切片是检索质量的第一道关卡：切太粗，关键信息淹没在噪音里；切太细，上下文丢失；边界切错，跨边界事实永远召回不全。上限的另一半：切得再好，文档之间仍是平的——粒度混乱（“问为什么返回怎么实现”）要靠层次和结构解决",
-  "images": []
+  "cover": "/blogs/rag-chunking-guide/4e9a5d2a28c4a3c7.png",
+  "images": [
+    "/blogs/rag-chunking-guide/d6552c7484a5c9df.png",
+    "/blogs/rag-chunking-guide/2611fc16c8f1ed30.png",
+    "/blogs/rag-chunking-guide/e8df4d24ba657d86.png",
+    "/blogs/rag-chunking-guide/333d9355af575c87.png",
+    "/blogs/rag-chunking-guide/4a1a454742706817.png",
+    "/blogs/rag-chunking-guide/4e9a5d2a28c4a3c7.png"
+  ]
 }

@@ -12,7 +12,7 @@
         → 切后清理 → 父子拓扑 → 元数据完备的入库 → 评测迭代
 ```
 
-![切片处理八步骨架：解析降噪→结构检测→策略选择→切分→切后清理→父子拓扑→元数据入库→评测迭代，末端闭环回流](illustrations/01-flowchart-pipeline-spine.png)
+![切片处理八步骨架：解析降噪→结构检测→策略选择→切分→切后清理→父子拓扑→元数据入库→评测迭代，末端闭环回流](/blogs/rag-chunking-guide/4e9a5d2a28c4a3c7.png)
 
 本指南按这条链路逐段给出最佳实践，每条规则标注来源与采纳建议。
 
@@ -56,7 +56,7 @@ super-agent 的 `DocumentStructureTreeValidator` 做六遍修复`super-agent`：
 
 > **互补性一目了然**：文章一贡献了最便宜的语义切分算法（embedding 断点）和最精细的事实切分（命题）；kb-mvp 贡献了切后人工维护和块级降级标记；super-agent 贡献了切前工程（降噪、信号、树校验）和策略管线编排。一套理想体系应该三者拼装。
 
-![四方互补拼装：文章一/kb-mvp/super-agent 各补一块，拼成理想切片体系](illustrations/02-framework-four-way-complementarity.png)
+![四方互补拼装：文章一/kb-mvp/super-agent 各补一块，拼成理想切片体系](/blogs/rag-chunking-guide/4a1a454742706817.png)
 
 ---
 
@@ -101,7 +101,7 @@ kb-mvp 与 super-agent 的实现高度趋同：分隔符按优先级下钻（段
 | **LLM 直接分段** | 把文本交给 LLM 按语义返回 JSON 数组（温度 0） | 每 3000 字 1 次 Chat（贵） | 高，但有截断风险（kb-mvp 超 12000 字 substring 硬截）和解析失败风险 | `kb-mvp` |
 | **LLM 命题切分** | LLM 拆原子事实命题（保留数字/日期/名称，禁编造），再按 maxChunkSize 重组 | 最贵 | 最高（原子事实级，适合法律/规格/制度） | `文章一` |
 
-![语义切分成本-质量光谱：Jaccard→Embedding 断点→LLM 直接分段→LLM 命题切分，从便宜·低质到贵·高质](illustrations/03-comparison-semantic-cost-spectrum.png)
+![语义切分成本-质量光谱：Jaccard→Embedding 断点→LLM 直接分段→LLM 命题切分，从便宜·低质到贵·高质](/blogs/rag-chunking-guide/333d9355af575c87.png)
 
 > **规则 5.1：按文档价值选档位，并允许逐档降级。**
 
@@ -133,7 +133,7 @@ markdown heading / docx 样式大纲 / pdf 书签是显式结构；pdf 无书签
 
 > **这是 kb-mvp 和 super-agent 共同超出两篇文章的核心设计**：检索要细粒度（小块向量更聚焦），生成要粗上下文（大块语义完整）。父子分块同时满足两者——小块负责被搜到，父块负责喂给 LLM。
 
-![父子分块 small-to-big：query 命中 searchable 子块，经 parent_chunk_id 回填到父块，父块作为完整上下文喂给 LLM](illustrations/04-framework-parent-child-small-to-big.png)
+![父子分块 small-to-big：query 命中 searchable 子块，经 parent_chunk_id 回填到父块，父块作为完整上下文喂给 LLM](/blogs/rag-chunking-guide/e8df4d24ba657d86.png)
 
 | 维度 | `kb-mvp` | `super-agent` |
 |---|---|---|
@@ -161,7 +161,7 @@ kb-mvp 是粒度最细的：SEMANTIC 切分按 3000 字粗块逐块调 LLM，**�
 
 super-agent：LLM 失败 → Jaccard 语义（保住语义意图）→ 才到递归`super-agent`；kb-mvp：STRUCTURED_SEMANTIC 无结构 → SEMANTIC（保住语义切分）→ 粗块失败才递归`kb-mvp`。
 
-![阶梯式优雅降级：LLM 切分→(失败)Jaccard/语义→(失败)递归兜底，每次降一档不跌到底；旁注三层痕迹（块级标记/任务级 warning/日志）](illustrations/05b-flowchart-graceful-fallback-chain.png)
+![阶梯式优雅降级：LLM 切分→(失败)Jaccard/语义→(失败)递归兜底，每次降一档不跌到底；旁注三层痕迹（块级标记/任务级 warning/日志）](/blogs/rag-chunking-guide/2611fc16c8f1ed30.png)
 
 > **规则 8.3：每次降级都要留下可观测的痕迹。**
 
@@ -259,8 +259,7 @@ kb-mvp 的 split/merge 工作台是四方唯一的切后修正能力`kb-mvp`。�
    → 降级痕迹三层（块标记 + warning + 日志）
 ```
 
-![切片策略决策树：文档进来后逐级判断（领域格式/显式结构/规整文档/事实密集高价值/多主题长文），其余落到递归兜底；所有路径共同尾巴=清理闸+元数据四组+降级痕迹三层](illustrations/06-flowchart-strategy-decision-tree.png)
-
+![切片策略决策树：文档进来后逐级判断（领域格式/显式结构/规整文档/事实密集高价值/多主题长文），其余落到递归兜底；所有路径共同尾巴=清理闸+元数据四组+降级痕迹三层](/blogs/rag-chunking-guide/d6552c7484a5c9df.png)
 ### 上线前检查清单
 
 | # | 检查项 | 不满足的代价 |
