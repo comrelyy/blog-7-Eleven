@@ -1,5 +1,17 @@
 [
   {
+    "slug": "rag-eval",
+    "title": " RAG 评估体系搭建",
+    "tags": [
+      "RAG",
+      "知识库评估"
+    ],
+    "date": "2026-06-17",
+    "summary": "一篇「怎么从零搭一套 RAG 评估体系」的方法论指南：分几层、先建什么、每步用什么指标、怎么形成防线",
+    "cover": "/blogs/rag-eval/e942cd860cf6714a.png",
+    "updatedAt": "2026-06-17"
+  },
+  {
     "slug": "rag-chunking-guide",
     "title": "RAG 文档切片优化指南",
     "tags": [

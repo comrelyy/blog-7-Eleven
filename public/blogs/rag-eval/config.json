@@ -1,0 +1,18 @@
+{
+  "title": " RAG 评估体系搭建",
+  "tags": [
+    "RAG",
+    "知识库评估"
+  ],
+  "date": "2026-06-17",
+  "summary": "一篇「怎么从零搭一套 RAG 评估体系」的方法论指南：分几层、先建什么、每步用什么指标、怎么形成防线",
+  "cover": "/blogs/rag-eval/e942cd860cf6714a.png",
+  "images": [
+    "/blogs/rag-eval/385da0e323f7daf1.png",
+    "/blogs/rag-eval/85ebdf29926c8125.png",
+    "/blogs/rag-eval/912efcfd56bbe779.png",
+    "/blogs/rag-eval/e77ee24271bc5c09.png",
+    "/blogs/rag-eval/eff2c7910abd262e.png",
+    "/blogs/rag-eval/e942cd860cf6714a.png"
+  ]
+}
