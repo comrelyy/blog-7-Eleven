@@ -1,3 +1,24 @@
+### 2026-06-17
+
+***AI Agent开发学习***
+对 AI native 的核心判断：它不是"在产品里加个 AI
+  功能"，而是控制流本身由模型驱动。区分线很清楚 ——
+
+  - AI-enabled（套壳）：流程是人写死的，AI
+  是其中一个被调用的函数。你的 Way A（Advisor） 就是这个 ——
+  similaritySearch → 塞 system prompt → 一次 LLM
+  调用，链路固定。
+  - AI-native：模型决定下一步做什么、要不要再检索、调哪个工
+  具、何时停。你的 Way B（ReactAgent + Hook）
+  在往这个方向走 —— ReAct循环让模型自己决定迭代
+
+ - 拿掉 AI 产品照常跑、只是少个智能客服 —— 这是
+  AI-enabled，AI 是装饰。
+  - 拿掉 AI 产品根本不存在、整个交互范式垮掉 —— 这才是 AI
+  native。
+
+---
+
 ### 2026-06-16
 
 ***心境 · 翻涌***
