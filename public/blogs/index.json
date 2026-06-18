@@ -1,5 +1,17 @@
 [
   {
+    "slug": "ai-native",
+    "title": "AI Native 漫谈：认识、形态与趋势",
+    "tags": [
+      "AI",
+      "AI native"
+    ],
+    "date": "2026-06-18",
+    "summary": "AI native 的硬标准，是「控制流交给谁」",
+    "cover": "/blogs/ai-native/8aa712ba58d3120c.svg",
+    "updatedAt": "2026-06-18"
+  },
+  {
     "slug": "rag-eval",
     "title": " RAG 评估体系搭建",
     "tags": [

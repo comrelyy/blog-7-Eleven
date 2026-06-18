@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="260" viewBox="0 0 680 260" font-family="'Patrick Hand','Gaegu','STKaiti','KaiTi','楷体',cursive">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="0%" r="120%">
+      <stop offset="0" stop-color="#2c4036"/><stop offset=".6" stop-color="#243429"/><stop offset="1" stop-color="#1c2a22"/>
+    </radialGradient>
+    <filter id="chalk"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/></filter>
+  </defs>
+  <rect width="680" height="260" rx="16" fill="url(#bg)"/>
+  <rect x="7" y="7" width="666" height="246" rx="12" fill="none" stroke="#465b4f" stroke-width="2" stroke-dasharray="2 7"/>
+  <g filter="url(#chalk)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <text x="42" y="92" fill="#ffffff" font-size="50" filter="none">AI&#160;NATIVE</text>
+    <text x="44" y="128" fill="#ffe08a" font-size="20" filter="none">控制流交给模型 · 主动放弃确定性</text>
+    <path d="M44 146 q120 -8 240 0" stroke="#8fe3ff" stroke-width="2.4"/>
+    <!-- robot -->
+    <rect x="430" y="70" width="110" height="92" rx="14" stroke="#f3f1e7" stroke-width="2.4"/>
+    <circle cx="462" cy="108" r="10" stroke="#8fe3ff" stroke-width="2.4"/><circle cx="508" cy="108" r="10" stroke="#8fe3ff" stroke-width="2.4"/>
+    <circle cx="462" cy="108" r="3" fill="#8fe3ff" stroke="none"/><circle cx="508" cy="108" r="3" fill="#8fe3ff" stroke="none"/>
+    <path d="M460 138 q25 12 50 0" stroke="#ffe08a" stroke-width="2.4"/>
+    <line x1="485" y1="70" x2="485" y2="52" stroke="#f3f1e7" stroke-width="2.4"/><circle cx="485" cy="46" r="7" stroke="#ff9fb6" stroke-width="2.4"/>
+    <!-- gear -->
+    <g stroke="#a8e6a0" stroke-width="2.2">
+      <circle cx="600" cy="92" r="20"/>
+      <line x1="600" y1="64" x2="600" y2="74"/><line x1="600" y1="110" x2="600" y2="120"/>
+      <line x1="572" y1="92" x2="582" y2="92"/><line x1="618" y1="92" x2="628" y2="92"/>
+      <line x1="581" y1="73" x2="588" y2="80"/><line x1="612" y1="104" x2="619" y2="111"/>
+      <line x1="619" y1="73" x2="612" y2="80"/><line x1="588" y1="104" x2="581" y2="111"/>
+      <circle cx="600" cy="92" r="6"/>
+    </g>
+    <!-- thought loop -->
+    <path d="M430 200 q80 -34 150 -6" stroke="#ffe08a" stroke-width="2.4"/>
+    <path d="M580 194 l4 12 l-13 -2" stroke="#ffe08a" stroke-width="2.4"/>
+    <path d="M580 178 q-80 34 -150 6" stroke="#ffc07a" stroke-width="2.4"/>
+    <path d="M430 184 l-4 -12 l13 2" stroke="#ffc07a" stroke-width="2.4"/>
+    <text x="452" y="232" fill="#cfd4c8" font-size="15" filter="none">model-driven · re-think · re-act</text>
+  </g>
+</svg>
