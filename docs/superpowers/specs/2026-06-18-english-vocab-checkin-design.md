@@ -34,7 +34,7 @@
 ## 架构与组件
 
 ### 1. 词库数据（一次性构建）
-- 脚本 `scripts/build-vocab.mjs`：下载/读取 ECDICT 源 CSV，筛选 tag 含 `cet4`/`cet6`/`ky`，并纳入高频词；每条只保留 `{ word, phonetic, translation }`。
+- 脚本 `scripts/build-vocab.mjs`：下载/读取 ECDICT 源 CSV，筛选 tag 含 `cet4`/`cet6`/`ky`，并纳入高频词（高频以 ECDICT 的 `frq` 列界定，`frq` 越小越高频，取阈值内的词；阈值在计划阶段定具体数值）；每条只保留 `{ word, phonetic, translation }`。
 - 输出 `public/checkin/vocab.json`（预计约 8000 词，1–2MB）。
 - 脚本可重跑以更新词库。
 
