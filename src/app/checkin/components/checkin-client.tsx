@@ -202,6 +202,21 @@ export default function CheckinClient() {
 		}
 	}
 
+	// 单词任务打卡：把当天 20 词 markdown 作为总结，走 submitJournal 单次提交
+	const handleVocabCheckin = async (ev: CheckinEvent, summaryMarkdown: string) => {
+		if (!requireAuth()) return
+		const already = records.some(r => r.eventId === ev.id && r.date === today)
+		const nextRecords = already ? records : [...records, { eventId: ev.id, date: today }]
+		if (!summaryMarkdown.trim()) {
+			// 词库未就绪等异常：退化为普通打卡
+			setRecords(nextRecords)
+			fireConfetti(ev.color)
+			setHasUnsavedChanges(true)
+			return
+		}
+		await submitJournal(ev, summaryMarkdown, nextRecords)
+	}
+
 	const handleJournalConfirm = async (summary: string) => {
 		const ev = journalEvent
 		if (!ev || !requireAuth()) return
@@ -406,6 +421,7 @@ export default function CheckinClient() {
 								onAppendJournal={ev.journal ? () => openAppendJournal(ev) : undefined}
 								onEdit={() => openEdit(ev)}
 								onDelete={() => handleDelete(ev.id)}
+								onVocabCheckin={ev.vocab ? summary => handleVocabCheckin(ev, summary) : undefined}
 							/>
 						))}
 					</AnimatePresence>
