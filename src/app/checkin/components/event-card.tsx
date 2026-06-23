@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import type { CheckinEvent, CheckinRecord } from '../services/checkin-data-service'
+import { pickDailyWords, formatVocabSummary, type VocabWord } from '../services/daily-words'
 
 const CARD_HEIGHT = 300
 
@@ -55,7 +56,8 @@ export default function EventCard({
 	onToggleCheck,
 	onAppendJournal,
 	onEdit,
-	onDelete
+	onDelete,
+	onVocabCheckin
 }: {
 	event: CheckinEvent
 	records: CheckinRecord[]
@@ -66,9 +68,32 @@ export default function EventCard({
 	onAppendJournal?: () => void
 	onEdit: () => void
 	onDelete: () => void
+	onVocabCheckin?: (summaryMarkdown: string) => void
 }) {
 	const [flipped, setFlipped] = useState(false)
 	const [confirmDelete, setConfirmDelete] = useState(false)
+
+	const [vocabWords, setVocabWords] = useState<VocabWord[]>([])
+	const [vocabError, setVocabError] = useState(false)
+
+	useEffect(() => {
+		if (!event.vocab) return
+		let alive = true
+		fetch('/checkin/vocab.json', { cache: 'force-cache' })
+			.then(r => {
+				if (!r.ok) throw new Error('vocab load failed')
+				return r.json()
+			})
+			.then((all: VocabWord[]) => {
+				if (alive) setVocabWords(pickDailyWords(today, all))
+			})
+			.catch(() => {
+				if (alive) setVocabError(true)
+			})
+		return () => {
+			alive = false
+		}
+	}, [event.vocab, today])
 
 	const ended = !!event.end && event.end < today
 	const streak = useMemo(() => streakFor(records, event.id, today), [records, event.id, today])
@@ -160,19 +185,29 @@ export default function EventCard({
 						</div>
 					</div>
 
-					<button
-						type='button'
-						disabled={disabled}
-						onClick={onToggleCheck}
-						aria-pressed={checkedToday}
-						className='mt-4 rounded-full px-7 py-2.5 text-sm font-semibold shadow-md transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
-						style={{
-							background: checkedToday ? '#e5e7eb' : event.color,
-							color: checkedToday ? '#6b7280' : 'white',
-							boxShadow: checkedToday ? undefined : `0 6px 16px ${event.color}55`
-						}}>
-						{ended ? '打卡截止' : checkedToday ? '✓ 今日已打 · 取消' : '今日打卡'}
-					</button>
+					{event.vocab && !checkedToday && !ended ? (
+						<button
+							type='button'
+							onClick={() => setFlipped(true)}
+							className='mt-4 rounded-full px-7 py-2.5 text-sm font-semibold text-white shadow-md transition active:scale-95'
+							style={{ background: event.color, boxShadow: `0 6px 16px ${event.color}55` }}>
+							查看今日单词
+						</button>
+					) : (
+						<button
+							type='button'
+							disabled={disabled}
+							onClick={onToggleCheck}
+							aria-pressed={checkedToday}
+							className='mt-4 rounded-full px-7 py-2.5 text-sm font-semibold shadow-md transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
+							style={{
+								background: checkedToday ? '#e5e7eb' : event.color,
+								color: checkedToday ? '#6b7280' : 'white',
+								boxShadow: checkedToday ? undefined : `0 6px 16px ${event.color}55`
+							}}>
+							{ended ? '打卡截止' : checkedToday ? '✓ 今日已打 · 取消' : '今日打卡'}
+						</button>
+					)}
 
 					{event.description && (
 						<p className='mt-3 line-clamp-2 text-[11px] text-secondary whitespace-pre-line'>{event.description}</p>
@@ -206,7 +241,28 @@ export default function EventCard({
 						)}
 					</div>
 
-					<div className='min-h-0 flex-1 overflow-y-auto rounded-xl bg-white/40 p-3'>
+					{event.vocab && (
+						<div className='mb-3 min-h-0 flex-1 overflow-y-auto rounded-xl bg-white/40 p-3'>
+							<div className='mb-2 text-[11px] font-medium text-primary'>今日单词 · {vocabWords.length}</div>
+							{vocabError ? (
+								<div className='text-[11px] text-red-500/80'>词库加载失败</div>
+							) : vocabWords.length === 0 ? (
+								<div className='text-[11px] text-secondary/60'>加载中…</div>
+							) : (
+								<ol className='space-y-1.5 text-[11px] text-secondary'>
+									{vocabWords.map((w, i) => (
+										<li key={w.word} className='leading-snug'>
+											<span className='font-semibold text-primary'>{i + 1}. {w.word}</span>
+											{w.phonetic && <span className='ml-1 text-secondary/70'>{w.phonetic}</span>}
+											<span className='ml-1'>{w.translation}</span>
+										</li>
+									))}
+								</ol>
+							)}
+						</div>
+					)}
+
+					<div className={`${event.vocab ? 'max-h-24' : 'min-h-0 flex-1'} overflow-y-auto rounded-xl bg-white/40 p-3`}>
 						<div className='mb-2 text-[11px] font-medium text-primary'>打卡记录 · {total}</div>
 						{history.length === 0 ? (
 							<div className='text-[11px] text-secondary/60'>暂无打卡记录</div>
@@ -228,6 +284,16 @@ export default function EventCard({
 							className='mt-3 w-full rounded-xl py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90'
 							style={{ background: event.color, boxShadow: `0 4px 12px ${event.color}44` }}>
 							✏️ 追加今日总结到博客
+						</button>
+					)}
+
+					{event.vocab && !checkedToday && (
+						<button
+							onClick={() => onVocabCheckin?.(formatVocabSummary(vocabWords))}
+							disabled={vocabWords.length === 0}
+							className='mt-3 w-full rounded-xl py-2 text-xs font-semibold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50'
+							style={{ background: event.color, boxShadow: `0 4px 12px ${event.color}44` }}>
+							✓ 打卡并记入博客
 						</button>
 					)}
 

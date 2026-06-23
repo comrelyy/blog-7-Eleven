@@ -26,6 +26,7 @@ export default function EventFormDialog({
 	const [color, setColor] = useState(DEFAULT_COLOR)
 	const [category, setCategory] = useState('')
 	const [journal, setJournal] = useState(false)
+	const [vocab, setVocab] = useState(false)
 	const [start, setStart] = useState('')
 	const [end, setEnd] = useState('')
 	const [description, setDescription] = useState('')
@@ -37,6 +38,7 @@ export default function EventFormDialog({
 		setColor(initial?.color ?? DEFAULT_COLOR)
 		setCategory(initial?.category ?? '')
 		setJournal(initial?.journal ?? false)
+		setVocab(initial?.vocab ?? false)
 		setStart(initial?.start ?? '')
 		setEnd(initial?.end ?? '')
 		setDescription(initial?.description ?? '')
@@ -56,6 +58,7 @@ export default function EventFormDialog({
 				color,
 				category: category.trim() || undefined,
 				journal: journal || undefined,
+				vocab: vocab || undefined,
 				start: start || undefined,
 				end: end || undefined,
 				description: description.trim() || undefined
@@ -152,6 +155,14 @@ export default function EventFormDialog({
 							<span className='font-medium text-primary'>打卡时写学习总结</span>
 							<br />
 							打卡时弹出输入框，内容会追加到当月博客（标题如 2026-05）
+						</span>
+					</label>
+					<label className='flex cursor-pointer items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50/60 px-3 py-2.5'>
+						<input type='checkbox' checked={vocab} onChange={e => setVocab(e.target.checked)} className='mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-brand' />
+						<span className='text-xs text-secondary'>
+							<span className='font-medium text-primary'>每日单词任务</span>
+							<br />
+							每天生成 20 个单词（词/音标/中文），打卡时追加到当月博客
 						</span>
 					</label>
 				</div>
