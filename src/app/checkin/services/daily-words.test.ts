@@ -40,3 +40,8 @@ test('formatVocabSummary 生成有序列表', () => {
 	const md = formatVocabSummary([{ word: 'abandon', phonetic: '/əˈbændən/', translation: 'vt. 放弃' }])
 	assert.equal(md, '1. **abandon** /əˈbændən/ vt. 放弃')
 })
+
+test('formatVocabSummary 音标为空时不留双空格', () => {
+	const md = formatVocabSummary([{ word: 'benefit', phonetic: '', translation: 'n. 利益' }])
+	assert.equal(md, '1. **benefit** n. 利益')
+})
