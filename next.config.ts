@@ -6,6 +6,13 @@ const nextConfig: NextConfig = {
 	reactStrictMode: false,
 	reactCompiler: true,
 	pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+	// Keep the 95MB of static assets in `public/` out of Serverless Function
+	// bundles. They are served as static CDN files regardless, so excluding
+	// them from output file tracing avoids Vercel's 250MB unzipped function
+	// limit (triggered by runtime fs/process.cwd() access in rss.xml/route.ts).
+	outputFileTracingExcludes: {
+		'*': ['public/**/*']
+	},
 	typescript: {
 		ignoreBuildErrors: true
 	},
