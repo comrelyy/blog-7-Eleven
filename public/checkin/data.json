@@ -30,7 +30,8 @@
       "color": "#35bfab",
       "category": "学习类",
       "journal": true,
-      "start": "2026-06-10"
+      "start": "2026-06-10",
+      "vocab": true
     },
     {
       "id": "1780393125282",
