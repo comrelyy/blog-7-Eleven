@@ -1,3 +1,29 @@
+### 2026-06-24
+
+***英语学习***
+1. **taboo** tә'bu: n. 禁忌, 禁止接近, 禁止使用; a. 禁忌的, 忌讳的; vt. 禁忌, 忌讳, 禁止
+2. **mule** mju:l n. 骡, 倔强之人
+3. **receive** ri'si:v vt. 收到, 接到, 得到, 接待, 迎接, 承受; vi. 收到, 会客; [计] 接收
+4. **American** ә'merikәn n. 美国人; a. 美国的, 美洲的
+5. **ampere** 'æmpєә n. 安培; [化] 安培
+6. **invitation** .invi'teiʃәn n. 邀请, 请柬, 引诱; [经] 邀请, 招待, 吸引
+7. **heighten** 'haitn vt. 增高, 提高, 加强; vi. 升高, 变大
+8. **possibility** .pɒsә'biliti n. 可能性, 可能的事; [法] 可能性, 可能发生的事, 不确定权
+9. **sensor** 'sensә n. 传感器; [计] 检测器
+10. **atomic** ә'tɒmik a. 原子的, 原子能的; [医] 原子的
+11. **thick** θik a. 厚的, 粗壮的, 浓的, 迟钝的, 浑浊的, 多雾的, 过分的, 口齿不清的; adv. 厚地, 密地, 浓浓地; n. 最浓处, 最厚处, 最密集处; [计] 暗, 粗线
+12. **efficient** i'fiʃәnt a. 有效率的, 能干的
+13. **habitual** hә'hitʃuәl a. 习惯的, 惯常的, 平常的; [法] 习惯的, 以习惯为常业的, 惯常的
+14. **temporarily** 'tempәrәrәli adv. 暂时, 一时, 临时
+15. **middle** 'midl n. 中央, 中间, 腰部; a. 中央的, 中庸的, 中间的
+16. **expansion** ik'spænʃәn n. 扩充, 开展, 膨胀; [计] 扩展
+17. **statistics** stә'tistiks n. 统计学, 统计资料; [计] 统计信息
+18. **sibling** 'sibliŋ n. 兄弟, 同胞; [医] 同胞(兄弟姐妹)
+19. **revive** ri'vaiv vt. 使苏醒, 使复兴, 使振奋, 回想起, 重播; vi. 苏醒, 复活, 复兴, 恢复精神
+20. **curiosity** .kjuәri'ɒsiti n. 好奇心, 新奇的事物, 珍品
+
+---
+
 ### 2026-06-23
 
 ***英语学习***
