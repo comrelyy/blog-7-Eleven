@@ -2,10 +2,14 @@ import { motion } from 'motion/react'
 import { useWriteStore } from '../stores/write-store'
 import { INIT_DELAY } from '@/consts'
 import { useRef } from 'react'
+import { PaperThemePicker } from '@/components/paper-theme-picker'
+import { usePaperTheme } from '@/hooks/use-paper-theme'
+import { getPaperThemeStyle } from '@/lib/paper-themes'
 
 const defaultText = 'text'
 
 export function WriteEditor() {
+	const { theme, pattern, appearance } = usePaperTheme()
 	const { form, updateForm, images, addFiles } = useWriteStore()
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -160,7 +164,11 @@ export function WriteEditor() {
 			initial={{ opacity: 0, scale: 0.8 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ delay: INIT_DELAY }}
-			className='bg-card flex min-h-[800px] w-[800px] flex-col rounded-[40px] border p-6 shadow max-sm:min-h-[500px] max-sm:w-full max-sm:rounded-3xl max-sm:p-4'>
+			data-paper-theme={theme}
+			data-paper-pattern={pattern}
+			style={getPaperThemeStyle(theme, pattern, appearance)}
+			className='paper-scope paper-sheet bg-card flex min-h-[800px] w-[800px] flex-col rounded-[40px] border p-6 shadow max-sm:min-h-[500px] max-sm:w-full max-sm:rounded-3xl max-sm:p-4'>
+			<PaperThemePicker />
 			<div className='mb-3 flex gap-3 max-sm:flex-col max-sm:gap-2'>
 				<input
 					type='text'

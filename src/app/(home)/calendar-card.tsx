@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
@@ -13,13 +12,9 @@ import { DialogModal } from '@/components/dialog-modal'
 import DateActivityModal from './date-activity-modal'
 import DateActivityTooltip from './date-activity-tooltip'
 import { HomeDraggableLayer } from './home-draggable-layer'
-import { loadEmotionEventData, saveEmotionEventData, getDayEmotions, getMonthEmotionCounts, type EmotionEventData } from './services/emotion-event-service'
-import { EMOTION_ORDER, getEmotion } from './services/emotions'
-import { appendLearningLog } from '@/app/checkin/services/append-learning-log'
-import { useAuthStore } from '@/hooks/use-auth'
-import EmotionJournalDialog from './emotion-journal-dialog'
-import { Zap } from 'lucide-react'
-
+import { loadEmotionEventData, getDayEmotions, type EmotionEventData } from './services/emotion-event-service'
+import EmotionLineCardDialog from './emotion-line-card-dialog'
+import { MessageCircle } from 'lucide-react'
 
 dayjs.locale('zh-cn')
 
@@ -46,61 +41,11 @@ export default function CalendarCard() {
 	const [showModal, setShowModal] = useState(false)
 	const [hoveredDate, setHoveredDate] = useState<string | null>(null)
 	const [emotionEvents, setEmotionEvents] = useState<EmotionEventData>({})
-	const [emotionSaving, setEmotionSaving] = useState(false)
-	const [journalOpen, setJournalOpen] = useState(false)
-	const { isAuth } = useAuthStore()
-	const todayKey = now.format('YYYY-MM-DD')
-
-	const monthEmotionCounts = useMemo(() => getMonthEmotionCounts(emotionEvents, currentMonth.format('YYYY-MM-DD')), [emotionEvents, currentMonth])
-	const monthCount = useMemo(() => Object.values(monthEmotionCounts).reduce((a, b) => a + b, 0), [monthEmotionCounts])
-	// 本月翻涌/沉静堆叠成彩条，按枚举顺序排列
-	const segments = EMOTION_ORDER.map(key => ({ def: getEmotion(key), count: monthEmotionCounts[key] || 0 })).filter(s => s.count > 0)
-	const lostCount = monthEmotionCounts['lost'] || 0
-	const ctrlCount = monthEmotionCounts['controlled'] || 0
+	const [lineCardOpen, setLineCardOpen] = useState(false)
 
 	useEffect(() => {
 		void loadEmotionEventData().then(setEmotionEvents)
 	}, [])
-
-	const handleOpenJournal = () => {
-		if (!isAuth) {
-			toast.error('请先导入密钥')
-			return
-		}
-		setJournalOpen(true)
-	}
-
-	const handleEmotionConfirm = async (emotion: string, text: string) => {
-		if (emotionSaving || !emotion) return
-		const trimmed = text.trim()
-		const next: EmotionEventData = {
-			...emotionEvents,
-			[todayKey]: [...(emotionEvents[todayKey] ?? []), { emotion, time: new Date().toISOString() }]
-		}
-		setEmotionEvents(next)
-		setEmotionSaving(true)
-		try {
-			if (trimmed) {
-				// 心境数据 + 博客追加合并为单次 commit
-				const emotionJson = JSON.stringify(next, null, 2)
-				await appendLearningLog({
-					eventName: `心境 · ${getEmotion(emotion).label}`,
-					summary: trimmed,
-					date: todayKey,
-					extraFiles: [{ path: 'public/emotion-events/data.json', content: emotionJson }]
-				})
-			} else {
-				await saveEmotionEventData(next)
-			}
-			setJournalOpen(false)
-		} catch (error: any) {
-			console.error(error)
-			toast.error(error?.message || '记录失败')
-			setEmotionEvents(emotionEvents)
-		} finally {
-			setEmotionSaving(false)
-		}
-	}
 
 	// 切换到上个月
 	const handlePrevMonth = () => {
@@ -151,22 +96,27 @@ export default function CalendarCard() {
 					</>
 				)}
 
-				<div className="flex items-center justify-between">
-					<button
-						onClick={handlePrevMonth}
-						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
-					>
+				<div className='flex items-center justify-between'>
+					<button onClick={handlePrevMonth} className='text-secondary hover:text-brand px-2 text-lg font-bold transition-colors'>
 						&lt;
 					</button>
-					<h3 className='text-secondary text-sm'>
+					<h3 className='text-secondary min-w-0 truncate text-sm'>
 						{currentMonth.format('YYYY/M/D')} {currentMonth.format('ddd')}
 					</h3>
-					<button
-						onClick={handleNextMonth}
-						className="text-secondary text-lg font-bold px-2 hover:text-brand transition-colors"
-					>
-						&gt;
-					</button>
+					<div className='flex shrink-0 items-center gap-1'>
+						<button
+							type='button'
+							onClick={() => setLineCardOpen(true)}
+							aria-label='打开情绪台词卡'
+							title='情绪台词卡'
+							className='text-secondary hover:text-brand focus-visible:outline-brand inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2'>
+							<MessageCircle size={12} aria-hidden='true' />
+							{styles.width >= 300 && <span>情绪台词卡</span>}
+						</button>
+						<button onClick={handleNextMonth} className='text-secondary hover:text-brand px-2 text-lg font-bold transition-colors'>
+							&gt;
+						</button>
+					</div>
 				</div>
 				<ul className={cn('text-secondary mt-3 grid h-[206px] flex-1 grid-cols-7 gap-2 text-sm', (styles.height < 240 || styles.width < 240) && 'text-xs')}>
 					{new Array(7).fill(0).map((_, index) => {
@@ -193,7 +143,7 @@ export default function CalendarCard() {
 								onMouseEnter={() => handleDateHover(day)}
 								onMouseLeave={handleDateLeave}
 								className={cn(
-									'relative flex items-center justify-center rounded-lg cursor-pointer transition-all hover:bg-gray-100',
+									'relative flex cursor-pointer items-center justify-center rounded-lg transition-all hover:bg-gray-100',
 									isCurrentDay && 'bg-linear border font-medium'
 								)}>
 								{day}
@@ -202,47 +152,13 @@ export default function CalendarCard() {
 						)
 					})}
 				</ul>
-				<button
-					onClick={handleOpenJournal}
-					disabled={emotionSaving}
-					title={`本月翻涌 ${lostCount} · 沉静 ${ctrlCount}（点击记录这次）`}
-					className='mt-3 flex w-full items-center gap-2 disabled:opacity-60'>
-					<span className='inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-secondary transition-colors hover:bg-gray-100'>
-						<Zap className='h-3.5 w-3.5' />
-						<span>心境</span>
-					</span>
-					<div className='flex h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100'>
-						{segments.map(s => (
-							<div
-								key={s.def.key}
-								title={`${s.def.label} ${s.count} 次`}
-								className='h-full transition-all'
-								style={{ width: `${(s.count / monthCount) * 100}%`, background: s.def.color }}
-							/>
-						))}
-					</div>
-					<span className='whitespace-nowrap text-xs text-secondary'>
-					翻涌 <span className='font-medium text-red-500'>{lostCount}</span> · 沉静 <span className='font-medium text-emerald-500'>{ctrlCount}</span>
-				</span>
-				</button>
 			</Card>
 
-
-
-
 			<DialogModal open={showModal} onClose={handleCloseModal}>
-				{selectedDate && (
-					<DateActivityModal date={selectedDate} emotions={getDayEmotions(emotionEvents, selectedDate)} onClose={handleCloseModal} />
-				)}
+				{selectedDate && <DateActivityModal date={selectedDate} emotions={getDayEmotions(emotionEvents, selectedDate)} onClose={handleCloseModal} />}
 			</DialogModal>
 
-			<EmotionJournalDialog
-				open={journalOpen}
-				date={todayKey}
-				submitting={emotionSaving}
-				onClose={() => setJournalOpen(false)}
-				onConfirm={handleEmotionConfirm}
-			/>
+			<EmotionLineCardDialog open={lineCardOpen} onClose={() => setLineCardOpen(false)} />
 		</HomeDraggableLayer>
 	)
 }

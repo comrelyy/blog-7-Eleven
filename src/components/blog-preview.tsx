@@ -6,6 +6,9 @@ import { useMarkdownRender } from '@/hooks/use-markdown-render'
 import { useSize } from '@/hooks/use-size'
 import { BlogSidebar } from '@/components/blog-sidebar'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
+import { PaperThemePicker } from '@/components/paper-theme-picker'
+import { usePaperTheme } from '@/hooks/use-paper-theme'
+import { getPaperThemeStyle } from '@/lib/paper-themes'
 
 type BlogPreviewProps = {
 	markdown: string
@@ -19,6 +22,7 @@ type BlogPreviewProps = {
 }
 
 export function BlogPreview({ markdown, title, tags, date, summary, cover, slug, images }: BlogPreviewProps) {
+	const { theme, pattern, appearance } = usePaperTheme()
 	const { maxSM: isMobile } = useSize()
 	const { content, toc, loading } = useMarkdownRender(markdown)
 	const { siteContent } = useConfigStore()
@@ -29,12 +33,17 @@ export function BlogPreview({ markdown, title, tags, date, summary, cover, slug,
 	}
 
 	return (
-		<div className='mx-auto flex max-w-[1140px] justify-center gap-6 px-6 pt-28 pb-12 max-sm:px-0'>
+		<div
+			data-paper-theme={theme}
+			data-paper-pattern={pattern}
+			style={getPaperThemeStyle(theme, pattern, appearance)}
+			className='paper-scope mx-auto flex max-w-[1140px] justify-center gap-6 px-6 pt-28 pb-12 max-sm:px-0'>
 			<motion.article
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ delay: INIT_DELAY }}
-				className='card bg-article static flex-1 overflow-auto rounded-xl p-8'>
+				className='paper-sheet card bg-article static flex-1 overflow-auto rounded-xl p-8'>
+				<PaperThemePicker />
 				<div>
 					<div className='text-center text-2xl font-semibold'>{title}</div>
 

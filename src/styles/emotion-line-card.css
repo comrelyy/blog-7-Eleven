@@ -1,0 +1,486 @@
+.emotion-line-card {
+	--line-card-bg: #faf9f6;
+	--line-card-ink: #2c2c2a;
+	--line-card-muted: #76736b;
+	--line-card-border: #00000017;
+	--line-card-teal: #0f6e56;
+	width: min(560px, calc(100vw - 32px));
+	max-height: min(90dvh, 900px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+	border: 1px solid var(--line-card-border);
+	border-radius: 22px;
+	background: var(--line-card-bg);
+	color: var(--line-card-ink);
+	font-size: 16px;
+	line-height: 1.6;
+	box-shadow: 0 24px 80px #0000001a;
+}
+
+.emotion-line-card button:focus-visible,
+.emotion-line-card input:focus-visible {
+	outline: 2px solid var(--line-card-teal);
+	outline-offset: 3px;
+}
+
+.emotion-line-header {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 25px 24px 20px;
+	background: var(--line-card-bg);
+}
+
+.emotion-line-header h2 {
+	margin: 0 0 6px;
+	font-size: 24px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+
+.emotion-line-header p {
+	font-size: 14px;
+	color: #5f5e5a;
+}
+
+.emotion-line-close {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	color: var(--line-card-muted);
+}
+
+.emotion-line-close:hover {
+	background: #f1efe8;
+}
+.emotion-line-content {
+	padding: 0 24px 28px;
+}
+
+.emotion-line-progress {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-bottom: 22px;
+	padding: 16px 18px;
+	border: 1px solid var(--line-card-border);
+	border-radius: 14px;
+	background: #fff;
+}
+
+.emotion-line-number {
+	font-size: 22px;
+	font-weight: 600;
+	color: var(--line-card-teal);
+	white-space: nowrap;
+}
+.emotion-line-number > span {
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--line-card-muted);
+}
+.emotion-line-bar {
+	flex: 1;
+	height: 6px;
+	overflow: hidden;
+	border-radius: 99px;
+	background: #f1efe8;
+}
+.emotion-line-bar > span {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--line-card-teal);
+	transition: width 0.3s ease;
+}
+.emotion-line-trigger {
+	margin-bottom: 28px;
+	padding: 16px 18px;
+	border: 1px solid #0f6e562e;
+	border-radius: 14px;
+	background: #e1f5ee;
+}
+.emotion-line-trigger label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 13px;
+	color: var(--line-card-teal);
+	font-weight: 600;
+	letter-spacing: 0.3px;
+}
+.emotion-line-trigger input {
+	width: 100%;
+	border: 0;
+	border-bottom: 1px dashed #0f6e5659;
+	padding: 6px 0;
+	background: transparent;
+	color: var(--line-card-ink);
+	font-size: 15px;
+}
+.emotion-line-trigger input::placeholder {
+	color: #578272;
+}
+.emotion-line-trigger p {
+	margin-top: 9px;
+	color: #5f5e5a;
+	font-size: 12.5px;
+	line-height: 1.5;
+}
+.emotion-line-group {
+	margin-bottom: 28px;
+}
+.emotion-line-section-head {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 12px;
+	padding-left: 2px;
+}
+.emotion-line-section-head h3 {
+	font-size: 14px;
+	font-weight: 600;
+}
+.emotion-line-section-head > span {
+	border: 1px solid var(--line-card-border);
+	border-radius: 99px;
+	padding: 1px 8px;
+	font-size: 11.5px;
+	color: var(--line-card-muted);
+}
+.emotion-line-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin-bottom: 10px;
+	padding: 13px 15px 13px 9px;
+	border: 1px solid var(--line-card-border);
+	border-radius: 14px;
+	background: #fff;
+	transition:
+		background 0.2s,
+		border-color 0.2s;
+}
+.emotion-line-item.is-done {
+	background: #fbfcfb;
+}
+.emotion-line-toggle {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 36px;
+	height: 36px;
+	cursor: pointer;
+}
+.emotion-line-toggle input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+}
+.emotion-line-toggle > span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border: 1.5px solid #cfccc2;
+	border-radius: 7px;
+	color: #fff;
+	pointer-events: none;
+}
+.emotion-line-toggle input:checked + span {
+	background: var(--line-card-teal);
+	border-color: var(--line-card-teal);
+}
+.emotion-line-toggle input:focus-visible + span {
+	outline: 2px solid var(--line-card-teal);
+	outline-offset: 3px;
+}
+.emotion-line-copy {
+	position: relative;
+	flex: 1;
+	min-width: 0;
+	padding: 2px 18px 2px 0;
+	text-align: left;
+	line-height: inherit;
+	user-select: text;
+	width: 100%;
+}
+
+.emotion-line-body {
+	flex: 1;
+	min-width: 0;
+}
+
+.emotion-practice-record,
+.emotion-practice-legacy {
+	margin-top: 12px;
+	padding-top: 11px;
+	border-top: 1px solid var(--line-card-border);
+	font-size: 12px;
+}
+
+.emotion-practice-record-head,
+.emotion-practice-legacy {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.emotion-practice-record time {
+	font-variant-numeric: tabular-nums;
+	font-size: 11px;
+	color: var(--line-card-teal);
+}
+
+.emotion-practice-record p {
+	margin-top: 5px;
+	font-size: 13px;
+	color: #5f5e5a;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.emotion-practice-record-head button,
+.emotion-practice-legacy button {
+	flex-shrink: 0;
+	padding: 3px 0;
+	font-size: 11px;
+	color: var(--line-card-teal);
+}
+
+.emotion-practice-legacy {
+	flex-wrap: wrap;
+	color: var(--line-card-muted);
+}
+
+.emotion-practice-history {
+	margin-top: 10px;
+	color: var(--line-card-muted);
+}
+
+.emotion-practice-history summary {
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.emotion-practice-history ol {
+	margin-top: 9px;
+	padding-left: 12px;
+	border-left: 1px solid var(--line-card-border);
+}
+
+.emotion-practice-history li + li {
+	margin-top: 10px;
+}
+
+.emotion-practice-form {
+	margin-top: 12px;
+	padding: 14px;
+	border: 1px solid #0f6e562e;
+	border-radius: 10px;
+	background: #f3f8f5;
+}
+
+.emotion-practice-form h4 {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--line-card-teal);
+}
+
+.emotion-practice-form label {
+	display: block;
+	margin-top: 12px;
+	font-size: 12px;
+	color: #5f5e5a;
+}
+
+.emotion-practice-form input,
+.emotion-practice-form textarea {
+	display: block;
+	width: 100%;
+	min-width: 0;
+	margin-top: 5px;
+	padding: 8px 10px;
+	border: 1px solid var(--line-card-border);
+	border-radius: 7px;
+	background: #fff;
+	color: var(--line-card-ink);
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.emotion-practice-form textarea {
+	resize: vertical;
+}
+
+.emotion-practice-form textarea::placeholder {
+	color: var(--line-card-muted);
+}
+
+.emotion-practice-error {
+	margin-top: 8px;
+	font-size: 12px;
+	color: #993c1d;
+}
+
+.emotion-practice-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 12px;
+}
+
+.emotion-practice-actions button {
+	padding: 7px 10px;
+	border-radius: 7px;
+	font-size: 12px;
+	color: var(--line-card-muted);
+}
+
+.emotion-practice-actions button[type='submit'] {
+	background: var(--line-card-teal);
+	color: #fff;
+}
+.emotion-line-text {
+	display: block;
+	font-size: 16px;
+	line-height: 1.5;
+	color: var(--line-card-ink);
+	overflow-wrap: anywhere;
+}
+.emotion-line-item.is-done .emotion-line-text {
+	color: var(--line-card-muted);
+	text-decoration: line-through;
+	text-decoration-color: #9a989080;
+}
+.emotion-line-when {
+	display: block;
+	margin-top: 6px;
+	color: var(--line-card-muted);
+	font-size: 12.5px;
+}
+.emotion-line-level {
+	display: inline-block;
+	margin-right: 6px;
+	padding: 1px 7px;
+	border-radius: 5px;
+	font-size: 11px;
+	font-weight: 500;
+	vertical-align: 1px;
+}
+.emotion-line-level.level-1 {
+	background: #f1efe8;
+	color: #5f5e5a;
+}
+.emotion-line-level.level-2 {
+	background: #faeeda;
+	color: #854f0b;
+}
+.emotion-line-level.level-3 {
+	background: #faece7;
+	color: #993c1d;
+}
+.emotion-line-copy-icon {
+	position: absolute;
+	right: 0;
+	top: 5px;
+	color: var(--line-card-teal);
+	opacity: 0;
+}
+.emotion-line-copy:hover .emotion-line-copy-icon,
+.emotion-line-copy:focus-visible .emotion-line-copy-icon {
+	opacity: 1;
+}
+.emotion-line-copy:hover .emotion-line-text {
+	color: var(--line-card-teal);
+}
+.emotion-line-rules {
+	margin-top: 32px;
+	padding: 18px 18px 6px;
+	border: 1px solid var(--line-card-border);
+	border-radius: 14px;
+	background: #fff;
+}
+.emotion-line-rules h3 {
+	margin-bottom: 12px;
+	font-size: 14px;
+	font-weight: 600;
+}
+.emotion-line-rules ol {
+	list-style: decimal;
+	padding-left: 18px;
+}
+.emotion-line-rules li {
+	margin-bottom: 11px;
+	font-size: 13.5px;
+	color: #5f5e5a;
+	line-height: 1.55;
+}
+.emotion-line-rules b {
+	color: var(--line-card-ink);
+	font-weight: 600;
+}
+.emotion-line-reset {
+	display: block;
+	margin: 26px auto 0;
+	border: 1px solid var(--line-card-border);
+	border-radius: 99px;
+	padding: 9px 20px;
+	color: var(--line-card-muted);
+	font-size: 13px;
+}
+.emotion-line-reset:hover {
+	background: #f1efe8;
+}
+.emotion-line-content footer {
+	margin-top: 28px;
+	color: var(--line-card-muted);
+	font-size: 12px;
+	text-align: center;
+}
+.emotion-line-storage-note {
+	margin-top: 10px;
+	margin-bottom: 14px;
+	font-size: 12px;
+	text-align: center;
+	color: #993c1d;
+}
+@media (max-width: 480px) {
+	.emotion-practice-form input,
+	.emotion-practice-form textarea {
+		font-size: 16px;
+	}
+	.emotion-line-header {
+		padding: 20px 18px 16px;
+	}
+	.emotion-line-header h2 {
+		font-size: 22px;
+	}
+	.emotion-line-content {
+		padding: 0 18px 24px;
+	}
+	.emotion-line-text {
+		font-size: 15px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.emotion-line-card * {
+		transition: none;
+	}
+}
